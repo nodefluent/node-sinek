@@ -1,0 +1,40 @@
+{
+  "name": "sinek",
+  "version": "1.1.0",
+  "description": "kafka client (consumer + producer); polite out of the box",
+  "main": "index.js",
+  "scripts": {
+    "test": "istanbul cover _mocha --recursive -- -R spec test && istanbul check-coverage --statements 30"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krystianity/node-sinek.git"
+  },
+  "keywords": [
+    "polite",
+    "kafka",
+    "client",
+    "sinek",
+    "simon",
+    "nice",
+    "easy"
+  ],
+  "author": "Christian Fröhlingsdorf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/krystianity/node-sinek/issues"
+  },
+  "homepage": "https://github.com/krystianity/node-sinek#readme",
+  "dependencies": {
+    "async": "~2.1.5",
+    "bluebird": "~3.5.0",
+    "kafka-node": "~1.5.0"
+  },
+  "devDependencies": {
+    "expect.js": "~0.3.1",
+    "mocha": "~3.2.0",
+    "istanbul": "~0.4.2",
+    "uuid": "*",
+    "sinon": "*"
+  }
+}
