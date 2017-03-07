@@ -4,7 +4,7 @@
   "description": "kafka client (consumer + producer); polite out of the box",
   "main": "index.js",
   "scripts": {
-    "test": "istanbul cover _mocha --recursive -- -R spec test && istanbul check-coverage --statements 30"
+    "test": "istanbul cover _mocha -- -R spec test/int/* && istanbul check-coverage --statements 75"
   },
   "repository": {
     "type": "git",

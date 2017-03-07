@@ -1,17 +1,18 @@
 const expect = require("expect.js");
-const uuid = require("uuid");
 
 const {Kafka, Drainer, Publisher} = require("./../../index.js");
 
-/*
+
+const uuid = require("uuid");
 const TEST_TOPIC = "sinek-test-topic-" + uuid.v4();
 const CONSUMER_NAME = "sinek-consumer-" + uuid.v4();
 const PRODUCER_NAME = "sinek-producer-" + uuid.v4();
-*/
 
+/*
 const TEST_TOPIC = "sinek-test-topic-1";
 const CONSUMER_NAME = "sinek-consumer-1";
 const PRODUCER_NAME = "sinek-producer-1";
+*/
 
 const DUMMY_MESSAGE = {
     a: "funny",
@@ -19,10 +20,10 @@ const DUMMY_MESSAGE = {
     that: "is super cool"
 };
 
-const MESSAGE_COUNT = 20;
+const MESSAGE_COUNT = 150;
 
 const CONSUMER_TEST_LOGGER = {
-    debug: msg => console.log("consumer: " + msg),
+    debug: msg => {}, //silence
     info: msg => console.log("consumer: " + msg),
     warn: msg => console.log("consumer: " + msg),
     error: msg => console.log("consumer: " + msg)
@@ -36,12 +37,16 @@ const PRODUCER_TEST_LOGGER = {
 };
 
 const CON_STR = "localhost:2181";
+const DRAIN_TIMEOUT = 35000;
 
 describe("Sinek INT", function(){
 
     let consumer = null;
     let producer = null;
     const consumedMessages = [];
+    let lastConsumedSize = 0;
+    let drainDone = false;
+    let firstDrainFired = false;
 
     before(function(done){
         done();
@@ -69,13 +74,28 @@ describe("Sinek INT", function(){
             producer = new Publisher(kp);
             done();
         });
+
+        kp.on("error", err => console.log("producer error: " + err));
+    });
+
+    it("should be able to start the a consumer", function(done){
+
+        const kc = new Kafka(CON_STR, CONSUMER_TEST_LOGGER);
+        kc.becomeConsumer([TEST_TOPIC], CONSUMER_NAME);
+
+        kc.on("ready", () => {
+            consumer = new Drainer(kc, 1);
+            done();
+        });
+
+        kc.on("error", err => console.log("consumer error: " + err));
     });
 
     it("halt threshold", function(done){
         setTimeout(done, 500);
     });
 
-    xit("should be able to delete the topic if present", function(done){
+    it("should be able to delete the topic if present", function(done){
         consumer.removeTopics([TEST_TOPIC]).then(rt => {
             console.log(rt);
             done();
@@ -107,42 +127,81 @@ describe("Sinek INT", function(){
     });
 
     it("halt threshold", function(done){
-        setTimeout(done, 1900);
+        setTimeout(done, 200);
     });
 
-    it("should be able to start the a consumer", function(done){
-
-        const kc = new Kafka(CON_STR, CONSUMER_TEST_LOGGER);
-        kc.becomeConsumer([TEST_TOPIC], CONSUMER_NAME);
-
-        kc.on("ready", () => {
-            consumer = new Drainer(kc, 1);
-            consumer.drain((message, cb) => {
-                consumedMessages.push(message);
-                cb(null, true);
-            });
-            done();
+    it("should be able to drain messages from consumer", function(done){
+        consumer.drain((message, _done) => {
+            consumedMessages.push(message);
+            _done();
         });
+        done();
     });
 
-    xit("should be able to enforce offset", function(done){
+    it("should be able to enforce offset", function(done){
         consumer.resetConsumer([TEST_TOPIC]).then(_ => {
             done();
         });
     });
 
     it("halt threshold", function(done){
-        setTimeout(done, 1900);
+        setTimeout(done, 200);
     });
 
     it("should have consumed a decent amount of messages", function(done){
         console.log(consumedMessages.length);
 
-        //dependingon your zk and broker configuration this will not work
+        //depending your zk and broker configuration this will not work
         //because you have not received any messages yet
-        //expect(consumedMessages.length).to.be.equal(MESSAGE_COUNT);
-        //expect(consumedMessages[0].msg).to.be.equal(DUMMY_MESSAGE.msg);
+        expect(consumedMessages.length >= MESSAGE_COUNT).to.be.equal(true);
+        lastConsumedSize = consumedMessages.length;
+        expect(consumedMessages[0].msg).to.be.equal(DUMMY_MESSAGE.msg);
         done();
     });
 
+    it("should be able to await stall of messages", function(done){
+        consumer.stopDrain();
+        consumer.drainOnce((message, _done) => {
+            consumedMessages.push(message);
+            _done();
+        }, 760, DRAIN_TIMEOUT).then(r => {
+            console.log(r);
+            drainDone = true;
+        });
+
+        //listen once for first drain message
+        let fdm = null;
+        fdm = function(){
+            consumer.removeListener("first-drain-message", fdm);
+            firstDrainFired = true;
+        };
+        consumer.on("first-drain-message", fdm);
+        done();
+    });
+
+    it("should be able to enforce offset", function(done){
+        consumer.resetConsumer([TEST_TOPIC]).then(_ => {
+            done();
+        });
+    });
+
+    it("await drain done", function(done){
+        this.timeout(DRAIN_TIMEOUT);
+        let intv = null;
+        intv = setInterval(() => {
+            if(drainDone){
+                clearInterval(intv);
+                done();
+            }
+        }, 100);
+    });
+
+    it("should have drained messages until stall", function(done){
+        console.log(consumedMessages.length - lastConsumedSize);
+        expect(consumedMessages.length).not.to.be.equal(lastConsumedSize);
+        expect(drainDone).to.be.equal(true);
+        expect(firstDrainFired).to.be.equal(true);
+        console.log(consumedMessages[0], consumedMessages[100], consumedMessages[200], consumedMessages[250]);
+        done();
+    });
 });
