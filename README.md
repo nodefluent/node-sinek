@@ -91,6 +91,7 @@ kc.on("error", err => console.log("consumer error: " + err));
 ## hints
 
 ```javascript
+
 //interesting options for tweaking consumers
 const OPTIONS = {
     sessionTimeout: 12500,
@@ -102,4 +103,10 @@ const OPTIONS = {
     autoCommit: true,
     autoCommitIntervalMs: 5000
 };
+
+//remove and create topic api will require
+//a special broker configuration or these
+//will just result in nothing at all
+drainer.removeTopics([]).then(..)
+publisher.createTopics([]).then(..)
 ```
