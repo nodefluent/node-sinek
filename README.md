@@ -51,7 +51,7 @@ kp.on("ready", () => {
     producer = new Publisher(kp);
     
     producer.send()
-    producer.send(TEST_TOPIC, [])
+    producer.batch(TEST_TOPIC, [])
 });
 
 kp.on("error", err => console.log("producer error: " + err));

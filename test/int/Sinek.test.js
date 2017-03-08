@@ -155,7 +155,7 @@ describe("Sinek INT", function(){
         //because you have not received any messages yet
         expect(consumedMessages.length >= MESSAGE_COUNT).to.be.equal(true);
         lastConsumedSize = consumedMessages.length;
-        expect(consumedMessages[0].msg).to.be.equal(DUMMY_MESSAGE.msg);
+        expect(consumedMessages[0].value.msg).to.be.equal(DUMMY_MESSAGE.msg);
         done();
     });
 
