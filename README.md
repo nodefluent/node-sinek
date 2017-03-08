@@ -1,4 +1,4 @@
-<center><img src="sinek.png?raw=true" height="245" /></center><br/>
+<center><img src="https://cdn1.teamhellfall.de/contentdelivery/8642e870-7555-473a-b549-c520bd85bc51.0861a88f-28cf-42b6-88c7-f2942e64cc79.png?dim=165x125" /></center><br/>
 
 # node-sinek
 
@@ -90,9 +90,9 @@ kc.on("error", err => console.log("consumer error: " + err));
 
 ## hints
 
-```javascript
+- interesting options for tweaking consumers
 
-//interesting options for tweaking consumers
+```javascript
 const OPTIONS = {
     sessionTimeout: 12500,
     protocol: ["roundrobin"],
@@ -103,10 +103,20 @@ const OPTIONS = {
     autoCommit: true,
     autoCommitIntervalMs: 5000
 };
+```
 
-//remove and create topic api will require
-//a special broker configuration or these
-//will just result in nothing at all
+- remove and create topic api will require a special broker configuration
+or these will just result in nothing at all
+
+```javascript
 drainer.removeTopics([]).then(..)
 publisher.createTopics([]).then(..)
 ```
+
+- when using "Drainer" to consume and write upserts into a database
+that require ACID functionality and a build-up of models/message-payloads
+you must set the AsyncLimit of new Drainer(.., 1) to "1" or you will
+have trouble with data integrity
+
+- if your data is spread entity wise above partitions you can use the
+"PartitionDrainer" to drain multiple partitions at the same time

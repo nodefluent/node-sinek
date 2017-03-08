@@ -185,6 +185,14 @@ describe("Sinek INT", function(){
         });
     });
 
+    it("should be able to get stats", function(done){
+        setTimeout(() => {
+            console.log(consumer.getStats());
+            console.log(producer.getStats());
+            done();
+        }, 250);
+    });
+
     it("await drain done", function(done){
         this.timeout(DRAIN_TIMEOUT);
         let intv = null;
