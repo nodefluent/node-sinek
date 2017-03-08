@@ -121,7 +121,7 @@ describe("Sinek INT", function(){
 
     it("should be able to publish messages", function(done){
         populateQueue().then(_ => {
-            expect(producer.getProcessingStats().totalPublished).to.be.equal(MESSAGE_COUNT);
+            expect(producer.getStats().totalPublished).to.be.equal(MESSAGE_COUNT);
             done();
         });
     });
