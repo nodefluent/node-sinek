@@ -1,6 +1,6 @@
 const expect = require("expect.js");
 
-const {Kafka, Drainer, Publisher} = require("./../../index.js");
+const {Kafka, Drainer, Publisher, PartitionDrainer} = require("./../../index.js");
 
 
 const uuid = require("uuid");
@@ -23,7 +23,8 @@ const DUMMY_MESSAGE = {
 const MESSAGE_COUNT = 150;
 
 const CONSUMER_TEST_LOGGER = {
-    debug: msg => {}, //silence
+    debug: msg => console.log("consumer: " + msg),
+    //debug: msg => {}, //silence
     info: msg => console.log("consumer: " + msg),
     warn: msg => console.log("consumer: " + msg),
     error: msg => console.log("consumer: " + msg)
@@ -43,7 +44,7 @@ describe("Sinek INT", function(){
 
     let consumer = null;
     let producer = null;
-    const consumedMessages = [];
+    let consumedMessages = [];
     let lastConsumedSize = 0;
     let drainDone = false;
     let firstDrainFired = false;
@@ -159,8 +160,9 @@ describe("Sinek INT", function(){
         done();
     });
 
-    it("should be able to await stall of messages", function(done){
+    it("should be able to drainOnce for all messages", function(done){
         consumer.stopDrain();
+        consumer.DRAIN_INTV = 200; //speed up for testing
         consumer.drainOnce((message, _done) => {
             consumedMessages.push(message);
             _done();
@@ -207,6 +209,80 @@ describe("Sinek INT", function(){
     it("should have drained messages until stall", function(done){
         console.log(consumedMessages.length - lastConsumedSize);
         expect(consumedMessages.length).not.to.be.equal(lastConsumedSize);
+        expect(drainDone).to.be.equal(true);
+        expect(firstDrainFired).to.be.equal(true);
+        console.log(consumedMessages[0], consumedMessages[100], consumedMessages[200], consumedMessages[250]);
+        done();
+    });
+
+    it("should be able to close consumer", function(done){
+       setTimeout(() => {
+            consumer.close();
+            consumer = null;
+           done();
+       }, 300);
+    });
+
+    it("should be able to setup partition drainer", function(done){
+
+        //reset
+        consumedMessages = [];
+        firstDrainFired = false;
+        drainDone = false;
+
+        const kc = new Kafka(CON_STR, CONSUMER_TEST_LOGGER);
+        kc.becomeConsumer([TEST_TOPIC], CONSUMER_NAME);
+
+        kc.on("ready", () => {
+            consumer = new PartitionDrainer(kc, 1);
+            done();
+        });
+
+        kc.on("error", err => console.log("consumer error: " + err));
+    });
+
+    it("should be able to enforce offset", function(done){
+        consumer.resetConsumer([TEST_TOPIC]).then(_ => {
+            done();
+        });
+    });
+
+    it("should be able to drainOnce again for all messages", function(done){
+
+        consumer.DRAIN_INTV = 400; //speed up for testing
+        consumer.drainOnce(TEST_TOPIC, (message, _done) => {
+            consumedMessages.push(message);
+            _done();
+        }, 700, DRAIN_TIMEOUT).then(r => {
+            console.log(r);
+            drainDone = true;
+        });
+
+        //listen once for first drain message
+        let fdm = null;
+        fdm = function(){
+            consumer.removeListener("first-drain-message", fdm);
+            firstDrainFired = true;
+        };
+        consumer.on("first-drain-message", fdm);
+        done();
+    });
+
+    it("await drain 2 done", function(done){
+        this.timeout(DRAIN_TIMEOUT);
+        let intv = null;
+        intv = setInterval(() => {
+            console.log(consumer.getStats());
+            if(drainDone){
+                clearInterval(intv);
+                done();
+            }
+        }, 500);
+    });
+
+    it("should have drained messages until stall 2", function(done){
+        console.log(consumedMessages.length);
+        expect(consumedMessages.length).not.to.be.equal(0);
         expect(drainDone).to.be.equal(true);
         expect(firstDrainFired).to.be.equal(true);
         console.log(consumedMessages[0], consumedMessages[100], consumedMessages[200], consumedMessages[250]);
