@@ -88,6 +88,39 @@ kc.on("ready", () => {
 kc.on("error", err => console.log("consumer error: " + err));
 ```
 
+## consumer (PartitionDrainer) [faster ~ runs a queue per topic partition]
+
+```javascript
+const kc = new Kafka(ZK_CON_STR, LOGGER);
+kc.becomeConsumer([TEST_TOPIC], GROUP_ID, OPTIONS);
+
+kc.on("ready", () => {
+    consumer = new PartitionDrainer(kc, 1); //1 = thread/worker/parallel count per partition
+    
+    //drain requires a topic-name and returns a promise 
+    consumer.drain(TEST_TOPIC, (message, done) => {
+        console.log(message);
+        done();
+    }).then(_ => ..).catch(e => console.log(e));
+    
+    consumer.stopDrain();
+    
+    //drainOnce requires a topic-name
+    consumer.drainOnce(TEST_TOPIC, (message, done) => {
+        console.log(message);
+        done();
+    }, DRAIN_THRESHOLD, DRAIN_TIMEOUT).then(r => {
+        console.log("drain done: " + r);
+    }).catch(e => {
+        console.log("drain timeout: " + e);
+    });
+    
+    consumer.resetConsumer([TEST_TOPIC]).then(_ => {});
+});
+
+kc.on("error", err => console.log("consumer error: " + err));
+```
+
 ## hints
 
 - interesting options for tweaking consumers
@@ -113,6 +146,10 @@ drainer.removeTopics([]).then(..)
 publisher.createTopics([]).then(..)
 ```
 
+- using the `.getStats()` functions on Drainer, Publisher or 
+PartitionDrainer you can get some valueable insights into whats
+currently going on in your client
+
 - when using "Drainer" to consume and write upserts into a database
 that require ACID functionality and a build-up of models/message-payloads
 you must set the AsyncLimit of new Drainer(.., 1) to "1" or you will
@@ -120,3 +157,5 @@ have trouble with data integrity
 
 - if your data is spread entity wise above partitions you can use the
 "PartitionDrainer" to drain multiple partitions at the same time
+
+- it is probably a good idea to spawn a Consumer per Topic
