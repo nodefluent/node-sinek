@@ -38,7 +38,7 @@ npm test
 # Usage
 
 ```javascript
-const {Kafka, Drainer, Publisher} = require("sinek");
+const {Kafka, Drainer, Publisher, PartitionDrainer} = require("sinek");
 ```
 
 ## producer (Publisher)

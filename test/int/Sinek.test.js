@@ -241,12 +241,6 @@ describe("Sinek INT", function(){
         kc.on("error", err => console.log("consumer error: " + err));
     });
 
-    it("should be able to enforce offset", function(done){
-        consumer.resetConsumer([TEST_TOPIC]).then(_ => {
-            done();
-        });
-    });
-
     it("should be able to drainOnce again for all messages", function(done){
 
         consumer.DRAIN_INTV = 400; //speed up for testing
@@ -270,9 +264,36 @@ describe("Sinek INT", function(){
 
     it("await drain 2 done", function(done){
         this.timeout(DRAIN_TIMEOUT);
+
+        const pubint = setInterval(() => {
+            consumer.raw.emit("message", {
+                topic: TEST_TOPIC,
+                partition: 0,
+                value: "{}"
+            });
+        }, 1);
+
+        consumer.raw.emit("message", {
+            topic: "other-topic",
+            partition: 0,
+            value: "{}"
+        });
+
+        consumer.raw.emit("message", {
+            topic: TEST_TOPIC,
+            partition: "bad-partition",
+            value: "{}"
+        });
+
+        setTimeout(() => {
+            clearTimeout(pubint);
+        }, MESSAGE_COUNT);
+
         let intv = null;
         intv = setInterval(() => {
+
             console.log(consumer.getStats());
+
             if(drainDone){
                 clearInterval(intv);
                 done();
