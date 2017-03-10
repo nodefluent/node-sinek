@@ -265,23 +265,34 @@ describe("Sinek INT", function(){
     it("await drain 2 done", function(done){
         this.timeout(DRAIN_TIMEOUT);
 
+        let offset = 0;
         const pubint = setInterval(() => {
+            offset++;
             consumer.raw.emit("message", {
                 topic: TEST_TOPIC,
                 partition: 0,
-                value: "{}"
+                value: "{}",
+                offset
             });
         }, 1);
 
         consumer.raw.emit("message", {
             topic: "other-topic",
             partition: 0,
-            value: "{}"
+            value: "{}",
+            offset: 1000
         });
 
         consumer.raw.emit("message", {
             topic: TEST_TOPIC,
             partition: "bad-partition",
+            value: "{}",
+            offset: 1001
+        });
+
+        consumer.raw.emit("message", {
+            topic: TEST_TOPIC,
+            partition: "no-offset",
             value: "{}"
         });
 
