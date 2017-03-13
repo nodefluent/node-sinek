@@ -315,6 +315,10 @@ describe("Sinek INT", function(){
     it("should have drained messages until stall 2", function(done){
         console.log(consumedMessages.length);
         expect(consumedMessages.length).not.to.be.equal(0);
+        expect(consumedMessages[0].offset).not.to.be.equal(consumedMessages[1].offset);
+        expect(consumedMessages[1].offset).not.to.be.equal(consumedMessages[2].offset);
+        expect(consumedMessages[2].offset).not.to.be.equal(consumedMessages[3].offset);
+        expect(consumedMessages[3].offset).not.to.be.equal(consumedMessages[4].offset);
         expect(drainDone).to.be.equal(true);
         expect(firstDrainFired).to.be.equal(true);
         console.log(consumedMessages[0], consumedMessages[100], consumedMessages[200], consumedMessages[250]);

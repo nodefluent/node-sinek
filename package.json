@@ -1,10 +1,11 @@
 {
   "name": "sinek",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "kafka client (consumer + producer); polite out of the box",
   "main": "index.js",
   "scripts": {
-    "test": "istanbul cover _mocha -- -R spec test/int/* && istanbul check-coverage --statements 75"
+    "test": "istanbul cover _mocha -- -R spec test/int/* && istanbul check-coverage --statements 75",
+    "rd-lt": "NODE_ENV=production node ./perf/RDLoadTest.js"
   },
   "repository": {
     "type": "git",
@@ -35,6 +36,7 @@
     "mocha": "~3.2.0",
     "istanbul": "~0.4.2",
     "uuid": "*",
-    "sinon": "*"
+    "sinon": "*",
+    "express": "*"
   }
 }
