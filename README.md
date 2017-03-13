@@ -11,7 +11,7 @@ kafka client (consumer + producer) polite out of the box
 > - Simon Sinek
 
 ## info
-- ~ 80% test coverage + promises
+- promise based api
 - core builds `kafka-node` module (checkout for options & tweaking)
 - uses ConsumerGroup(s) means your kafka needs to be > 0.9.x ( - 0.10.2+)
 
@@ -44,27 +44,39 @@ const {Kafka, Drainer, Publisher, PartitionDrainer} = require("sinek");
 ## producer (Publisher)
 
 ```javascript
-const kp = new Kafka(ZK_CON_STR, LOGGER);
-kp.becomeProducer([TEST_TOPIC], CLIENT_NAME, OPTIONS);
+const kafkaClient = new Kafka(ZK_CON_STR, LOGGER);
+kafkaClient.becomeProducer([TEST_TOPIC], CLIENT_NAME, OPTIONS);
 
-kp.on("ready", () => {
-    producer = new Publisher(kp);
+kafkaClient.on("ready", () => {
+    producer = new Publisher(kafkaClient, PARTITION_COUNT); //partition count should be the default count on your brokers partiitons e.g. 30
     
-    producer.send()
-    producer.batch(TEST_TOPIC, [])
+    producer.send(topic, messages, partitionKey, partition, compressionType)
+    producer.batch(topic, [])
+    
+    producer.appendBuffer(topic, identifier, object, compressionType)
+    producer.flushBuffer(topic)
+    
+    //easy api that uses a KeyedPartitioner Type and identifies the
+    //target partition for the object's identifier by itself
+    //it also brings your payload (object) in perfect shape for 
+    //a nicely consumeable topic
+    //call producer.flushBuffer(topic) to batch send the payloads
+    producer.bufferPublishMessage(topic, identifier, object, version, compressionType)
+    producer.bufferUnpublishMessage(topic, identifier, object, version, compressionType)
+    producer.bufferUpdatehMessage(topic, identifier, object, version, compressionType)
 });
 
-kp.on("error", err => console.log("producer error: " + err));
+kafkaClient.on("error", err => console.log("producer error: " + err));
 ```
 
 ## consumer (Drainer)
 
 ```javascript
-const kc = new Kafka(ZK_CON_STR, LOGGER);
-kc.becomeConsumer([TEST_TOPIC], GROUP_ID, OPTIONS);
+const kafkaClient = new Kafka(ZK_CON_STR, LOGGER);
+kafkaClient.becomeConsumer([TEST_TOPIC], GROUP_ID, OPTIONS);
 
-kc.on("ready", () => {
-    consumer = new Drainer(kc, 1); //1 = thread/worker/parallel count
+kafkaClient.on("ready", () => {
+    consumer = new Drainer(kafkaClient, 1); //1 = thread/worker/parallel count
     
     consumer.drain((message, done) => {
         console.log(message);
@@ -85,17 +97,17 @@ kc.on("ready", () => {
     consumer.resetConsumer([TEST_TOPIC]).then(_ => {});
 });
 
-kc.on("error", err => console.log("consumer error: " + err));
+kafkaClient.on("error", err => console.log("consumer error: " + err));
 ```
 
 ## consumer (PartitionDrainer) [faster ~ runs a queue per topic partition]
 
 ```javascript
-const kc = new Kafka(ZK_CON_STR, LOGGER);
-kc.becomeConsumer([TEST_TOPIC], GROUP_ID, OPTIONS);
+const kafkaClient = new Kafka(ZK_CON_STR, LOGGER);
+kafkaClient.becomeConsumer([TEST_TOPIC], GROUP_ID, OPTIONS);
 
-kc.on("ready", () => {
-    consumer = new PartitionDrainer(kc, 1); //1 = thread/worker/parallel count per partition
+kafkaClient.on("ready", () => {
+    consumer = new PartitionDrainer(kafkaClient, 1); //1 = thread/worker/parallel count per partition
     
     //drain requires a topic-name and returns a promise 
     consumer.drain(TEST_TOPIC, (message, done) => {
@@ -118,7 +130,7 @@ kc.on("ready", () => {
     consumer.resetConsumer([TEST_TOPIC]).then(_ => {});
 });
 
-kc.on("error", err => console.log("consumer error: " + err));
+kafkaClient.on("error", err => console.log("consumer error: " + err));
 ```
 
 ## hints
@@ -157,5 +169,8 @@ have trouble with data integrity
 
 - if your data is spread entity wise above partitions you can use the
 "PartitionDrainer" to drain multiple partitions at the same time
+
+- the "Publisher" offers a simple API to create such (keyed) partitioned
+topics
 
 - it is probably a good idea to spawn a Consumer per Topic

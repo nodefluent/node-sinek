@@ -14,7 +14,11 @@ const conStr = "localhost:2181";
 const groupId = "partition-test-2";
 
 const options = {
-    fetchMaxBytes: 1024 * 1024
+    fetchMaxBytes: 1024 * 10,
+    sessionTimeout: 8000,
+    heartbeatInterval: 250,
+    retryMinTimeout: 250,
+    fromOffset: "earliest",
 };
 
 const kafka = new Kafka(conStr, logger);
@@ -23,14 +27,9 @@ kafka.on("error", err => console.log("consumer error: " + err));
 
 let pd = null;
 kafka.on("ready", () => {
-
     pd = new PartitionDrainer(kafka, 1, false);
     pd.disablePauseResume = true;
-
-    pd.resetConsumer([topicName]).then(_ => {
-        console.log("offset reset.");
-        pd.drain(topicName, onMessage).then(_ => {console.log("load-test running.")}).catch(e => console.log(e));
-    });
+    pd.drain(topicName, onMessage).then(_ => {console.log("load-test running.")}).catch(e => console.log(e));
 });
 
 let totalMsg = 0;
