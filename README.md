@@ -14,6 +14,7 @@ kafka client (consumer + producer) polite out of the box
 - promise based api
 - core builds `kafka-node` module (checkout for options & tweaking)
 - uses ConsumerGroup(s) means your kafka needs to be > 0.9.x ( - 0.10.2+)
+- check out :goberserk: [kafka-streams](https://github.com/krystianity/kafka-streams) for a stream based kafka api
 
 ## offers
 
