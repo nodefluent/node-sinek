@@ -1,7 +1,7 @@
 <center><img src="https://cdn1.teamhellfall.de/contentdelivery/8642e870-7555-473a-b549-c520bd85bc51.0861a88f-28cf-42b6-88c7-f2942e64cc79.png?dim=165x125" /></center><br/>
 
 # node-sinek
-
+[![Build Status](https://travis-ci.org/krystianity/node-sinek.svg?branch=master)](https://travis-ci.org/krystianity/node-sinek)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 [![5cf](https://img.shields.io/badge/5cf-approved-ff69b4.svg)]()
 
