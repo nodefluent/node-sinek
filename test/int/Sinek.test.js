@@ -2,17 +2,10 @@ const expect = require("expect.js");
 
 const {Kafka, Drainer, Publisher, PartitionDrainer} = require("./../../index.js");
 
-
 const uuid = require("uuid");
-const TEST_TOPIC = "sinek-test-topic-" + uuid.v4();
+const TEST_TOPIC = "sinek-test-topic-" + (process.env.KST_TOPIC || uuid.v4());
 const CONSUMER_NAME = "sinek-consumer-" + uuid.v4();
 const PRODUCER_NAME = "sinek-producer-" + uuid.v4();
-
-/*
-const TEST_TOPIC = "sinek-test-topic-1";
-const CONSUMER_NAME = "sinek-consumer-1";
-const PRODUCER_NAME = "sinek-producer-1";
-*/
 
 const DUMMY_MESSAGE = {
     a: "funny",
