@@ -1,10 +1,10 @@
 {
   "name": "sinek",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "description": "kafka client (consumer + producer); polite out of the box",
   "main": "index.js",
   "scripts": {
-    "test": "istanbul cover _mocha -- -R spec test/int/* && istanbul check-coverage --statements 75",
+    "test": "istanbul cover _mocha -- -R spec test/int/* && istanbul check-coverage --statements 60",
     "rd-lt": "NODE_ENV=production node ./perf/RDLoadTest.js"
   },
   "repository": {
