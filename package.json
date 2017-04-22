@@ -1,6 +1,6 @@
 {
   "name": "sinek",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "description": "kafka client (consumer + producer); polite out of the box",
   "main": "index.js",
   "scripts": {
@@ -27,9 +27,9 @@
   },
   "homepage": "https://github.com/krystianity/node-sinek#readme",
   "dependencies": {
-    "async": "~2.1.5",
+    "async": "~2.3.0",
     "bluebird": "~3.5.0",
-    "kafka-node": "~1.5.0",
+    "kafka-node": "~1.6.0",
     "murmurhash": "~0.0.2",
     "uuid": "~3.0.1"
   },
@@ -37,7 +37,6 @@
     "expect.js": "~0.3.1",
     "mocha": "~3.2.0",
     "istanbul": "~0.4.2",
-    "uuid": "*",
     "sinon": "*",
     "express": "*"
   }
