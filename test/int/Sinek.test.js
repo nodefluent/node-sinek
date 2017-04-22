@@ -2,17 +2,10 @@ const expect = require("expect.js");
 
 const {Kafka, Drainer, Publisher, PartitionDrainer} = require("./../../index.js");
 
-
 const uuid = require("uuid");
-const TEST_TOPIC = "sinek-test-topic-" + uuid.v4();
+const TEST_TOPIC = "sinek-test-topic-" + (process.env.KST_TOPIC || uuid.v4());
 const CONSUMER_NAME = "sinek-consumer-" + uuid.v4();
 const PRODUCER_NAME = "sinek-producer-" + uuid.v4();
-
-/*
-const TEST_TOPIC = "sinek-test-topic-1";
-const CONSUMER_NAME = "sinek-consumer-1";
-const PRODUCER_NAME = "sinek-producer-1";
-*/
 
 const DUMMY_MESSAGE = {
     a: "funny",
@@ -96,14 +89,14 @@ describe("Sinek INT", function(){
         setTimeout(done, 500);
     });
 
-    it("should be able to delete the topic if present", function(done){
+    xit("should be able to delete the topic if present", function(done){
         consumer.removeTopics([TEST_TOPIC]).then(rt => {
             console.log(rt);
             done();
         });
     });
 
-    it("should be able to create topic", function(done){
+    xit("should be able to create topic", function(done){
         producer.createTopics([TEST_TOPIC]).then(ct => {
             console.log(ct);
             done();
@@ -128,7 +121,7 @@ describe("Sinek INT", function(){
     });
 
     it("halt threshold", function(done){
-        setTimeout(done, 200);
+        setTimeout(done, 1000);
     });
 
     it("should be able to drain messages from consumer", function(done){
@@ -139,16 +132,11 @@ describe("Sinek INT", function(){
         done();
     });
 
-    it("should be able to enforce offset", function(done){
-        consumer.resume();
-        done();
-    });
-
     it("halt threshold", function(done){
-        setTimeout(done, 200);
+        setTimeout(done, 500);
     });
 
-    it("should have consumed a decent amount of messages", function(done){
+    xit("should have consumed a decent amount of messages", function(done){
         console.log(consumedMessages.length);
 
         //depending your zk and broker configuration this will not work
