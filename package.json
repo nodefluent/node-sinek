@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/krystianity/node-sinek#readme",
   "dependencies": {
-    "async": "~2.3.0",
+    "async": "~2.4.0",
     "bluebird": "~3.5.0",
     "kafka-node": "~1.6.0",
     "murmurhash": "~0.0.2",
