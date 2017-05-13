@@ -2,6 +2,8 @@
 
 # node-sinek
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/nodefluent/node-sinek.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/nodefluent/node-sinek.svg?branch=master)](https://travis-ci.org/nodefluent/node-sinek)
 
 kafka client (consumer + producer) polite out of the box
