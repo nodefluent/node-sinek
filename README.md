@@ -2,8 +2,8 @@
 
 # node-sinek
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/krystianity/node-sinek.svg)](https://greenkeeper.io/)
-[![Build Status](https://travis-ci.org/krystianity/node-sinek.svg?branch=master)](https://travis-ci.org/krystianity/node-sinek)
+[![Greenkeeper badge](https://badges.greenkeeper.io/nodefluent/node-sinek.svg)](https://greenkeeper.io/)
+[![Build Status](https://travis-ci.org/nodefluent/node-sinek.svg?branch=master)](https://travis-ci.org/krystianity/node-sinek)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 [![5cf](https://img.shields.io/badge/5cf-approved-ff69b4.svg)]()
 
@@ -16,7 +16,7 @@ kafka client (consumer + producer) polite out of the box
 - promise based api
 - core builds `kafka-node` module (checkout for options & tweaking)
 - uses ConsumerGroup(s) means your kafka needs to be > 0.9.x ( - 0.10.2+)
-- check out :goberserk: [kafka-streams](https://github.com/krystianity/kafka-streams) for a stream based kafka api
+- check out :goberserk: [kafka-streams](https://github.com/nodefluent/kafka-streams) for a stream based kafka api
 
 ## offers
 
