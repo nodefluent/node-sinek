@@ -1,6 +1,6 @@
 {
   "name": "sinek",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "kafka client (consumer + producer); polite out of the box",
   "main": "index.js",
   "scripts": {
