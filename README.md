@@ -23,7 +23,8 @@ kafka client(s) polite out of the box
 - provides an incoming message flow control for consumers
 - provides a drain once for consumers
 - provides an easy api for producers
-- documentation is still wip;
+- higher level abstractions = less headaches
+- documentation is still wip
 
 ## install
 
