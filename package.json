@@ -35,14 +35,14 @@
   "dependencies": {
     "async": "~2.4.0",
     "bluebird": "~3.5.0",
-    "kafka-node": "~1.6.0",
+    "kafka-node": "~1.6.2",
     "murmurhash": "~0.0.2",
     "uuid": "~3.0.1"
   },
   "devDependencies": {
     "expect.js": "~0.3.1",
-    "mocha": "~3.3.0",
-    "istanbul": "~0.4.2",
+    "mocha": "~3.4.1",
+    "istanbul": "~0.4.5",
     "sinon": "*",
     "express": "*"
   }
