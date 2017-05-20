@@ -3,9 +3,7 @@
 # node-sinek
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/nodefluent/node-sinek.svg)](https://greenkeeper.io/)
-
 [![Build Status](https://travis-ci.org/nodefluent/node-sinek.svg?branch=master)](https://travis-ci.org/nodefluent/node-sinek)
-
 [![npm version](https://badge.fury.io/js/sinek.svg)](https://badge.fury.io/js/sinek)
 
 kafka client(s) polite out of the box
