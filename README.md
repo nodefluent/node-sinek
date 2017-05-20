@@ -23,7 +23,8 @@ kafka client(s) polite out of the box
 - provides an incoming message flow control for consumers
 - provides a drain once for consumers
 - provides an easy api for producers
-- documentation is still wip;
+- higher level abstractions = less headaches
+- documentation is still wip
 
 ## install
 
@@ -39,8 +40,8 @@ const {Kafka, Drainer, Publisher, PartitionDrainer, Consumer, Producer} = requir
 
 # docs
 
-[Publisher](docs/publisher.md)
-[Drainer](docs/drainer.md)
-[PartitionDrainer](docs/partition-drainer.md)
-[Consumer & Producer](lib/connect/README.md)
-[Hints & Help](docs/hints.md)
+* [Publisher](docs/publisher.md)
+* [Drainer](docs/drainer.md)
+* [PartitionDrainer](docs/partition-drainer.md)
+* [Consumer & Producer](lib/connect/README.md)
+* [Hints & Help](docs/hints.md)
