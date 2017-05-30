@@ -11,37 +11,43 @@ kafka client(s) polite out of the box
 > make it about them, not about you
 > - Simon Sinek
 
-## info
+## Info
 - promise based api
 - core builds `kafka-node` module (checkout for [options & tweaking](https://github.com/SOHU-Co/kafka-node/blob/master/README.md))
 - uses ConsumerGroup(s) means your kafka needs to be > 0.9.x ( - 0.10.2+)
 - check out :goberserk: [node-kafka-streams](https://github.com/nodefluent/kafka-streams) for a stream processing kafka api
 - check out :fire: [node-kafka-connect](https://github.com/nodefluent/kafka-connect) for a easy datastore <-> kafka transfer
 
-## offers
+## Offers
 
-- provides an incoming message flow control for consumers
-- provides a drain once for consumers
-- provides an easy api for producers
-- higher level abstractions = less headaches
-- documentation is still wip
+- easy api
+- no worries backpressure service (dont fry your database)
+- auto-commit / manual drain commit in backpressure-mode (dont loose data)
+- a lot of pitfalls are automatically taken care of
+- provides a drain once for consumers (that reads a whole topic and fires an event)
+- provides easy partition spreading, keyed messages and json formats for producers
 
-## install
+## Install
 
 ```shell
 npm install --save sinek
 ```
 
-# usage
+# Usage
 
 ```javascript
 const {Kafka, Drainer, Publisher, PartitionDrainer, Consumer, Producer} = require("sinek");
 ```
 
-# docs
+# Docs
+
+* If you just want a Kafka Client (Producer / Consumer) that works well and ships batteries included,
+just take a look at these two and their setup example:
+* [Consumer & Producer](lib/connect/README.md)
+
+# Other Docs
 
 * [Publisher](docs/publisher.md)
 * [Drainer](docs/drainer.md)
 * [PartitionDrainer](docs/partition-drainer.md)
-* [Consumer & Producer](lib/connect/README.md)
 * [Hints & Help](docs/hints.md)
