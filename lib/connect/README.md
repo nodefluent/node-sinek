@@ -55,7 +55,7 @@ consumer.consumeOnce(messageCallback, drainThreshold = 10000, timeout = 0)
     .then(consumedMessagesCount => console.log(consumedMessagesCount)); //resolves when topic is drained
     .catch(error => console.error(error)); //fires on error or timeout
 
-consumer.on("message", message => console.log(message"));
+consumer.on("message", message => console.log(message));
 consumer.on("error", error => console.error(error));
 ```
 
