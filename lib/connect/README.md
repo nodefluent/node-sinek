@@ -64,7 +64,7 @@ consumer.on("error", error => console.error(error));
 ```es6
 const {Producer} = require("sinek");
 const partitions = 1; //make sure the topic exists and has the given amount of partitions (relates to kafka broker config setup)
-const producer = new Producer(config, ["my-topic", partitions]);
+const producer = new Producer(config, ["my-topic"], partitions);
 
 //all 3 return promises (buffer wont actually buffer, they will all be sent immediatly per default)
 producer.send("my-topic", "my message as string"); //messages will be automatically spread across partitions randomly
