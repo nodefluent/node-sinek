@@ -104,7 +104,12 @@ client.close() //close the connection |-> you can pass true/false to the consume
 
 ```es6
 const config = {
-    zkConStr: "localhost:2181/",
+
+    //either one of the following, if you want to connect directly to the broker
+    //you should omit the zkConStr field and just provide kafkaHost
+    zkConStr: "localhost:2181/kafka",
+    kafkaHost: "localhost:9092/",
+
     logger: {
         debug: msg => console.log(msg),
         info: msg => console.log(msg),
@@ -142,3 +147,7 @@ const config = {
 * Q: I get a lot of leader not available errors when using the producer :(
 * A: Check your partition settings, does the topic really have the corresponding amount of partitions available
 * A: Otherwise this might related to topic metadata, run `producer.refreshMetadata(["topic"]).then()` (once) first.
+
+### 3
+* Q: Can I connect directly to the Kafka Broker without Zookeeper
+* A: Yes, it is possible simply provide "kafkaHost" as config instead of "zkConStr"
