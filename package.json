@@ -33,11 +33,11 @@
     },
     "homepage": "https://github.com/nodefluent/node-sinek#readme",
     "dependencies": {
-        "async": "~2.4.1",
+        "async": "~2.5.0",
         "bluebird": "~3.5.0",
-        "kafka-node": "~1.6.2",
+        "kafka-node": "~2.0.0",
         "murmurhash": "~0.0.2",
-        "uuid": "~3.0.1"
+        "uuid": "~3.1.0"
     },
     "devDependencies": {
         "expect.js": "~0.3.1",
