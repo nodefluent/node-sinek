@@ -1,6 +1,6 @@
 {
     "name": "sinek",
-    "version": "5.1.0",
+    "version": "5.2.0",
     "description": "kafka client (consumer + producer); polite out of the box",
     "main": "index.js",
     "scripts": {
@@ -35,7 +35,7 @@
     "dependencies": {
         "async": "~2.5.0",
         "bluebird": "~3.5.0",
-        "kafka-node": "~2.0.0",
+        "kafka-node": "^2.0.1",
         "murmurhash": "~0.0.2",
         "uuid": "~3.1.0"
     },
