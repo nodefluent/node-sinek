@@ -27,6 +27,7 @@ kafka client(s) polite out of the box
 - a lot of pitfalls are automatically taken care of
 - provides a drain once for consumers (that reads a whole topic and fires an event)
 - provides easy partition spreading, keyed messages and json formats for producers
+- auto reconnect
 
 ## Install
 
