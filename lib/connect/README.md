@@ -72,12 +72,12 @@ producer.send("my-topic", "my message as string"); //messages will be automatica
 const compressionType = 0;
 producer.buffer("my-topic", "my-message-key-identifier", {bla: "message as object"}, compressionType);
 //this will create a keyed-message (e.g. Kafka LogCompaction on Message-Keys), producer will automatically identfiy
-the message-key to a topic partition (idempotent)
+//the message-key to a topic partition (idempotent)
 
 //if you do not pass in an identifier, it will be created as uuid.v4()
 
 const version = 1;
-producer.bufferFormat("my-topic", "my-message-key-identifier", {bla: "message as object"}, version, compressionType)
+producer.bufferFormat("my-topic", "my-message-key-identifier", {bla: "message as object"}, version, compressionType);
 //same as .buffer(..) but with the fact that it wraps your message in a certain "standard" message json format e.g.:
 
 {
@@ -87,6 +87,18 @@ producer.bufferFormat("my-topic", "my-message-key-identifier", {bla: "message as
     time: "2017-05-29T11:58:15.139Z",
     type: "my-topic-published"
 }
+
+//using these methods you can control the create, update and delete messages via message.value.type description
+//its an easy schema that helps you to keep a simple design pattern for all of your kafka topics
+producer.bufferFormatPublish("my-topic", "my-message-key-identifier", {bla: "message as object"}, version, compressionType);
+producer.bufferFormatUpdate("my-topic", "my-message-key-identifier", {bla: "message as object"}, version, compressionType);
+producer.bufferFormatUnpublish("my-topic", "my-message-key-identifier", {bla: "message as object"}, version, compressionType);
+
+//besides setting keys (message identifiers) you can also set a key to that will make a distinct decision for the
+//partition that is produced to (identifiers and partition keys) have to be strings (partitionKey is an optional parameter)
+const distinctPartitionKeyValue = "my-distinct-partition-key-value";
+producer.bufferFormatUpdate("my-topic", "my-message-key-identifier", {bla: "message as object"}, version, compressionType, distinctPartitionKeyValue);
+//if the partition key is not provided or null, the producer will use the identifier to determine a kafka partition
 
 producer.on("error", error => console.error(error));
 ```

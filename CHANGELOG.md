@@ -1,5 +1,13 @@
 # sinek CHANGELOG
 
+## 2017-08-11, Version 5.3.0
+
+#### General Updates & Fixes
+* Updated to latest kafka-node 2.2.0
+* Fixed bug in logging message value length
+* Added 3 new format methhods publish, unpublish, update to connect producer
+* Added partitionKey (optional) to all bufferFormat operations of publisher and connect producer
+
 ## 2017-07-11, Version 5.0.0
 
 #### Kafka Client is now able to connect directly to the Kafka Broker
