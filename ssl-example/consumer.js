@@ -1,6 +1,6 @@
 "use strict";
 
-const {Consumer} = require("sinek");
+const {Consumer} = require("./../index.js");
 const consumer = new Consumer("test", require("./config.js"));
 
 consumer.on("error", error => console.error(error));

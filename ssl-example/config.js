@@ -1,7 +1,7 @@
 const config = {
-  kafkaHost: "localhost:9092",
+  kafkaHost: "localhost:9093",
   logger: {
-      debug: msg => console.log(msg),
+      debug: _ => {},
       info: msg => console.log(msg),
       warn: msg => console.log(msg),
       error: msg => console.log(msg)
@@ -10,10 +10,7 @@ const config = {
   clientName: "example-name",
   workerPerPartition: 1,
   options: {
-      ssl: true,
-      sslOptions: {
-          rejectUnauthorized: false
-      },
+      ssl: false,
       sessionTimeout: 8000,
       protocol: ["roundrobin"],
       fromOffset: "latest",

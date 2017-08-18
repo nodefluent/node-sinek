@@ -1,6 +1,6 @@
 "use strict";
 
-const {Producer} = require("sinek");
+const {Producer} = require("./../index.js");
 const producer = new Producer(require("./config.js"), ["test"], 1);
 
 producer.on("error", error => console.error(error));
