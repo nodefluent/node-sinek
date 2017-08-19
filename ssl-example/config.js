@@ -1,3 +1,4 @@
+const fs = require("fs");
 const config = {
   kafkaHost: "localhost:9093",
   logger: {
@@ -10,7 +11,19 @@ const config = {
   clientName: "example-name",
   workerPerPartition: 1,
   options: {
-      ssl: false,
+      autoconnect: false,
+      ssl: true,
+      sslOptions: {
+        rejectUnauthorized: true,
+        key: fs.readFileSync("../kafka-setup/certs/ca-key"),
+        cert: fs.readFileSync("../kafka-setup/certs/ca-cert"),
+        ca:[
+          fs.readFileSync("../kafka-setup/certs/ca-cert"),
+          fs.readFileSync("../kafka-setup/certs/cert-file"),
+          fs.readFileSync("../kafka-setup/certs/cert-signed"),
+        ],
+        passphrase: "nodesinek"
+      },
       sessionTimeout: 8000,
       protocol: ["roundrobin"],
       fromOffset: "latest",
