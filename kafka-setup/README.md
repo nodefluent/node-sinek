@@ -7,5 +7,4 @@
 
 ### Usage
 
-- execute `./generate.certs.sh`
 - execute `./start.sh`

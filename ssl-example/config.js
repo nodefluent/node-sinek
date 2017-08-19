@@ -14,14 +14,11 @@ const config = {
       autoconnect: false,
       ssl: true,
       sslOptions: {
+        // https://nodejs.org/dist/latest-v8.x/docs/api/tls.html#tls_tls_createsecurecontext_options
         rejectUnauthorized: true,
         key: fs.readFileSync("../kafka-setup/certs/ca-key"),
         cert: fs.readFileSync("../kafka-setup/certs/ca-cert"),
-        ca:[
-          fs.readFileSync("../kafka-setup/certs/ca-cert"),
-          fs.readFileSync("../kafka-setup/certs/cert-file"),
-          fs.readFileSync("../kafka-setup/certs/cert-signed"),
-        ],
+        ca:[fs.readFileSync("../kafka-setup/certs/ca-cert")],
         passphrase: "nodesinek"
       },
       sessionTimeout: 8000,

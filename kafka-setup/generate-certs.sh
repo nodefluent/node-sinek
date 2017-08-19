@@ -13,9 +13,9 @@ mkdir certs
 echo "Generating new Kafka SSL certs..."
 cd certs
 keytool -keystore $SERVER_KEYSTORE_JKS -alias localhost -validity 730 -genkey -storepass $PASSWORD -keypass $PASSWORD \
-  -dname "CN=${CN_HOST}, OU=None, O=None, L=London, S=London, C=UK"
+  -dname "CN=${CN_HOST}, OU=None, O=None, L=Cologne, S=Cologne, C=DE"
 openssl req -new -x509 -keyout ca-key -out ca-cert -days 730 -passout pass:$PASSWORD \
-   -subj "/C=UK/S=London/L=London/O=None/OU=None/CN=${CN_HOST}"
+   -subj "/C=DE/S=Cologne/L=Cologne/O=None/OU=None/CN=${CN_HOST}"
 keytool -keystore $SERVER_TRUSTSTORE_JKS -alias CARoot -import -file ca-cert -storepass $PASSWORD -noprompt
 keytool -keystore $CLIENT_TRUSTSTORE_JKS -alias CARoot -import -file ca-cert -storepass $PASSWORD -noprompt
 keytool -keystore $SERVER_KEYSTORE_JKS -alias localhost -certreq -file cert-file -storepass $PASSWORD -noprompt
