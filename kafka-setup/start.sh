@@ -5,4 +5,4 @@ mkdir /tmp/kafka-data/data
 mkdir /tmp/kafka-data/logs
 chmod -R 777 /tmp/kafka-data
 docker-compose rm
-docker-compose up
+docker-compose up -d
