@@ -11,7 +11,6 @@ const config = {
   clientName: "example-name",
   workerPerPartition: 1,
   options: {
-      autoconnect: false,
       ssl: true,
       sslOptions: {
         // https://nodejs.org/dist/latest-v8.x/docs/api/tls.html#tls_tls_createsecurecontext_options
