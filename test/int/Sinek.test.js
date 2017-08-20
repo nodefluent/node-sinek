@@ -7,6 +7,8 @@ const TEST_TOPIC = "sinek-test-topic-" + (process.env.KST_TOPIC || uuid.v4());
 const CONSUMER_NAME = "sinek-consumer-" + uuid.v4();
 const PRODUCER_NAME = "sinek-producer-" + uuid.v4();
 
+const debug = require("debug");
+
 const DUMMY_MESSAGE = {
     a: "funny",
     msg: "payload",
@@ -16,18 +18,18 @@ const DUMMY_MESSAGE = {
 const MESSAGE_COUNT = 150;
 
 const CONSUMER_TEST_LOGGER = {
-    debug: msg => console.log("consumer: " + msg),
-    //debug: msg => {}, //silence
-    info: msg => console.log("consumer: " + msg),
-    warn: msg => console.log("consumer: " + msg),
-    error: msg => console.log("consumer: " + msg)
+    debug: debug("sinek:consumer:debug"),
+    info: debug("sinek:consumer:info"),
+    warn: debug("sinek:consumer:warn"),
+    error: debug("sinek:consumer:error")
 };
 
+
 const PRODUCER_TEST_LOGGER = {
-    debug: msg => console.log("producer: " + msg),
-    info: msg => console.log("producer: " + msg),
-    warn: msg => console.log("producer: " + msg),
-    error: msg => console.log("producer: " + msg)
+    debug: debug("sinek:producer:debug"),
+    info: debug("sinek:producer:info"),
+    warn: debug("sinek:producer:warn"),
+    error: debug("sinek:producer:error")
 };
 
 const CON_STR = "localhost:2181";
