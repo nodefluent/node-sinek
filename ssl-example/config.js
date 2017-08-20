@@ -17,9 +17,9 @@ const config = {
       sslOptions: {
         // https://nodejs.org/dist/latest-v8.x/docs/api/tls.html#tls_tls_createsecurecontext_options
         rejectUnauthorized: true,
-        key: fs.readFileSync("../kafka-setup/certs/ca-key"),
-        cert: fs.readFileSync("../kafka-setup/certs/ca-cert"),
-        ca:[fs.readFileSync("../kafka-setup/certs/ca-cert")],
+        key: fs.readFileSync("../certs/ca-key"),
+        cert: fs.readFileSync("../certs/ca-cert"),
+        ca:[fs.readFileSync("../certs/ca-cert")],
         passphrase: "nodesinek"
       },
       sessionTimeout: 8000,
