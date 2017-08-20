@@ -1,5 +1,14 @@
 # sinek CHANGELOG
 
+## 2017-08-20, Version 5.4.0
+
+#### Focus on SSL
+* fixed a few option reference passes to allow for better ssl support
+* added /kafka-setup that allows for an easy local ssl kafka broker setup
+* added /ssl-example to show how ssl connections are configured
+* updated readme
+* added eslint and updated code style accordingly
+
 ## 2017-08-11, Version 5.3.0
 
 #### General Updates & Fixes
