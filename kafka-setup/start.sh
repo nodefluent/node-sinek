@@ -7,7 +7,7 @@ chmod -R 777 /tmp/kafka-data
 
 BASEDIR=$(dirname "$0")
 
-if [[ -z "$(docker-compose --file ${BASEDIR}/docker-compose.yml ps -q)" ]]; then
+if [ -z "$(docker-compose --file ${BASEDIR}/docker-compose.yml ps -q)" ]; then
 	${BASEDIR}/generate-certs.sh
 fi
 
