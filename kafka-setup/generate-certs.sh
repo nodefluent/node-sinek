@@ -7,12 +7,14 @@ SERVER_KEYSTORE_PEM="docker.kafka.server.keystore.pem"
 SERVER_TRUSTSTORE_JKS="docker.kafka.server.truststore.jks"
 CLIENT_TRUSTSTORE_JKS="docker.kafka.client.truststore.jks"
 echo "Clearing existing Kafka SSL certs..."
-cd ..
-rm -rf certs
-mkdir certs
+
+BASEDIR=${BASEDIR:-.}
+
+rm -rf ${BASEDIR}/certs
+mkdir ${BASEDIR}/certs
 (
 echo "Generating new Kafka SSL certs..."
-cd certs
+cd ${BASEDIR}/certs
 keytool -keystore $SERVER_KEYSTORE_JKS -alias localhost -validity 730 -genkey -storepass $PASSWORD -keypass $PASSWORD \
   -dname "CN=${CN_HOST}, OU=None, O=None, L=Cologne, S=Cologne, C=DE"
 openssl req -new -x509 -keyout ca-key -out ca-cert -days 730 -passout pass:$PASSWORD \
