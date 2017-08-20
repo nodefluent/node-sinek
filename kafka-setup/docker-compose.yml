@@ -7,7 +7,8 @@ services:
   kafka:
     image: wurstmeister/kafka:0.10.2.0
     ports:
-      - 9093:9093
+      - "9092:9092"
+      - "9093:9093"
     links:
      - zookeeper:zookeeper
     depends_on:
@@ -17,8 +18,8 @@ services:
       KAFKA_PORT: 9093
       KAFKA_ADVERTISED_PORT: 9093
       KAFKA_ADVERTISED_HOST_NAME: "localhost"
-      KAFKA_ADVERTISED_LISTENERS: "SSL://localhost:9093"
-      KAFKA_LISTENERS: "SSL://:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092,SSL://localhost:9093"
+      KAFKA_LISTENERS: "PLAINTEXT://:9092,SSL://:9093"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_SSL_KEYSTORE_LOCATION: "/certs/docker.kafka.server.keystore.jks"
       KAFKA_SSL_TRUSTSTORE_LOCATION: "/certs/docker.kafka.server.truststore.jks"
