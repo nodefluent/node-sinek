@@ -8,7 +8,7 @@ SERVER_TRUSTSTORE_JKS="docker.kafka.server.truststore.jks"
 CLIENT_TRUSTSTORE_JKS="docker.kafka.client.truststore.jks"
 echo "Clearing existing Kafka SSL certs..."
 
-BASEDIR=${BASEDIR:-.}
+BASEDIR=${BASEDIR:-..}
 
 rm -rf ${BASEDIR}/certs
 mkdir ${BASEDIR}/certs
