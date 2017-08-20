@@ -7,7 +7,7 @@
 [![Build Status](https://travis-ci.org/nodefluent/node-sinek.svg?branch=master)](https://travis-ci.org/nodefluent/node-sinek)
 [![npm version](https://badge.fury.io/js/sinek.svg)](https://badge.fury.io/js/sinek)
 
-kafka client(s) polite out of the box
+nodejs kafka client/consumer|producer polite out of the box
 
 > make it about them, not about you
 > - Simon Sinek
@@ -28,6 +28,7 @@ kafka client(s) polite out of the box
 - provides a drain once for consumers (that reads a whole topic and fires an event)
 - provides easy partition spreading, keyed messages and json formats for producers
 - auto reconnect
+- SSL support
 
 ## Install
 
