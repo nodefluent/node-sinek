@@ -33,5 +33,5 @@ services:
     volumes:
       - /tmp/kafka-data/data:/data
       - /tmp/kafka-data/logs:/logs
-      - ./certs:/certs
+      - ../certs:/certs
       - /var/run/docker.sock:/var/run/docker.sock

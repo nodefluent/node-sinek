@@ -7,6 +7,7 @@ SERVER_KEYSTORE_PEM="docker.kafka.server.keystore.pem"
 SERVER_TRUSTSTORE_JKS="docker.kafka.server.truststore.jks"
 CLIENT_TRUSTSTORE_JKS="docker.kafka.client.truststore.jks"
 echo "Clearing existing Kafka SSL certs..."
+cd ..
 rm -rf certs
 mkdir certs
 (
