@@ -7,6 +7,8 @@ const TEST_TOPIC = "sinek-test-topic-" + (process.env.KST_TOPIC || uuid.v4());
 const CONSUMER_NAME = "sinek-consumer-" + uuid.v4();
 const PRODUCER_NAME = "sinek-producer-" + uuid.v4();
 
+const debug = require("debug");
+
 const DUMMY_MESSAGE = {
     a: "funny",
     msg: "payload",
@@ -16,18 +18,18 @@ const DUMMY_MESSAGE = {
 const MESSAGE_COUNT = 150;
 
 const CONSUMER_TEST_LOGGER = {
-    debug: msg => console.log("consumer: " + msg),
-    //debug: msg => {}, //silence
-    info: msg => console.log("consumer: " + msg),
-    warn: msg => console.log("consumer: " + msg),
-    error: msg => console.log("consumer: " + msg)
+    debug: debug("sinek:consumer:debug"),
+    info: debug("sinek:consumer:info"),
+    warn: debug("sinek:consumer:warn"),
+    error: debug("sinek:consumer:error")
 };
 
+
 const PRODUCER_TEST_LOGGER = {
-    debug: msg => console.log("producer: " + msg),
-    info: msg => console.log("producer: " + msg),
-    warn: msg => console.log("producer: " + msg),
-    error: msg => console.log("producer: " + msg)
+    debug: debug("sinek:producer:debug"),
+    info: debug("sinek:producer:info"),
+    warn: debug("sinek:producer:warn"),
+    error: debug("sinek:producer:error")
 };
 
 const CON_STR = "localhost:2181";
@@ -69,7 +71,7 @@ describe("Sinek INT", function(){
             done();
         });
 
-        kp.on("error", err => console.log("producer error: " + err));
+        kp.on("error", err => PRODUCER_TEST_LOGGER.error(err));
     });
 
     it("should be able to start the a consumer", function(done){
@@ -82,7 +84,7 @@ describe("Sinek INT", function(){
             done();
         });
 
-        kc.on("error", err => console.log("consumer error: " + err));
+        kc.on("error", err => CONSUMER_TEST_LOGGER.error(err));
     });
 
     it("halt threshold", function(done){
@@ -91,14 +93,14 @@ describe("Sinek INT", function(){
 
     xit("should be able to delete the topic if present", function(done){
         consumer.removeTopics([TEST_TOPIC]).then(rt => {
-            console.log(rt);
+            CONSUMER_TEST_LOGGER.info(rt);
             done();
         });
     });
 
     xit("should be able to create topic", function(done){
         producer.createTopics([TEST_TOPIC]).then(ct => {
-            console.log(ct);
+            PRODUCER_TEST_LOGGER.info(ct);
             done();
         });
     });
@@ -137,7 +139,7 @@ describe("Sinek INT", function(){
     });
 
     xit("should have consumed a decent amount of messages", function(done){
-        console.log(consumedMessages.length);
+        CONSUMER_TEST_LOGGER.info(consumedMessages.length);
 
         //depending your zk and broker configuration this will not work
         //because you have not received any messages yet
@@ -154,7 +156,7 @@ describe("Sinek INT", function(){
             consumedMessages.push(message);
             _done();
         }, 760, DRAIN_TIMEOUT).then(r => {
-            console.log(r);
+            CONSUMER_TEST_LOGGER.info(r);
             drainDone = true;
         });
 
@@ -175,8 +177,8 @@ describe("Sinek INT", function(){
 
     it("should be able to get stats", function(done){
         setTimeout(() => {
-            console.log(consumer.getStats());
-            console.log(producer.getStats());
+            CONSUMER_TEST_LOGGER.info(consumer.getStats());
+            PRODUCER_TEST_LOGGER.info(producer.getStats());
             done();
         }, 250);
     });
@@ -193,11 +195,11 @@ describe("Sinek INT", function(){
     });
 
     xit("should have drained messages until stall", function(done){
-        console.log(consumedMessages.length - lastConsumedSize);
+        CONSUMER_TEST_LOGGER.info(consumedMessages.length - lastConsumedSize);
         expect(consumedMessages.length).not.to.be.equal(lastConsumedSize);
         expect(drainDone).to.be.equal(true);
         expect(firstDrainFired).to.be.equal(true);
-        console.log(consumedMessages[0], consumedMessages[100], consumedMessages[200], consumedMessages[250]);
+        CONSUMER_TEST_LOGGER.info(consumedMessages[0], consumedMessages[100], consumedMessages[200], consumedMessages[250]);
         done();
     });
 
@@ -224,7 +226,7 @@ describe("Sinek INT", function(){
             done();
         });
 
-        kc.on("error", err => console.log("consumer error: " + err));
+        kc.on("error", err => CONSUMER_TEST_LOGGER.error(err));
     });
 
     it("should be able to drainOnce again for all messages", function(done){
@@ -234,7 +236,7 @@ describe("Sinek INT", function(){
             consumedMessages.push(message);
             _done();
         }, 700, DRAIN_TIMEOUT).then(r => {
-            console.log(r);
+            CONSUMER_TEST_LOGGER.info(r);
             drainDone = true;
         });
 
@@ -289,7 +291,7 @@ describe("Sinek INT", function(){
         let intv = null;
         intv = setInterval(() => {
 
-            console.log(consumer.getStats());
+            CONSUMER_TEST_LOGGER.info(consumer.getStats());
 
             if(drainDone){
                 clearInterval(intv);
@@ -299,7 +301,7 @@ describe("Sinek INT", function(){
     });
 
     it("should have drained messages until stall 2", function(done){
-        console.log(consumedMessages.length);
+        CONSUMER_TEST_LOGGER.info(consumedMessages.length);
         expect(consumedMessages.length).not.to.be.equal(0);
         expect(consumedMessages[0].offset).not.to.be.equal(consumedMessages[1].offset);
         expect(consumedMessages[1].offset).not.to.be.equal(consumedMessages[2].offset);
@@ -307,7 +309,7 @@ describe("Sinek INT", function(){
         expect(consumedMessages[3].offset).not.to.be.equal(consumedMessages[4].offset);
         expect(drainDone).to.be.equal(true);
         expect(firstDrainFired).to.be.equal(true);
-        console.log(consumedMessages[0], consumedMessages[100], consumedMessages[200], consumedMessages[250]);
+        CONSUMER_TEST_LOGGER.info(consumedMessages[0], consumedMessages[100], consumedMessages[200], consumedMessages[250]);
         done();
     });
 });

@@ -1,11 +1,13 @@
+const debug = require("debug");
 const fs = require("fs");
+
 const config = {
   kafkaHost: "localhost:9093",
   logger: {
-      debug: _ => {},
-      info: msg => console.log(msg),
-      warn: msg => console.log(msg),
-      error: msg => console.log(msg)
+    debug: debug("sinek:debug"),
+    info: debug("sinek:info"),
+    warn: debug("sinek:warn"),
+    error: debug("sinek:error")
   },
   groupId: "example-group",
   clientName: "example-name",
