@@ -39,4 +39,4 @@ jspm_packages
 logs
 .vscode
 
-kafka-setup/certs
+certs

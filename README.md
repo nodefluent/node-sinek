@@ -46,7 +46,7 @@ const {Kafka, Drainer, Publisher, PartitionDrainer, Consumer, Producer} = requir
 * If you just want a Kafka Client (Producer / Consumer) that works well and ships batteries included,
 just take a look at these two and their setup example:
 * [Consumer & Producer](lib/connect/README.md)
-* [Find an SSL example here](ssl-example/README.md)
+* [Find an SSL example here](ssl-example/)
 
 # Other Docs
 
