@@ -109,14 +109,14 @@ describe("Sinek INT", function(){
     const map = [];
     const me = [1,2,3,4,5,6,7,8,9,10];
     for(let i = 0; i < MESSAGE_COUNT / me.length; i++){
-      const batch = me.map(_ => JSON.stringify(DUMMY_MESSAGE));
+      const batch = me.map(() => JSON.stringify(DUMMY_MESSAGE));
       map.push(producer.send(TEST_TOPIC, batch));
     }
     return Promise.all(map);
   }
 
   it("should be able to publish messages", function(done){
-    populateQueue().then(_ => {
+    populateQueue().then(() => {
       expect(producer.getStats().totalPublished).to.be.equal(MESSAGE_COUNT);
       done();
     });
@@ -141,8 +141,8 @@ describe("Sinek INT", function(){
   xit("should have consumed a decent amount of messages", function(done){
     CONSUMER_TEST_LOGGER.info(consumedMessages.length);
 
-        //depending your zk and broker configuration this will not work
-        //because you have not received any messages yet
+    //depending your zk and broker configuration this will not work
+    //because you have not received any messages yet
     expect(consumedMessages.length >= MESSAGE_COUNT).to.be.equal(true);
     lastConsumedSize = consumedMessages.length;
     expect(consumedMessages[0].value.msg).to.be.equal(DUMMY_MESSAGE.msg);
@@ -160,7 +160,7 @@ describe("Sinek INT", function(){
       drainDone = true;
     });
 
-        //listen once for first drain message
+    //listen once for first drain message
     let fdm = null;
     fdm = function(){
       consumer.removeListener("first-drain-message", fdm);
@@ -213,7 +213,7 @@ describe("Sinek INT", function(){
 
   it("should be able to setup partition drainer", function(done){
 
-        //reset
+    //reset
     consumedMessages = [];
     firstDrainFired = false;
     drainDone = false;
@@ -240,7 +240,7 @@ describe("Sinek INT", function(){
       drainDone = true;
     });
 
-        //listen once for first drain message
+    //listen once for first drain message
     let fdm = null;
     fdm = function(){
       consumer.removeListener("first-drain-message", fdm);

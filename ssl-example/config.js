@@ -15,7 +15,7 @@ const config = {
   options: {
     ssl: true,
     sslOptions: {
-        // https://nodejs.org/dist/latest-v8.x/docs/api/tls.html#tls_tls_createsecurecontext_options
+      // https://nodejs.org/dist/latest-v8.x/docs/api/tls.html#tls_tls_createsecurecontext_options
       rejectUnauthorized: true,
       key: fs.readFileSync("../certs/ca-key"),
       cert: fs.readFileSync("../certs/ca-cert"),
