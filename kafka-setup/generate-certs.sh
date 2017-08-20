@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 PASSWORD="nodesinek"
 CN_HOST="localhost"
 SERVER_KEYSTORE_JKS="docker.kafka.server.keystore.jks"
