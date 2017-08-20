@@ -7,7 +7,7 @@
 [![Build Status](https://travis-ci.org/nodefluent/node-sinek.svg?branch=master)](https://travis-ci.org/nodefluent/node-sinek)
 [![npm version](https://badge.fury.io/js/sinek.svg)](https://badge.fury.io/js/sinek)
 
-kafka client(s) polite out of the box
+Node.js kafka client, consumer, producer polite out of the box
 
 > make it about them, not about you
 > - Simon Sinek
@@ -28,6 +28,7 @@ kafka client(s) polite out of the box
 - provides a drain once for consumers (that reads a whole topic and fires an event)
 - provides easy partition spreading, keyed messages and json formats for producers
 - auto reconnect
+- SSL support
 
 ## Install
 
@@ -46,7 +47,7 @@ const {Kafka, Drainer, Publisher, PartitionDrainer, Consumer, Producer} = requir
 * If you just want a Kafka Client (Producer / Consumer) that works well and ships batteries included,
 just take a look at these two and their setup example:
 * [Consumer & Producer](lib/connect/README.md)
-* [Find an SSL example here](ssl-example/README.md)
+* [Find an SSL example here](ssl-example/)
 
 # Other Docs
 

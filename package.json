@@ -6,6 +6,8 @@
     "scripts": {
         "lint": "eslint .",
         "fix": "eslint --fix .",
+        "kafka:start": "./kafka-setup/start.sh",
+        "kafka:stop": "./kafka-setup/stop.sh",
         "test": "istanbul cover _mocha -- -R spec test/int/* && istanbul check-coverage --statements 50",
         "rd-lt": "NODE_ENV=production node ./perf/RDLoadTest.js"
     },
@@ -37,6 +39,7 @@
     "dependencies": {
         "async": "~2.5.0",
         "bluebird": "~3.5.0",
+        "debug": "^3.0.0",
         "kafka-node": "^2.2.0",
         "murmurhash": "~0.0.2",
         "uuid": "~3.1.0"

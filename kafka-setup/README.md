@@ -1,4 +1,10 @@
-# Local Kafka SSL Dev Setup
+## Local Kafka SSL Dev Setup
 
-- execute `./generate.certs.sh`
+### Requirements
+
+* Docker
+* JDK
+
+### Usage
+
 - execute `./start.sh`
