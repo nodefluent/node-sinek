@@ -5,11 +5,11 @@ mkdir /tmp/kafka-data/data
 mkdir /tmp/kafka-data/logs
 chmod -R 777 /tmp/kafka-data
 
-BASEDIR=$(dirname "$0")
+BASEDIR=$(git rev-parse --show-toplevel)
 
-if [ -z "$(docker-compose --file ${BASEDIR}/docker-compose.yml ps -q)" ]; then
-	${BASEDIR}/generate-certs.sh
+if [ -z "$(docker-compose --file ${BASEDIR}/kafka-setup/docker-compose.yml ps -q)" ]; then
+	${BASEDIR}/kafka-setup/generate-certs.sh
 fi
 
-docker-compose --file ${BASEDIR}/docker-compose.yml rm
-docker-compose --file ${BASEDIR}/docker-compose.yml up -d
+docker-compose --file ${BASEDIR}/kafka-setup/docker-compose.yml rm
+docker-compose --file ${BASEDIR}/kafka-setup/docker-compose.yml up -d
