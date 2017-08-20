@@ -7,7 +7,7 @@
 [![Build Status](https://travis-ci.org/nodefluent/node-sinek.svg?branch=master)](https://travis-ci.org/nodefluent/node-sinek)
 [![npm version](https://badge.fury.io/js/sinek.svg)](https://badge.fury.io/js/sinek)
 
-Node.js kafka client/consumer|producer polite out of the box
+Node.js kafka client, consumer, producer polite out of the box
 
 > make it about them, not about you
 > - Simon Sinek
