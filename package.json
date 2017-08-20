@@ -4,9 +4,11 @@
     "description": "kafka client (consumer + producer); polite out of the box",
     "main": "index.js",
     "scripts": {
+        "lint": "eslint .",
+        "fix": "eslint --fix .",
         "kafka:start": "./kafka-setup/start.sh",
         "kafka:stop": "./kafka-setup/stop.sh",
-        "test": "istanbul cover _mocha -- -R spec test/int/* && istanbul check-coverage --statements 50",
+        "test": "npm run lint && istanbul cover _mocha -- -R spec test/int/* && istanbul check-coverage --statements 50",
         "rd-lt": "NODE_ENV=production node ./perf/RDLoadTest.js"
     },
     "repository": {
@@ -43,6 +45,7 @@
         "uuid": "~3.1.0"
     },
     "devDependencies": {
+        "eslint": "^4.5.0",
         "expect.js": "~0.3.1",
         "express": "*",
         "istanbul": "~0.4.5",
