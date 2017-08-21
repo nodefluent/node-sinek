@@ -1,6 +1,6 @@
 {
     "name": "sinek",
-    "version": "5.4.0",
+    "version": "6.0.0",
     "description": "Node.js kafka client, consumer, producer polite out of the box",
     "main": "index.js",
     "scripts": {
@@ -30,7 +30,10 @@
         "flow",
         "queue",
         "ssl",
-        "secure"
+        "secure",
+        "sasl",
+        "kerberos",
+        "librdkafka"
     ],
     "author": "Christian Fröhlingsdorf",
     "license": "MIT",
