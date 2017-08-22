@@ -8,8 +8,8 @@ chmod -R 777 /tmp/kafka-data
 BASEDIR=$(git rev-parse --show-toplevel)
 
 if [ -z "$(docker-compose --file ${BASEDIR}/kafka-setup/docker-compose.yml ps -q)" ]; then
-	${BASEDIR}/kafka-setup/generate-certs.sh
+  ${BASEDIR}/kafka-setup/generate-certs.sh
+  docker-compose --file ${BASEDIR}/kafka-setup/docker-compose.yml rm
 fi
 
-docker-compose --file ${BASEDIR}/kafka-setup/docker-compose.yml rm
 docker-compose --file ${BASEDIR}/kafka-setup/docker-compose.yml up -d
