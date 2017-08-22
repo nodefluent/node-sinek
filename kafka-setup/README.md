@@ -1,4 +1,4 @@
-## Local Kafka SSL Dev Setup
+## Local Kafka PLAINTEXT/SSL/SSL_SASL Dev Setup
 
 ### Requirements
 
