@@ -5,7 +5,9 @@ services:
     ports:
       - 2181:2181
     environment:
-      JMX_OPTS: "-Djava.security.auth.login.config=/etc/kafka/jaas/kafka_server_jaas.conf"
+      JMX_OPTS: "-Djava.security.auth.login.config=/etc/kafka/server-jaas.conf"
+    volumes:
+      - ./server-jaas.conf:/etc/kafka/server-jaas.conf
 
   kafka:
     image: wurstmeister/kafka:0.10.2.0
@@ -36,50 +38,50 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: "PLAIN"
       KAFKA_SASL_ENABLED_MECHANISMS: "PLAIN"
-      KAFKA_JMX_OPTS: "-Djava.security.auth.login.config=/etc/kafka/jaas.conf"
+      KAFKA_JMX_OPTS: "-Djava.security.auth.login.config=/etc/kafka/server-jaas.conf"
     volumes:
       - /tmp/kafka-data/data:/data
       - /tmp/kafka-data/logs:/logs
-      - ./jaas.conf:/etc/kafka/jaas.conf
+      - ./server-jaas.conf:/etc/kafka/server-jaas.conf
       - ../certs:/certs
       - /var/run/docker.sock:/var/run/docker.sock
 
-  kafka-topics-ui:
-    image: landoop/kafka-topics-ui:0.9.2
-    links:
-      - kafka-rest
-    depends_on:
-      - kafka-rest
-    ports:
-      - 8000:8000
-    environment:
-      PROXY: "true"
-      KAFKA_REST: "http://kafka-rest:8082"
-      KAFKA_REST_PROXY_URL: "http://kafka-rest:8082"
-
-  kafka-rest:
-    image: confluentinc/cp-kafka-rest:3.3.0
-    links:
-      - kafka
-      - zookeeper
-    depends_on:
-      - kafka
-      - zookeeper
-    ports:
-      - 8082:8082
-    environment:
-      KAFKA_REST_ID: "kafka-rest"
-      KAFKA_REST_CLIENT_BOOTSTRAP_SERVERS: "SSL://kafka:9093"
-      KAFKA_REST_CLIENT_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_REST_BOOTSTRAP_SERVERS: "SSL://kafka:9093"
-      KAFKA_REST_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_REST_HOST_NAME: "kafka-rest"
-      KAFKA_REST_CLIENT_SECURITY_PROTOCOL: "SSL"
-      KAFKA_REST_CLIENT_SSL_KEYSTORE_LOCATION: "/certs/docker.kafka.server.keystore.jks"
-      KAFKA_REST_CLIENT_SSL_TRUSTSTORE_LOCATION: "/certs/docker.kafka.server.truststore.jks"
-      KAFKA_REST_CLIENT_SSL_KEYSTORE_PASSWORD: "nodesinek"
-      KAFKA_REST_CLIENT_SSL_KEY_PASSWORD: "nodesinek"
-      KAFKA_REST_CLIENT_SSL_TRUSTSTORE_PASSWORD: "nodesinek"
-      KAFKA_REST_CLIENT_SSL_CLIENT_AUTH: "required"
-    volumes:
-      - ../certs:/certs
+  # kafka-topics-ui:
+  #   image: landoop/kafka-topics-ui:0.9.2
+  #   links:
+  #     - kafka-rest
+  #   depends_on:
+  #     - kafka-rest
+  #   ports:
+  #     - 8000:8000
+  #   environment:
+  #     PROXY: "true"
+  #     KAFKA_REST: "http://kafka-rest:8082"
+  #     KAFKA_REST_PROXY_URL: "http://kafka-rest:8082"
+  #
+  # kafka-rest:
+  #   image: confluentinc/cp-kafka-rest:3.3.0
+  #   links:
+  #     - kafka
+  #     - zookeeper
+  #   depends_on:
+  #     - kafka
+  #     - zookeeper
+  #   ports:
+  #     - 8082:8082
+  #   environment:
+  #     KAFKA_REST_ID: "kafka-rest"
+  #     KAFKA_REST_CLIENT_BOOTSTRAP_SERVERS: "SSL://kafka:9093"
+  #     KAFKA_REST_CLIENT_ZOOKEEPER_CONNECT: "zookeeper:2181"
+  #     KAFKA_REST_BOOTSTRAP_SERVERS: "SSL://kafka:9093"
+  #     KAFKA_REST_ZOOKEEPER_CONNECT: "zookeeper:2181"
+  #     KAFKA_REST_HOST_NAME: "kafka-rest"
+  #     KAFKA_REST_CLIENT_SECURITY_PROTOCOL: "SSL"
+  #     KAFKA_REST_CLIENT_SSL_KEYSTORE_LOCATION: "/certs/docker.kafka.server.keystore.jks"
+  #     KAFKA_REST_CLIENT_SSL_TRUSTSTORE_LOCATION: "/certs/docker.kafka.server.truststore.jks"
+  #     KAFKA_REST_CLIENT_SSL_KEYSTORE_PASSWORD: "nodesinek"
+  #     KAFKA_REST_CLIENT_SSL_KEY_PASSWORD: "nodesinek"
+  #     KAFKA_REST_CLIENT_SSL_TRUSTSTORE_PASSWORD: "nodesinek"
+  #     KAFKA_REST_CLIENT_SSL_CLIENT_AUTH: "required"
+  #   volumes:
+  #     - ../certs:/certs
