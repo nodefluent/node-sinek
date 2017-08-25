@@ -6,9 +6,14 @@
 
 ## Setup (required actions to use the clients)
 
+### Debian/Ubuntu
 - `sudo apt install librdkafka-dev libsasl2-dev`
 - `npm i --no-package-lock --no-save node-rdkafka`
-- done
+
+### MacOS
+- `brew upgrade librdkafka`
+- `brew upgrade openssl`
+- `npm i --no-package-lock --no-save node-rdkafka`
 
 ## Using NConsumer & NProducer
 
