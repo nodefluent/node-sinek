@@ -3,7 +3,8 @@
 ### Requirements
 
 * Docker
-* JDK
+* Docker Compose
+* JDK (for keytool, `sudo apt install openjdk-8-jdk`)
 
 ### Usage
 
