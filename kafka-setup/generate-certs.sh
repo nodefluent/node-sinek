@@ -8,12 +8,12 @@ SERVER_TRUSTSTORE_JKS="docker.kafka.server.truststore.jks"
 CLIENT_TRUSTSTORE_JKS="docker.kafka.client.truststore.jks"
 echo "Clearing existing Kafka SSL certs..."
 
-BASEDIR=${BASEDIR:-..}
+BASEDIR=$(git rev-parse --show-toplevel)
 
 rm -rf ${BASEDIR}/certs
 mkdir ${BASEDIR}/certs
 (
-echo "Generating new Kafka SSL certs..."
+echo "Generating new Kafka SSL certs in \"${BASEDIR}/certs\" folder..."
 cd ${BASEDIR}/certs
 keytool -keystore $SERVER_KEYSTORE_JKS -alias localhost -validity 730 -genkey -storepass $PASSWORD -keypass $PASSWORD \
   -dname "CN=${CN_HOST}, OU=None, O=None, L=Cologne, S=Cologne, C=DE"
