@@ -10,13 +10,37 @@ const config = {
     warn: console.log,
     error: console.log
   },
-  options: {},
+  options: {
+    pollIntervalMs: 100
+  }
+};
+
+const producerConfig = Object.assign({}, config, {
+  noptions: {
+    "client.id": "n-test-producer",
+    "metadata.broker.list": "localhost:9092",
+    //"debug": "all",
+    "dr_cb": true,
+    "compression.codec": "gzip",
+    "retry.backoff.ms": 200,
+    "message.send.max.retries": 10,
+    "socket.keepalive.enable": true,
+    "queue.buffering.max.messages": 100000,
+    "queue.buffering.max.ms": 1000,
+    "batch.num.messages": 1000000
+  }
+});
+
+const consumerConfig = Object.assign({}, config, {
   noptions: {
     "metadata.broker.list": "localhost:9092",
     "group.id": "n-test-group",
-    "enable.auto.commit": true
+    "enable.auto.commit": false,
+    //"debug": "all"
   }
-};
+});
+
+const topic = "n-test-topic";
 
 describe("NSinek INT", () => {
 
@@ -26,15 +50,20 @@ describe("NSinek INT", () => {
 
   before(done => {
 
-    producer = new NProducer(config, ["n-test-topic"]);
-    consumer = new NConsumer(["n-test-topic"], config);
-    
+    producer = new NProducer(producerConfig);
+    consumer = new NConsumer([topic], consumerConfig);
+
+    producer.on("error", error => console.error(error));
+    consumer.on("error", error => console.error(error));
+
     Promise.all([
       producer.connect(),
       consumer.connect()
     ]).then(() => {
       consumer.on("message", m => consumedMessages.push(m));
-      consumer.consume().then(done);
+      consumer.consume().then(() => {
+        setTimeout(done, 1000);
+      });
     });
   });
 
@@ -47,17 +76,18 @@ describe("NSinek INT", () => {
   });
 
   it("should be able to produce messages", done => {
-    producer.send("n-test-topic", "a message");
+    producer.send(topic, "a message");
     done();
   });
 
   it("should be able to wait", done => {
-    setTimeout(done, 500);
+    setTimeout(done, 1500);
   });
 
   it("should be able to consume messages", done => {
     console.log(consumedMessages);
     assert.ok(consumedMessages.length);
+    assert.equal(consumedMessages[0].value.toString("utf8"), "a message");
     done();
   });
 });

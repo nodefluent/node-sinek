@@ -54,9 +54,12 @@
     "devDependencies": {
         "eslint": "^4.5.0",
         "expect.js": "~0.3.1",
-        "express": "*",
+        "express": "~4.15.4",
         "istanbul": "~0.4.5",
         "mocha": "~3.5.0",
-        "sinon": "*"
+        "sinon": "~3.2.1"
+    },
+    "optionalDependencies": {
+        "node-rdkafka": "~1.0.6"
     }
 }
