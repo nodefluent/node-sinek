@@ -21,7 +21,7 @@ const producerConfig = Object.assign({}, config, {
     "metadata.broker.list": "localhost:9092",
     //"debug": "all",
     "dr_cb": true,
-    "compression.codec": "gzip",
+    "compression.codec": "snappy",
     "retry.backoff.ms": 200,
     "message.send.max.retries": 10,
     "socket.keepalive.enable": true,
