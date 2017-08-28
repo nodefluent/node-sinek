@@ -21,6 +21,7 @@ const producerConfig = Object.assign({}, config, {
     "metadata.broker.list": "localhost:9092",
     //"debug": "all",
     "dr_cb": true,
+    "event_cb": true,
     "compression.codec": "snappy",
     "retry.backoff.ms": 200,
     "message.send.max.retries": 10,
@@ -36,7 +37,8 @@ const consumerConfig = Object.assign({}, config, {
     "metadata.broker.list": "localhost:9092",
     "group.id": "n-test-group",
     "enable.auto.commit": false,
-    //"debug": "all"
+    //"debug": "all",
+    "event_cb": true
   }
 });
 
@@ -47,6 +49,7 @@ describe("NSinek INT", () => {
   let consumer = null;
   let producer = null;
   const consumedMessages = [];
+  let firstMessageReceived = false;
 
   before(done => {
 
@@ -62,8 +65,9 @@ describe("NSinek INT", () => {
     ]).then(() => {
       consumer.on("message", m => consumedMessages.push(m));
       consumer.consume().then(() => {
-        setTimeout(done, 1000);
+        firstMessageReceived = true;
       });
+      setTimeout(done, 1000);
     });
   });
 
@@ -91,8 +95,13 @@ describe("NSinek INT", () => {
     setTimeout(done, 1500);
   });
 
+  it("should have received first message", done => {
+    assert.ok(firstMessageReceived);
+    done();
+  });
+
   it("should be able to consume messages", done => {
-    console.log(consumedMessages);
+    //console.log(consumedMessages);
     assert.ok(consumedMessages.length);
     assert.equal(consumedMessages[0].value.toString("utf8"), "a message");
     assert.equal(JSON.parse(consumedMessages[1].value.toString("utf8")).payload.content, "a message 1");
