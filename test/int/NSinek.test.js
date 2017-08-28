@@ -75,9 +75,16 @@ describe("NSinek INT", () => {
     }
   });
 
-  it("should be able to produce messages", done => {
-    producer.send(topic, "a message");
-    done();
+  it("should be able to produce messages", () => {
+
+    const promises = [
+      producer.send(topic, "a message").then(console.log),
+      producer.bufferFormatPublish(topic, "1", {content: "a message 1"}, 1, null, 0).then(console.log),
+      producer.bufferFormatUpdate(topic, "2", {content: "a message 2"}, 1, null, 0).then(console.log),
+      producer.bufferFormatUnpublish(topic, "3", {content: "a message 3"}, 1, null, 0).then(console.log)
+    ];
+
+    return Promise.all(promises);
   });
 
   it("should be able to wait", done => {
@@ -88,6 +95,9 @@ describe("NSinek INT", () => {
     console.log(consumedMessages);
     assert.ok(consumedMessages.length);
     assert.equal(consumedMessages[0].value.toString("utf8"), "a message");
+    assert.equal(JSON.parse(consumedMessages[1].value.toString("utf8")).payload.content, "a message 1");
+    assert.equal(JSON.parse(consumedMessages[2].value.toString("utf8")).payload.content, "a message 2");
+    assert.equal(JSON.parse(consumedMessages[3].value.toString("utf8")).payload.content, "a message 3");
     done();
   });
 });
