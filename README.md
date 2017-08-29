@@ -49,6 +49,7 @@ const {Kafka, Drainer, Publisher, PartitionDrainer, Consumer, Producer, NConsume
 just take a look at these two and their setup example:
 * [Consumer & Producer](lib/connect/README.md)
 * [Find an SSL example here](ssl-example/)
+* [Find an SASL example here](sasl-ssl-example/)
 * [Need SASL Support or want to use the Native Clients](lib/librdkafka/README.md)
 
 # Other Docs
