@@ -8,6 +8,7 @@ env:
   - ZOOKEEPER_PEERS=localhost:2181
   - KAFKA_PEERS=localhost:9092
   - KST_TOPIC=travis
+  - CXX=g++-4.8
 
 before_install:
 - wget http://www.us.apache.org/dist/kafka/0.10.2.0/kafka_2.10-0.10.2.0.tgz -O kafka.tgz
@@ -18,3 +19,10 @@ before_install:
 - kafka/bin/kafka-topics.sh --create --partitions 1 --replication-factor 1 --topic sinek-test-topic-travis --zookeeper localhost:2181
 - kafka/bin/kafka-topics.sh --create --partitions 1 --replication-factor 1 --topic n-test-topic --zookeeper localhost:2181
 - sleep 2
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
