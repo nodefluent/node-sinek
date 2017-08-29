@@ -4,7 +4,7 @@ const assert = require("assert");
 const {NConsumer, NProducer} = require("./../../index.js");
 const {producerConfig, consumerConfig, topic} = require("./../nconfig.js");
 
-describe("NSinek INT Buffer (1by1)", () => {
+describe("NSinek INT String (fast)", () => {
 
   let consumer = null;
   let producer = null;
@@ -23,10 +23,8 @@ describe("NSinek INT Buffer (1by1)", () => {
       producer.connect(),
       consumer.connect()
     ]).then(() => {
-      consumer.consume((message, callback) => {
-        consumedMessages.push(message);
-        callback();
-      }, false, false).then(() => {
+      consumer.on("message", message => consumedMessages.push(message));
+      consumer.consume().then(() => {
         firstMessageReceived = true;
       });
       setTimeout(done, 1000);
@@ -66,12 +64,12 @@ describe("NSinek INT Buffer (1by1)", () => {
   it("should be able to consume messages", done => {
     //console.log(consumedMessages);
     assert.ok(consumedMessages.length);
-    assert.ok(Buffer.isBuffer(consumedMessages[0].value));
-    assert.equal(consumedMessages[0].value.toString("utf8"), "a message");
-    assert.equal(JSON.parse(consumedMessages[1].value.toString("utf8")).payload.content, "a message 1");
-    assert.equal(JSON.parse(consumedMessages[2].value.toString("utf8")).payload.content, "a message 2");
-    assert.equal(JSON.parse(consumedMessages[3].value.toString("utf8")).payload.content, "a message 3");
-    assert.equal(consumedMessages[4].value.toString("utf8"), "a message buffer");
+    assert.ok(!Buffer.isBuffer(consumedMessages[0].value));
+    assert.equal(consumedMessages[0].value, "a message");
+    assert.equal(JSON.parse(consumedMessages[1].value).payload.content, "a message 1");
+    assert.equal(JSON.parse(consumedMessages[2].value).payload.content, "a message 2");
+    assert.equal(JSON.parse(consumedMessages[3].value).payload.content, "a message 3");
+    assert.equal(consumedMessages[4].value, "a message buffer");
     done();
   });
 });
