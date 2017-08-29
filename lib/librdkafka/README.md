@@ -16,10 +16,18 @@
 - `yarn` # node-rdkafka is installed as optional dependency
 
 ### MacOS
-- `brew upgrade librdkafka`
-- `brew upgrade openssl`
+- `brew install librdkafka`
+- `brew install openssl`
 - `rm -rf node_modules`
 - `yarn` # node-rdkafka is installed as optional dependency
+
+```shell
+  # If you have a ssl problem with an error like: `Invalid value for configuration property "security.protocol"`
+  # Add to your shell profile:
+  export CPPFLAGS=-I/usr/local/opt/openssl/include
+  export LDFLAGS=-L/usr/local/opt/openssl/lib
+  # and redo the installation.
+```
 
 ## Using NConsumer & NProducer
 

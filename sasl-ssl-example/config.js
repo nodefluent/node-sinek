@@ -1,4 +1,5 @@
 const debug = require("debug");
+const path = require("path");
 
 const config = {
   logger: {
@@ -23,10 +24,10 @@ const config = {
     "batch.num.messages": 1000000,
 
     "security.protocol": "sasl_ssl",
-    "ssl.key.location": "../certs/ca-key",
+    "ssl.key.location": path.join(__dirname, "../certs/ca-key"),
     "ssl.key.password": "nodesinek",
-    "ssl.certificate.location": "../certs/ca-cert",
-    "ssl.ca.location": "../certs/ca-cert",
+    "ssl.certificate.location": path.join(__dirname,"../certs/ca-cert"),
+    "ssl.ca.location": path.join(__dirname,"../certs/ca-cert"),
     "sasl.mechanisms": "PLAIN",
     "sasl.username": "admin",
     "sasl.password": "nodesinek",

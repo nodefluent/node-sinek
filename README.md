@@ -15,6 +15,7 @@ Node.js kafka client, consumer, producer polite out of the box
 ## Info
 - promise based api
 - core builds `kafka-node` module (checkout for [options & tweaking](https://github.com/SOHU-Co/kafka-node/blob/master/README.md))
+- native builds `node-rdkafka` module (checkout for [options & tweaking](https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md))
 - uses ConsumerGroup(s) means your kafka needs to be > 0.9
 - check out :goberserk: [node-kafka-streams](https://github.com/nodefluent/kafka-streams) for a stream processing kafka api
 - check out :fire: [node-kafka-connect](https://github.com/nodefluent/kafka-connect) for a easy datastore <-> kafka transfer
