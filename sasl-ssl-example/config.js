@@ -8,6 +8,7 @@ const config = {
     error: debug("sinek:error")
   },
   noptions: {
+    //"debug": "all",
     "metadata.broker.list": "localhost:9193",
     "group.id": "example-group",
     "client.id": "example-client",
@@ -29,6 +30,7 @@ const config = {
     "sasl.mechanisms": "PLAIN",
     "sasl.username": "admin",
     "sasl.password": "nodesinek",
+    "api.version.request": true,
   }
 };
 
