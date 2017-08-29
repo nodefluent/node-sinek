@@ -1,3 +1,5 @@
+"use strict";
+
 const expect = require("expect.js");
 
 const {Kafka, Drainer, Publisher, PartitionDrainer} = require("./../../index.js");

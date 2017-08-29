@@ -1,6 +1,6 @@
 {
     "name": "sinek",
-    "version": "5.4.0",
+    "version": "6.0.0",
     "description": "Node.js kafka client, consumer, producer polite out of the box",
     "main": "index.js",
     "scripts": {
@@ -32,7 +32,10 @@
         "flow",
         "queue",
         "ssl",
-        "secure"
+        "secure",
+        "sasl",
+        "kerberos",
+        "librdkafka"
     ],
     "author": "Christian Fröhlingsdorf",
     "license": "MIT",
@@ -51,9 +54,12 @@
     "devDependencies": {
         "eslint": "^4.5.0",
         "expect.js": "~0.3.1",
-        "express": "*",
+        "express": "~4.15.4",
         "istanbul": "~0.4.5",
         "mocha": "~3.5.0",
-        "sinon": "*"
+        "sinon": "~3.2.1"
+    },
+    "optionalDependencies": {
+        "node-rdkafka": "~1.0.6"
     }
 }

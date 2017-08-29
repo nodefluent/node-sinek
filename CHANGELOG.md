@@ -1,5 +1,14 @@
 # sinek CHANGELOG
 
+## 2017-08-29, Version 6.0.0
+
+#### LIBRDKAFKA Clients
+* sinek now ships with an optional dependency to node-rdkafka
+* 2 native clients embbed rdkafka in the usual sinek connector api interface
+* NConsumer and NProducer
+* sasl support
+* additional config params through noptions
+
 ## 2017-08-20, Version 5.4.0
 
 #### Focus on SSL
