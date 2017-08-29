@@ -15,7 +15,7 @@ Node.js kafka client, consumer, producer polite out of the box
 ## Info
 - promise based api
 - core builds `kafka-node` module (checkout for [options & tweaking](https://github.com/SOHU-Co/kafka-node/blob/master/README.md))
-- uses ConsumerGroup(s) means your kafka needs to be > 0.9.x ( - 0.10.2+)
+- uses ConsumerGroup(s) means your kafka needs to be > 0.9
 - check out :goberserk: [node-kafka-streams](https://github.com/nodefluent/kafka-streams) for a stream processing kafka api
 - check out :fire: [node-kafka-connect](https://github.com/nodefluent/kafka-connect) for a easy datastore <-> kafka transfer
 
@@ -29,6 +29,7 @@ Node.js kafka client, consumer, producer polite out of the box
 - provides easy partition spreading, keyed messages and json formats for producers
 - auto reconnect
 - SSL support
+- SASL support (through native clients)
 
 ## Install
 
@@ -39,7 +40,7 @@ npm install --save sinek
 # Usage
 
 ```javascript
-const {Kafka, Drainer, Publisher, PartitionDrainer, Consumer, Producer} = require("sinek");
+const {Kafka, Drainer, Publisher, PartitionDrainer, Consumer, Producer, NConsumer, NProducer} = require("sinek");
 ```
 
 # Docs
@@ -48,6 +49,7 @@ const {Kafka, Drainer, Publisher, PartitionDrainer, Consumer, Producer} = requir
 just take a look at these two and their setup example:
 * [Consumer & Producer](lib/connect/README.md)
 * [Find an SSL example here](ssl-example/)
+* [Need SASL Support or want to use the Native Clients](lib/librdkafka/README.md)
 
 # Other Docs
 
