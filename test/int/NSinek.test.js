@@ -29,7 +29,7 @@ describe("NSinek INT Buffer (1by1)", () => {
       }, false, false).then(() => {
         firstMessageReceived = true;
       });
-      setTimeout(done, 1000);
+      setTimeout(done, 1900);
     });
   });
 
@@ -54,8 +54,9 @@ describe("NSinek INT Buffer (1by1)", () => {
     return Promise.all(promises);
   });
 
-  it("should be able to wait", done => {
-    setTimeout(done, 1500);
+  it("should be able to wait", function(done){
+    this.timeout(5000);
+    setTimeout(done, 4900);
   });
 
   it("should have received first message", done => {
