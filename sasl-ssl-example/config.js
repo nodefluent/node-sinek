@@ -13,7 +13,7 @@ const config = {
     "client.id": "example-client",
     "enable.auto.commit": false,
     "event_cb": true,
-    "compression.codec": "snappy",
+    "compression.codec": "none",
     "retry.backoff.ms": 200,
     "message.send.max.retries": 10,
     "socket.keepalive.enable": true,
