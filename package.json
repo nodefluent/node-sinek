@@ -60,6 +60,6 @@
         "sinon": "~3.2.1"
     },
     "optionalDependencies": {
-        "node-rdkafka": "~1.0.6"
+        "node-rdkafka": "~2.0.0"
     }
 }
