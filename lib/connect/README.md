@@ -8,7 +8,7 @@ consumers or producers. (in fact; they are easier to setup.)
 
 ## Using the consumer
 
-```es6
+```javascript
 const {Consumer} = require("sinek");
 const consumer = new Consumer("my-topic", config); //checkout config below
 
@@ -33,7 +33,7 @@ consumer.connect(withBackpressure).then(_ => {
 
 consumer.on("error", error => console.error(error));
 
-//messages are always objects that look like this:
+/* messages are always objects that look like this:
 {
     value: "..",
     key: "..",
@@ -42,11 +42,12 @@ consumer.on("error", error => console.error(error));
     highWaterOffset: 15,
     topic: "my-topic"
 }
+*/
 ```
 
 ## Consuming a whole topic once
 
-```es6
+```javascript
 const drainThreshold = 10000; //time that should pass with no message being received
 const timeout = 0; //time that should maximally pass in total (0 = infinite)
 const messageCallback = null; //just like the usual .consume() this supports events and callbacks (for backpressure)
@@ -61,7 +62,7 @@ consumer.on("error", error => console.error(error));
 
 ## Using the producer
 
-```es6
+```javascript
 const {Producer} = require("sinek");
 const partitions = 1; //make sure the topic exists and has the given amount of partitions (relates to kafka broker config setup)
 const producer = new Producer(config, ["my-topic"], partitions);
@@ -79,7 +80,7 @@ producer.connect().then(_ => {
 
     const version = 1;
     producer.bufferFormat("my-topic", "my-message-key-identifier", {bla: "message as object"}, version, compressionType);
-    //same as .buffer(..) but with the fact that it wraps your message in a certain "standard" message json format e.g.:
+    /* same as .buffer(..) but with the fact that it wraps your message in a certain "standard" message json format e.g.:
 
     {
         payload: {bla: "message as object"},
@@ -88,6 +89,7 @@ producer.connect().then(_ => {
         time: "2017-05-29T11:58:15.139Z",
         type: "my-topic-published"
     }
+    */
 
     //using these methods you can control the create, update and delete messages via message.value.type description
     //its an easy schema that helps you to keep a simple design pattern for all of your kafka topics
@@ -107,7 +109,7 @@ producer.on("error", error => console.error(error));
 
 ## Common Methods
 
-```es6
+```javascript
 client.getStats() //returns an object with information about the consumer/producer
 client.pause() //stops (dont pause continously; the backpressure functionality of the consumer is most likely what you are looking for)
 client.resume() //continues
@@ -116,7 +118,7 @@ client.close() //close the connection |-> you can pass true/false to the consume
 
 ## Configuring the kafka connection
 
-```es6
+```javascript
 const config = {
 
     //either one of the following, if you want to connect directly to the broker
