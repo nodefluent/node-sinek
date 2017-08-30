@@ -55,16 +55,11 @@ const {
 
 # Docs
 
-If you just want a Kafka Client (Producer / Consumer) that works well and ships batteries included, just take a look at these examples and their setup:
-
-* [Consumer & Producer examples](lib/connect/README.md)
-* [Find an SSL example here](ssl-example/)
-* [Find an SASL example with Native Client here](sasl-ssl-example/)
-* [Need SASL Support or want to use the Native Clients](lib/librdkafka/README.md)
-
-# Other Docs
-
+* [Kafka Client (Consumer & Producer)](lib/connect/README.md)
+* [Native Client (NConsumer & NProducer)](lib/librdkafka/README.md)
 * [Publisher](docs/publisher.md)
 * [Drainer](docs/drainer.md)
 * [PartitionDrainer](docs/partition-drainer.md)
+* [SSL example](ssl-example/)
+* [SASL example with the Native Client](sasl-ssl-example/)
 * [Hints & Help](docs/hints.md)
