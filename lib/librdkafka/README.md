@@ -49,6 +49,7 @@ config that you are used to use with the other clients
   * e.g. `const config = { noptions: { "metadata.broker.list": "localhost:9092"} };`
 - a full list and descriptions of config params can be found [CONFIG HERE](https://github.com/edenhill/librdkafka/blob/0.9.5.x/CONFIGURATION.md)
 - producer poll interval can be configured via `const config = { options: { pollIntervalMs: 100 }};` - *default is 100ms*
+- consumer poll grace (only 1 by 1 mode) can be configured via `const config = { options: { consumeGraceMs: 125 }};` - *default is 1000ms*
 - when **noptions** is set, you do not have to set the old config params
 
 ## Consumer Modes

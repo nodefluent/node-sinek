@@ -8,7 +8,8 @@ const config = {
     error: console.log
   }, */
   options: {
-    pollIntervalMs: 100
+    pollIntervalMs: 100,
+    consumeGraceMs: 22
   }
 };
 
