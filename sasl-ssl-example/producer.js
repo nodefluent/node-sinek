@@ -1,7 +1,7 @@
 "use strict";
 
 const {NProducer} = require("./../index.js");
-const config = require("./config.js");
+const { producerConfig: config } = require("./config.js");
 const producer = new NProducer(config, ["test"], 1);
 
 producer.on("error", error => config.logger.error(error));

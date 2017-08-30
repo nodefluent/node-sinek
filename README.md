@@ -53,6 +53,8 @@ const {
 } = require("sinek");
 ```
 
+We suggest using the native clients NConsumer & NProducer implementations, if possible.
+
 # Docs
 
 * [Kafka Client (Consumer & Producer)](lib/connect/README.md)

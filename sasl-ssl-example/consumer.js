@@ -1,7 +1,7 @@
 "use strict";
 
 const {NConsumer} = require("./../index.js");
-const config = require("./config.js");
+const { consumerConfig: config } = require("./config.js");
 const consumer = new NConsumer("test", config);
 
 consumer.on("error", error => config.logger.error(error));

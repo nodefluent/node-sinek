@@ -38,6 +38,8 @@
 
 > with `const {NConsumer, NProducer} = require("sinek");`
 
+You can find an implementation [example here](../../sasl-ssl-example)
+
 ## New/Additional Configuration Parameters
 
 - as usual sinek tries to be as polite as possible and will offer you to use the same
@@ -78,6 +80,7 @@ config that you are used to use with the other clients
 - lastProcessed and lastReceived are now set to null as default value
 - closing will reset stats
 - no internal async-queue is used to manage messages
+- tconf config field sets topic configuration such as `{ "auto.offset.reset": "earliest" }`
 
 ## BREAKING CHANGES PRODUCER API (compared to connect/Producer):
 - send does not support arrays of messages
@@ -90,3 +93,4 @@ config that you are used to use with the other clients
 - you can now define a strict partition for send bufferFormat types
 - `_lastProcessed` is now null if no message has been send
 - closing will reset stats
+- tconf config field sets topic configuration
