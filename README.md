@@ -41,7 +41,16 @@ npm install --save sinek
 # Usage
 
 ```javascript
-const {Kafka, Drainer, Publisher, PartitionDrainer, Consumer, Producer, NConsumer, NProducer} = require("sinek");
+const {
+  Kafka,
+  Drainer,
+  Publisher,
+  PartitionDrainer,
+  Consumer,
+  Producer,
+  NConsumer,
+  NProducer,
+} = require("sinek");
 ```
 
 # Docs
