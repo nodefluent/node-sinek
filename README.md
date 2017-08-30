@@ -15,6 +15,7 @@ Node.js kafka client, consumer, producer polite out of the box
 ## Info
 - promise based api
 - core builds `kafka-node` module (checkout for [options & tweaking](https://github.com/SOHU-Co/kafka-node/blob/master/README.md))
+- native builds `node-rdkafka` module (checkout for [options & tweaking](https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md))
 - uses ConsumerGroup(s) means your kafka needs to be > 0.9
 - check out :goberserk: [node-kafka-streams](https://github.com/nodefluent/kafka-streams) for a stream processing kafka api
 - check out :fire: [node-kafka-connect](https://github.com/nodefluent/kafka-connect) for a easy datastore <-> kafka transfer
@@ -40,21 +41,25 @@ npm install --save sinek
 # Usage
 
 ```javascript
-const {Kafka, Drainer, Publisher, PartitionDrainer, Consumer, Producer, NConsumer, NProducer} = require("sinek");
+const {
+  Kafka,
+  Drainer,
+  Publisher,
+  PartitionDrainer,
+  Consumer,
+  Producer,
+  NConsumer,
+  NProducer,
+} = require("sinek");
 ```
 
 # Docs
 
-* If you just want a Kafka Client (Producer / Consumer) that works well and ships batteries included,
-just take a look at these two and their setup example:
-* [Consumer & Producer](lib/connect/README.md)
-* [Find an SSL example here](ssl-example/)
-* [Find an SASL example here](sasl-ssl-example/)
-* [Need SASL Support or want to use the Native Clients](lib/librdkafka/README.md)
-
-# Other Docs
-
+* [Kafka Client (Consumer & Producer)](lib/connect/README.md)
+* [Native Client (NConsumer & NProducer)](lib/librdkafka/README.md)
 * [Publisher](docs/publisher.md)
 * [Drainer](docs/drainer.md)
 * [PartitionDrainer](docs/partition-drainer.md)
+* [SSL example](ssl-example/)
+* [SASL example with the Native Client](sasl-ssl-example/)
 * [Hints & Help](docs/hints.md)

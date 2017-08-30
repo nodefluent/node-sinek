@@ -1,13 +1,14 @@
 "use strict";
 
 const {NConsumer} = require("./../index.js");
-const consumer = new NConsumer("test", require("./config.js"));
+const config = require("./config.js");
+const consumer = new NConsumer("test", config);
 
-consumer.on("error", error => console.error(error));
+consumer.on("error", error => config.logger.error(error));
 
-consumer.connect(false).then(() => {
-  console.log("connected");
+consumer.connect().then(() => {
+  config.logger.info("connected");
   consumer.consume();
-}).catch(error => console.error(error));
+}).catch(error => config.logger.error(error));
 
-consumer.on("message", message => console.log(message.offset, message.value));
+consumer.on("message", message => config.logger.log(message.offset, message.value));
