@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2017-08-29, Version 6.1.2
+
+* fixed connection event (ready) for connect/ consumers
+
 ## 2017-08-29, Version 6.1.0
 
 #### LIBRDKAFKA Clients fixes to 6.0.4
@@ -9,7 +13,7 @@
 * more and better examples
 
 #### LIBRDKAFKA Clients to 6.1.0
-* updated NProducer api to allow new node-rdkafka 2.0.0 
+* updated NProducer api to allow new node-rdkafka 2.0.0
 (as it had breaking changes regarding its topic api)
 
 ## 2017-08-29, Version 6.0.0
