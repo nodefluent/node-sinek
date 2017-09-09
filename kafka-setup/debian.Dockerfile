@@ -5,6 +5,9 @@ RUN mkdir -p /usr/src/app \
   && apt-get autoremove -y && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/*
 
+# place Dockerfile in your app folder first
 WORKDIR /usr/src/app
 COPY . /usr/src/app/
-RUN yarn
+RUN yarn install
+
+CMD ["yarn", "start"]
