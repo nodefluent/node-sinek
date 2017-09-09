@@ -10,6 +10,7 @@ describe("NSinek INT JSON (fast)", () => {
   let producer = null;
   const consumedMessages = [];
   let firstMessageReceived = false;
+  let messagesChecker;
 
   before(done => {
 
@@ -51,7 +52,12 @@ describe("NSinek INT JSON (fast)", () => {
   });
 
   it("should be able to wait", done => {
-    setTimeout(done, 1500);
+    messagesChecker = setInterval(()=>{
+      if(consumedMessages.length >= 3){
+        clearInterval(messagesChecker);
+        done();
+      }
+    }, 500);
   });
 
   it("should have received first message", done => {

@@ -10,6 +10,7 @@ describe("NSinek INT Buffer (1by1)", () => {
   let producer = null;
   const consumedMessages = [];
   let firstMessageReceived = false;
+  let messagesChecker;
 
   before(done => {
 
@@ -55,8 +56,12 @@ describe("NSinek INT Buffer (1by1)", () => {
   });
 
   it("should be able to wait", function(done){
-    this.timeout(5000);
-    setTimeout(done, 4900);
+    messagesChecker = setInterval(()=>{
+      if(consumedMessages.length >= 5){
+        clearInterval(messagesChecker);
+        done();
+      }
+    }, 500);
   });
 
   it("should have received first message", done => {
