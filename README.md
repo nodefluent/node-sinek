@@ -64,4 +64,6 @@ We suggest using the native clients NConsumer & NProducer implementations, if po
 * [PartitionDrainer](docs/partition-drainer.md)
 * [SSL example](ssl-example/)
 * [SASL example with the Native Client](sasl-ssl-example/)
+* [Alpine based docker example](kafka-setup/alpine.Dockerfile)
+* [Debian based docker example](kafka-setup/debian.Dockerfile)
 * [Hints & Help](docs/hints.md)
