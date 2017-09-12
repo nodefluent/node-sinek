@@ -10,7 +10,7 @@
         "kafka:stop": "./kafka-setup/stop.sh",
         "kafka:logs": "docker-compose --file ./kafka-setup/docker-compose.yml logs -f",
         "kafka:console": "./kafka-setup/kafka-console.sh",
-        "test": "npm run lint && istanbul cover _mocha -- -R spec test/int/* && istanbul check-coverage --statements 50",
+        "test": "npm run lint && istanbul cover _mocha -- -R spec --timeout 10000 test/int/* && istanbul check-coverage --statements 50",
         "rd-lt": "NODE_ENV=production node ./perf/RDLoadTest.js"
     },
     "repository": {
