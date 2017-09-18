@@ -58,7 +58,7 @@
         "express": "~4.15.4",
         "istanbul": "~0.4.5",
         "mocha": "~3.5.0",
-        "sinon": "~3.2.1"
+        "sinon": "~3.3.0"
     },
     "optionalDependencies": {
         "node-rdkafka": "~2.0.0"
