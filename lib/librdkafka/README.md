@@ -70,6 +70,29 @@ config that you are used to use with the other clients
 - the native clients will use the debug module to log messages
 - use e.g. `DEBUG=sinek:n* npm test`
 
+## Memory Usage
+
+Make sure you read explain the memory usage in librdkafka FAQ: 
+https://github.com/edenhill/librdkafka/wiki/FAQ#explain-the-consumers-memory-usage-to-me
+
+#### Our experience
+
+To limit memory usage to ~100Mi, you need to set noptions to:
+
+```json
+{
+  "noptions": {
+    "metadata.broker.list": "kafka:9092",
+    "group.id": "consumer-group-1",
+    "api.version.request": true,
+    "queued.min.messages": 1000,
+    "queued.max.messages.kbytes": 5000,
+    "fetch.message.max.bytes": 524288,
+    }
+}
+```
+
+
 ## BREAKING CHANGES CONSUMER API (compared to connect/Consumer):
 - there is an optional options object for the config named: **noptions** - see [sasl-ssl-example](../../sasl-ssl-example/)
 - pause and resume have been removed
