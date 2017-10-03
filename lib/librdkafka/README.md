@@ -77,7 +77,7 @@ https://github.com/edenhill/librdkafka/wiki/FAQ#explain-the-consumers-memory-usa
 
 #### Our experience
 
-To limit memory usage to ~100Mi, you need to set noptions to:
+To limit memory usage, you need to set noptions to:
 
 ```json
 {
