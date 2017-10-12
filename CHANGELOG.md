@@ -1,5 +1,13 @@
 # sinek CHANGELOG
 
+## 2017-10-12, Version 6.4.0
+
+* NConsumer automatically sets memory related configs (easier start if you missed those config params..)
+
+## 2017-10-11, Version 6.3.0
+
+* bugfix on NProducer (partitions ranged from 1-30 instead of 0-29)
+
 ## 2017-09-12, Version 6.2.0
 
 * added streaming mode to NConsumer,
