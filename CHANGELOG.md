@@ -1,5 +1,11 @@
 # sinek CHANGELOG
 
+## 2017-10-12, Version 6.4.1
+
+* Updated depdendencies
+* Re-created lockfile
+* fixed bug in sync commit (now catching timeout errors)
+
 ## 2017-10-12, Version 6.4.0
 
 * NConsumer automatically sets memory related configs (easier start if you missed those config params..)
