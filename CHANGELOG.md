@@ -3,6 +3,9 @@
 ## 2017-10-12, Version 6.4.0
 
 * NConsumer automatically sets memory related configs (easier start if you missed those config params..)
+* NConsumer in 1:1 mode will now use commitMessageSync instead of commitMessage (this reduces performance, but
+    ensures we do not stack tons of commit-requests in the consumers-queue), sinek 6.5.0 will follow
+    with an option to set the amount of messages that are consumed & committed in one step 1-10000
 
 ## 2017-10-11, Version 6.3.0
 
