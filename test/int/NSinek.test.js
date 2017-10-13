@@ -12,6 +12,13 @@ describe("NSinek INT Buffer (1by1)", () => {
   let firstMessageReceived = false;
   let messagesChecker;
 
+  const oneByNModeOptions = {
+    batchSize: 2,
+    commitEveryNBatch: 1,
+    concurrency: 1,
+    commitSync: true
+  };
+
   before(done => {
 
     producer = new NProducer(producerConfig);
@@ -27,7 +34,7 @@ describe("NSinek INT Buffer (1by1)", () => {
       consumer.consume((message, callback) => {
         consumedMessages.push(message);
         callback();
-      }, false, false).then(() => {
+      }, false, false, oneByNModeOptions).then(() => {
         firstMessageReceived = true;
       });
       setTimeout(done, 1900);
@@ -56,6 +63,7 @@ describe("NSinek INT Buffer (1by1)", () => {
   });
 
   it("should be able to wait", function(done){
+    this.timeout(10000);
     messagesChecker = setInterval(()=>{
       if(consumedMessages.length >= 5){
         clearInterval(messagesChecker);

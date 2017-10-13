@@ -1,5 +1,13 @@
 # sinek CHANGELOG
 
+## 2017-10-13, Version 6.5.0
+
+* new 1:N consumer mode (making 1:1 mode configurable with params -> see lib/librdkafka/README.md)
+* more stats for consumer batch mode
+* new consumer batch event
+* **BREAKING CHANGE** as consumer.consume(syncEvent) now rejects if you have `enabled.auto.commit: true`
+* updated librdkafka/README.md
+
 ## 2017-10-12, Version 6.4.1
 
 * Updated depdendencies

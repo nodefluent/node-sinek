@@ -58,6 +58,35 @@ config that you are used to use with the other clients
 - asap mode by passing **no callback** to `.consume()` - see [test/int/NSinekF.test.js](../../test/int/NSinekF.test.js)
   * consumes messages as fast as possible
 
+### Advanced 1:n consumer mode
+
+- as stated above, passing a iteratee function to .consume() as first parameter will enable 1 by 1 mode,
+    where every kafka message is consumed singlehandedly, passed to the function and committed afterwards, before
+    consuming the next message -> while this is secure and ensures that no messages is left untreated, even if your
+    consumer dies, it is also very slow
+- which is why we added options to controll the behavior as you whish:
+
+```javascript
+  /*
+   *  batchSize (default 1) amount of messages that is max. fetched per round
+   *  commitEveryNBatch (default 1) amount of messages that should be processed before committing
+   *  concurrency (default 1) the concurrency of the execution per batch
+   *  commitSync (default true) if the commit action should be blocking or non-blocking
+   */
+
+   const options = {
+     batchSize: 500, //grab up to 500 messages per batch round
+     commitEveryNBatch: 5, //commit all offsets on every 5th batch
+     concurrency: 2, //calls synFunction in parallel * 2 for messages in batch
+     commitSync: false //commits asynchronously (faster, but potential danger of growing offline commit request queue)
+   };
+
+   myNConsumer.consume(syncFunction, true, false, options);
+```
+
+- when active, this mode will also expose more a field called `batch` with insight stats on the `.getStats()` object
+- and the consumer instance will emit a `consumer.on("batch", messages => {});` event
+
 ## Buffer, String or JSON as message values
 - you can call `producer.send()` with a string or with a Buffer instance
 - you can only call `producer.bufferXXX()` methods with objects
@@ -72,7 +101,7 @@ config that you are used to use with the other clients
 
 ## Memory Usage
 
-Make sure you read explain the memory usage in librdkafka FAQ: 
+Make sure you read explain the memory usage in librdkafka FAQ:
 https://github.com/edenhill/librdkafka/wiki/FAQ#explain-the-consumers-memory-usage-to-me
 
 #### Our experience
@@ -92,6 +121,10 @@ To limit memory usage, you need to set noptions to:
 }
 ```
 
+## Altering subscriptions
+
+- `consumer.addSubscriptions(["topic1", "topic2"])` -> will add additional subscriptions
+- `consumer.adjustSubscription(["topic1"])` -> will change subcriptions to these only
 
 ## BREAKING CHANGES CONSUMER API (compared to connect/Consumer):
 - there is an optional options object for the config named: **noptions** - see [sasl-ssl-example](../../sasl-ssl-example/)
