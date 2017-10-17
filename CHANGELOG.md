@@ -1,5 +1,17 @@
 # sinek CHANGELOG
 
+## 2017-10-18, Version 6.6.0
+
+* added librdkafka/Metadata class
+* added new metadata functions to NProducer
+* send, buffer and _sendBufferFormat are now async functions
+* ^ **BREAKING CHANGE** sinek now requires min. Node.js Version 7.6
+* added `auto` mode for NProducer (automatically produces to latest partition count
+    event if it changes during runtime of a producer -> updates every 5 minutes)
+* refactored and optimized NProducer send logic
+* updated librdkafka/README.md
+* added new tests for NProducer
+
 ## 2017-10-17, Version 6.5.1
 
 * fixed bug in NConsumer consume() consume options, where commitSync field was always true

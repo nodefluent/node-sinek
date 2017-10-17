@@ -21,7 +21,7 @@ describe("NSinek INT Buffer (1by1)", () => {
 
   before(done => {
 
-    producer = new NProducer(producerConfig);
+    producer = new NProducer(producerConfig, null, "auto");
     consumer = new NConsumer([topic], consumerConfig);
 
     producer.on("error", error => console.error(error));
@@ -47,6 +47,10 @@ describe("NSinek INT Buffer (1by1)", () => {
       consumer.close(true); //commit
       setTimeout(done, 500);
     }
+  });
+
+  it("should make sure topic exists (get metdata)", () => {
+    return producer.getTopicMetadata(topic);
   });
 
   it("should be able to produce messages", () => {
@@ -87,5 +91,33 @@ describe("NSinek INT Buffer (1by1)", () => {
     assert.equal(JSON.parse(consumedMessages[3].value.toString("utf8")).payload.content, "a message 3");
     assert.equal(consumedMessages[4].value.toString("utf8"), "a message buffer");
     done();
+  });
+
+  it("should be able to get partition count for topic", done => {
+    producer.getPartitionCountOfTopic(topic).then(count => {
+      //console.log(count);
+      //console.log(producer.getStoredPartitionCounts());
+      assert.ok(count);
+      assert.ok(producer.getStoredPartitionCounts()[topic].count);
+      done();
+    });
+  });
+
+  it("should be able to get partition count for topic (from cache)", done => {
+    producer.getPartitionCountOfTopic(topic).then(count => {
+      //console.log(count);
+      //console.log(producer.getStoredPartitionCounts());
+      assert.ok(count);
+      assert.ok(producer.getStoredPartitionCounts()[topic].count);
+      done();
+    });
+  });
+
+  it("should return -1 on error", done => {
+    producer.getPartitionCountOfTopic("dont-exist-x").then(count => {
+      //console.log(count);
+      assert.equal(count, -1);
+      done();
+    });
   });
 });

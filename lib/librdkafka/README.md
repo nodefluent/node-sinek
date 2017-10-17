@@ -52,7 +52,29 @@ config that you are used to use with the other clients
 - consumer poll grace (only 1 by 1 mode) can be configured via `const config = { options: { consumeGraceMs: 125 }};` - *default is 1000ms*
 - when **noptions** is set, you do not have to set the old config params
 
+## Producer Auto Partition Count Mode
+
+- it is possible to let the producer automatically handle the amount
+    of partitions (max count) of topics, when producing
+- to do that you must pass `"auto"` as third argument of the constructor
+    `new NProducer(config, null, "auto");`
+- and you must not pass a specific partition to the `send(), buffer() or bufferXXX()` functions
+- this way the the producer will fetch the metadata for the specific topics,
+    parse the partition count from it and use it as max value for its random or deterministic
+    partition selection approach
+- *NOTE:* that the topic must exist before producing if you are using the `auto` mode
+- when auto mode is enabled you can use `producer.getStoredPartitionCounts()` to grab
+    the locally cached partition counts
+
+### Getting Metadata via Producer
+
+- `producer.getMetdata()` returns generic information about all topics on the connected broker
+- `producer.getTopicMetadata("my-topic")` returns info for specific topic (*NOTE:* will create topic
+    if it does not already exist)
+- `Metadata` instances offer a few handy formatting functions checkout `/lib/librdkafka/Metadata.js`
+
 ## Consumer Modes
+
 - 1 by 1 mode by passing **a callback** to `.consume()` - see [test/int/NSinek.test.js](../../test/int/NSinek.test.js)
   * consumes a single message and commit after callback each round
 - asap mode by passing **no callback** to `.consume()` - see [test/int/NSinekF.test.js](../../test/int/NSinekF.test.js)
