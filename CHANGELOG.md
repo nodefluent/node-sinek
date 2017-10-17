@@ -1,5 +1,10 @@
 # sinek CHANGELOG
 
+## 2017-10-17, Version 6.5.1
+
+* fixed bug in NConsumer consume() consume options, where commitSync field was always true
+* added JSDOC for NConsumer and NProducer
+
 ## 2017-10-13, Version 6.5.0
 
 * new 1:N consumer mode (making 1:1 mode configurable with params -> see lib/librdkafka/README.md)
