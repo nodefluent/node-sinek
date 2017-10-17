@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2017-10-18, Version 6.6.1
+
+* updates `node-rdkafka` to @2.1.0 which ships fixes
+
 ## 2017-10-18, Version 6.6.0
 
 * added librdkafka/Metadata class

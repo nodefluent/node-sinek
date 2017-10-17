@@ -447,13 +447,9 @@ destroy@~1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.0.4.tgz#978857442c44749e4206613e37946205826abd80"
 
-diff@3.3.1:
+diff@3.3.1, diff@^3.1.0:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/diff/-/diff-3.3.1.tgz#aa8567a6eed03c531fc89d3f711cd0e5259dec75"
-
-diff@^3.1.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/diff/-/diff-3.4.0.tgz#b1d85507daf3964828de54b37d0d73ba67dda56c"
 
 doctrine@^2.0.0:
   version "2.0.0"
@@ -1234,9 +1230,9 @@ node-gyp@^3.6.2:
     tar "^2.0.0"
     which "1"
 
-node-rdkafka@~2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/node-rdkafka/-/node-rdkafka-2.0.0.tgz#188b15d95a5d5eae09a5097b2e649b5877159fd9"
+node-rdkafka@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/node-rdkafka/-/node-rdkafka-2.1.0.tgz#934425c5cbefb1730e29243489ecf5e481d5ed37"
   dependencies:
     bindings "1.x"
     nan "2.x"

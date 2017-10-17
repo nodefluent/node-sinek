@@ -1,6 +1,6 @@
 {
     "name": "sinek",
-    "version": "6.6.0",
+    "version": "6.6.1",
     "description": "Node.js kafka client, consumer, producer polite out of the box",
     "main": "index.js",
     "scripts": {
@@ -61,6 +61,6 @@
         "sinon": "~4.0.1"
     },
     "optionalDependencies": {
-        "node-rdkafka": "~2.0.0"
+        "node-rdkafka": "^2.1.0"
     }
 }
