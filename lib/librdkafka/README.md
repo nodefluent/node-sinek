@@ -78,7 +78,7 @@ config that you are used to use with the other clients
      batchSize: 500, //grab up to 500 messages per batch round
      commitEveryNBatch: 5, //commit all offsets on every 5th batch
      concurrency: 2, //calls synFunction in parallel * 2 for messages in batch
-     commitSync: false //commits asynchronously (faster, but potential danger of growing offline commit request queue)
+     commitSync: false //commits asynchronously (faster, but potential danger of growing offline commit request queue) => default is true
    };
 
    myNConsumer.consume(syncFunction, true, false, options);
