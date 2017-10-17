@@ -143,6 +143,8 @@ To limit memory usage, you need to set noptions to:
 }
 ```
 
+- these values ^ are now set as default (sinek >= 6.5.0)
+
 ## Altering subscriptions
 
 - `consumer.addSubscriptions(["topic1", "topic2"])` -> will add additional subscriptions
