@@ -1,5 +1,10 @@
 # sinek CHANGELOG
 
+## 2017-10-18, Version 6.7.0
+
+* new offset info functions for NConsumer (checkout librdkafka/README.md)
+* new getLagStatus() function for NConsumer that fetches and compares partition offsets
+
 ## 2017-10-18, Version 6.6.1
 
 * updates `node-rdkafka` to @2.1.0 which ships fixes
