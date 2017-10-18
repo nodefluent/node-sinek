@@ -10,7 +10,7 @@ env:
 
 script:
   - npm run lint
-  - mocha --timeout 60000 -R spec test/int/*
+  - mocha --exit --timeout 60000 -R spec test/int/*
 
 before_install:
 - wget http://www.us.apache.org/dist/kafka/0.10.2.0/kafka_2.10-0.10.2.0.tgz -O kafka.tgz
