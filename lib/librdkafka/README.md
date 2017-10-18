@@ -109,6 +109,13 @@ config that you are used to use with the other clients
 - when active, this mode will also expose more a field called `batch` with insight stats on the `.getStats()` object
 - and the consumer instance will emit a `consumer.on("batch", messages => {});` event
 
+### Accessing Consumer Offset Information
+
+- `consumer.getOffsetForTopicPartition("my-topic", 1).then(offsets => {});`
+- `consumer.getComittedOffsets().then(offsets => {});`
+- `const info = consumer.getAssignedPartitions();`
+- `consumer.getLagStatus().then(offsets => {});` -> automatically fetches and compares offsets for all assigned partitions for you
+
 ## Buffer, String or JSON as message values
 - you can call `producer.send()` with a string or with a Buffer instance
 - you can only call `producer.bufferXXX()` methods with objects

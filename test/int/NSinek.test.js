@@ -120,4 +120,20 @@ describe("NSinek INT Buffer (1by1)", () => {
       done();
     });
   });
+
+  it("should be able to get offsets for topic", () => {
+    return consumer.getOffsetForTopicPartition(topic, 0);
+  });
+
+  it("should be able to get comitted offsets", () => {
+    consumer.getAssignedPartitions();
+    return consumer.getComittedOffsets();
+  });
+
+  it("should be able to get lag infos for consumer", () => {
+    return consumer.getLagStatus().then(awass => {
+      console.log(awass);
+      return true;
+    });
+  });
 });
