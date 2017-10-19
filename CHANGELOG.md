@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2017-10-19, Version 6.8.0
+
+* comes with the new analytics class for nproducers and nconsumers
+
 ## 2017-10-18, Version 6.7.0
 
 * new offset info functions for NConsumer (checkout librdkafka/README.md)

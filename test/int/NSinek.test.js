@@ -12,6 +12,9 @@ describe("NSinek INT Buffer (1by1)", () => {
   let firstMessageReceived = false;
   let messagesChecker;
 
+  let producerAnalyticsResult = null;
+  let consumerAnalyticsResult = null;
+
   const oneByNModeOptions = {
     batchSize: 2,
     commitEveryNBatch: 1,
@@ -23,6 +26,17 @@ describe("NSinek INT Buffer (1by1)", () => {
 
     producer = new NProducer(producerConfig, null, "auto");
     consumer = new NConsumer([topic], consumerConfig);
+
+    const analyticsOptions = {
+      analyticsInterval: 500,
+      lagFetchInterval: 1000
+    };
+
+    producer.enableAnalytics(analyticsOptions);
+    producer.on("analytics", res => producerAnalyticsResult = res);
+
+    consumer.on("analytics", res => consumerAnalyticsResult = res);
+    consumer.enableAnalytics(analyticsOptions);
 
     producer.on("error", error => console.error(error));
     consumer.on("error", error => console.error(error));
@@ -135,5 +149,15 @@ describe("NSinek INT Buffer (1by1)", () => {
       console.log(awass);
       return true;
     });
+  });
+
+  it("should be able to see producer analytics data", () => {
+    assert.ok(producerAnalyticsResult);
+    console.log(producer.getAnalytics());
+  });
+
+  it("should be able to see consumer analytics data", () => {
+    assert.ok(consumerAnalyticsResult);
+    console.log(consumer.getAnalytics());
   });
 });
