@@ -1,8 +1,9 @@
 # sinek CHANGELOG
 
-## 2017-10-19, Version 6.8.0
+## 2017-10-20, Version 6.8.0
 
 * comes with the new analytics class for nproducers and nconsumers
+* checkout librdkafka/Analytics.md
 
 ## 2017-10-18, Version 6.7.0
 

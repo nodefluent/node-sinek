@@ -11,11 +11,13 @@
 - `npm i -g yarn` # make sure to have yarn available
 
 ### Debian/Ubuntu
+
 - `sudo apt install librdkafka-dev libsasl2-dev`
 - `rm -rf node_modules`
 - `yarn` # node-rdkafka is installed as optional dependency
 
 ### MacOS
+
 - `brew install librdkafka`
 - `brew install openssl`
 - `rm -rf node_modules`
@@ -43,10 +45,10 @@ You can find an implementation [example here](../../sasl-ssl-example)
 ## New/Additional Configuration Parameters
 
 - as usual sinek tries to be as polite as possible and will offer you to use the same
-config that you are used to use with the other clients
+    config that you are used to use with the other clients
 - however *librdkafka* brings a whole lot of different config settings and parameters
 - you can overwrite them (or use interely) with a config sub-object called **noptions**
-  * e.g. `const config = { noptions: { "metadata.broker.list": "localhost:9092"} };`
+    e.g. `const config = { noptions: { "metadata.broker.list": "localhost:9092"} };`
 - a full list and descriptions of config params can be found [CONFIG HERE](https://github.com/edenhill/librdkafka/blob/0.9.5.x/CONFIGURATION.md)
 - producer poll interval can be configured via `const config = { options: { pollIntervalMs: 100 }};` - *default is 100ms*
 - consumer poll grace (only 1 by 1 mode) can be configured via `const config = { options: { consumeGraceMs: 125 }};` - *default is 1000ms*
@@ -76,9 +78,9 @@ config that you are used to use with the other clients
 ## Consumer Modes
 
 - 1 by 1 mode by passing **a callback** to `.consume()` - see [test/int/NSinek.test.js](../../test/int/NSinek.test.js)
-  * consumes a single message and commit after callback each round
+    consumes a single message and commit after callback each round
 - asap mode by passing **no callback** to `.consume()` - see [test/int/NSinekF.test.js](../../test/int/NSinekF.test.js)
-  * consumes messages as fast as possible
+    consumes messages as fast as possible
 
 ### Advanced 1:n consumer mode
 
@@ -116,7 +118,13 @@ config that you are used to use with the other clients
 - `const info = consumer.getAssignedPartitions();`
 - `consumer.getLagStatus().then(offsets => {});` -> automatically fetches and compares offsets for all assigned partitions for you
 
+## Complex Analytics access for Consumers and Producers
+
+- additional information regarding performance and offset lags are exposed through analytics functions
+- take a look at the description [here](Analytics.md)
+
 ## Buffer, String or JSON as message values
+
 - you can call `producer.send()` with a string or with a Buffer instance
 - you can only call `producer.bufferXXX()` methods with objects
 - you can consume buffer message values with `consumer.consume(_, false, false)`
@@ -124,16 +132,16 @@ config that you are used to use with the other clients
 - you can consume json message values with `consumer.consume(_, true, true)`
 
 ## Debug Messages
+
 - if you do not pass a logger via config: `const config = { logger: { debug: console.log, info: console.log, .. }};`
 - the native clients will use the debug module to log messages
 - use e.g. `DEBUG=sinek:n* npm test`
 
 ## Memory Usage
 
-Make sure you read explain the memory usage in librdkafka FAQ:
-https://github.com/edenhill/librdkafka/wiki/FAQ#explain-the-consumers-memory-usage-to-me
+Make sure you read explain the memory usage in librdkafka [FAQ](https://github.com/edenhill/librdkafka/wiki/FAQ#explain-the-consumers-memory-usage-to-me).
 
-#### Our experience
+## Our experience
 
 To limit memory usage, you need to set noptions to:
 
@@ -158,19 +166,21 @@ To limit memory usage, you need to set noptions to:
 - `consumer.adjustSubscription(["topic1"])` -> will change subcriptions to these only
 
 ## BREAKING CHANGES CONSUMER API (compared to connect/Consumer):
+
 - there is an optional options object for the config named: **noptions** - see [sasl-ssl-example](../../sasl-ssl-example/)
 - pause and resume have been removed
 - `consumeOnce` is not implemented
 - backpressure mode is not implemented
-  * given in 1 message only commit mode
+    given in 1 message only commit mode
 - 1 message only & consume asap modes can be controlled via `consumer.consume(syncEvent);`
-  * if syncEvent is present it will consume & commit single messages on callback
+    if syncEvent is present it will consume & commit single messages on callback
 - lastProcessed and lastReceived are now set to null as default value
 - closing will reset stats
 - no internal async-queue is used to manage messages
 - tconf config field sets topic configuration such as `{ "auto.offset.reset": "earliest" }`
 
 ## BREAKING CHANGES PRODUCER API (compared to connect/Producer):
+
 - send does not support arrays of messages
 - compressionType does not work anymore
 - no topics are passed in the constructor

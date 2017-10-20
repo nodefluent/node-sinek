@@ -158,6 +158,6 @@ describe("NSinek INT Buffer (1by1)", () => {
 
   it("should be able to see consumer analytics data", () => {
     assert.ok(consumerAnalyticsResult);
-    console.log(consumer.getAnalytics());
+    console.log(JSON.stringify(consumer.getAnalytics(), null, 4));
   });
 });
