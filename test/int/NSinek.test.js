@@ -14,9 +14,12 @@ describe("NSinek INT Buffer (1by1)", () => {
 
   let producerAnalyticsResult = null;
   let consumerAnalyticsResult = null;
+  let commitCount = -1;
+  let commits = 0;
+  let comittedMessages = 0;
 
   const oneByNModeOptions = {
-    batchSize: 2,
+    batchSize: 1,
     commitEveryNBatch: 1,
     concurrency: 1,
     commitSync: true
@@ -37,6 +40,13 @@ describe("NSinek INT Buffer (1by1)", () => {
 
     consumer.on("analytics", res => consumerAnalyticsResult = res);
     consumer.enableAnalytics(analyticsOptions);
+
+    consumer.on("commit", messageCount => {
+      //console.log("com", messageCount);
+      commitCount = messageCount;
+      commits++;
+      comittedMessages += messageCount;
+    });
 
     producer.on("error", error => console.error(error));
     consumer.on("error", error => console.error(error));
@@ -74,6 +84,7 @@ describe("NSinek INT Buffer (1by1)", () => {
       producer.bufferFormatPublish(topic, "1", {content: "a message 1"}, 1, null, 0),
       producer.bufferFormatUpdate(topic, "2", {content: "a message 2"}, 1, null, 0),
       producer.bufferFormatUnpublish(topic, "3", {content: "a message 3"}, 1, null, 0),
+      producer.send(topic, new Buffer("a message buffer")),
       producer.send(topic, new Buffer("a message buffer"))
     ];
 
@@ -83,7 +94,7 @@ describe("NSinek INT Buffer (1by1)", () => {
   it("should be able to wait", function(done){
     this.timeout(10000);
     messagesChecker = setInterval(()=>{
-      if(consumedMessages.length >= 5){
+      if(consumedMessages.length >= 6){
         clearInterval(messagesChecker);
         done();
       }
@@ -96,7 +107,11 @@ describe("NSinek INT Buffer (1by1)", () => {
   });
 
   it("should be able to consume messages", done => {
-    //console.log(consumedMessages);
+
+    assert.equal(consumedMessages.length, 6);
+    assert.equal(consumedMessages.length, producer.getStats().totalPublished);
+    assert.equal(consumedMessages.length, consumer.getStats().totalIncoming);
+
     assert.ok(consumedMessages.length);
     assert.ok(Buffer.isBuffer(consumedMessages[0].value));
     assert.equal(consumedMessages[0].value.toString("utf8"), "a message");
@@ -159,5 +174,12 @@ describe("NSinek INT Buffer (1by1)", () => {
   it("should be able to see consumer analytics data", () => {
     assert.ok(consumerAnalyticsResult);
     console.log(JSON.stringify(consumer.getAnalytics(), null, 4));
+  });
+
+  it("should be able to see correct amount of commits", () => {
+    console.log(commitCount, comittedMessages, commits);
+    assert.equal(oneByNModeOptions.batchSize, commitCount);
+    assert.equal(comittedMessages, 6);
+    assert.equal(commits, 6);
   });
 });

@@ -1,5 +1,13 @@
 # sinek CHANGELOG
 
+## 2017-10-21, Version 6.9.0
+
+* **BREAKING CHANGE** nconsumer 1:n (batch mode) does not commit on every x batches now,
+    it will only commit when a certain amount of messages has been consumed and processed
+    requiredAmountOfMessagesForCommit = batchSize * commitEveryNBatch
+* this increases performance and makes less commit requests when a topic's lag has been
+    resolved and the amount of "freshly" produced messages is clearly lower than batchSize.
+
 ## 2017-10-20, Version 6.8.0
 
 * comes with the new analytics class for nproducers and nconsumers
