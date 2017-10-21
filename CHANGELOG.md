@@ -1,5 +1,16 @@
 # sinek CHANGELOG
 
+## 2017-10-21, Version 6.11.0
+
+* intelligent healthcheck
+* average batch processing time in getStats() for nconsumer
+* clear rejects for operations, when the clients are not connected
+
+## 2017-10-21, Version 6.10.0
+
+* intelligent fetch grace times in batch mode
+* small optimisations on nconsumer
+
 ## 2017-10-21, Version 6.9.0
 
 * **BREAKING CHANGE** nconsumer 1:n (batch mode) does not commit on every x batches now,
