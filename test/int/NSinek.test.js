@@ -182,4 +182,11 @@ describe("NSinek INT Buffer (1by1)", () => {
     assert.equal(comittedMessages, 6);
     assert.equal(commits, 6);
   });
+
+  it("should be able to make health checks", () => {
+    return Promise.all([
+      consumer.checkHealth().then(console.log),
+      producer.checkHealth().then(console.log)
+    ]);
+  });
 });
