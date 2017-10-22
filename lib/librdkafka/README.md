@@ -118,10 +118,15 @@ You can find an implementation [example here](../../sasl-ssl-example)
 - `const info = consumer.getAssignedPartitions();`
 - `consumer.getLagStatus().then(offsets => {});` -> automatically fetches and compares offsets for all assigned partitions for you
 
-## Complex Analytics access for Consumers and Producers
+## Complex Analytics Access for Consumers and Producers
 
 - additional information regarding performance and offset lags are exposed through analytics functions
 - take a look at the description [here](Analytics.md)
+
+## Intelligent Health Check for Consumers and Producers
+
+- when analytics are enabled, the clients also offer an intelligent health check functionality
+- take a look at the description [here](Health.md)
 
 ## Buffer, String or JSON as message values
 

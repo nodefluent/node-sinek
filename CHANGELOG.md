@@ -1,10 +1,12 @@
 # sinek CHANGELOG
 
-## 2017-10-21, Version 6.11.0
+## 2017-10-22, Version 6.11.0
 
-* intelligent healthcheck
+* intelligent healthcheck, checkout librdkafka/Health.md
 * average batch processing time in getStats() for nconsumer
 * clear rejects for operations, when the clients are not connected
+* added unit tests for Health.js
+* refactored readme
 
 ## 2017-10-21, Version 6.10.0
 

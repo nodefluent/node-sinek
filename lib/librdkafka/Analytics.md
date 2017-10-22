@@ -69,8 +69,19 @@ console.log(consumer.getAnalytics());
         },
         "stallLags": {} //lags that are still present and have not changed since last lag fetch
     },
-    "largestLag": null,
-    "consumed": 1 //consumed messages since last lag fetch
+    "largestLag": {
+        "topic": "n-test-topic",
+        "partition": 0,
+        "lowDistance": 319,
+        "highDistance": 0,
+        "detail": {
+            "lowOffset": 0,
+            "highOffset": 319,
+            "comittedOffset": 319
+        }
+    },
+    "consumed": 1, //consumed messages since last lag fetch
+    "errors": 0 //any client errors that occured during the interval
 }
 
 /*
