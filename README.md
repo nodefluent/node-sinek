@@ -61,11 +61,11 @@ const {
 * [SASL example with the Native Client](sasl-ssl-example/)
 * [Alpine based docker example](kafka-setup/alpine.Dockerfile)
 * [Debian based docker example](kafka-setup/debian.Dockerfile)
-* [Hints & Help](docs/hints.md)
 * The older client implementations:
 * [Publisher](docs/publisher.md)
 * [Drainer](docs/drainer.md)
 * [PartitionDrainer](docs/partition-drainer.md)
+* [Hints & Help](docs/hints.md)
 
 > make it about them, not about you
 > - Simon Sinek

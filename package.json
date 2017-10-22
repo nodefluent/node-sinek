@@ -36,7 +36,8 @@
         "sasl",
         "kerberos",
         "librdkafka",
-        "stream"
+        "stream",
+        "batch"
     ],
     "author": "Christian Fröhlingsdorf",
     "license": "MIT",
