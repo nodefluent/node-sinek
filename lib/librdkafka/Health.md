@@ -46,7 +46,7 @@ const producerHealth = await producer.checkHealth();
 
 - available status codes:
 
-```json
+```javascript
 {
   DIS_ANALYTICS: -4, //you have not enabled analytics
   NO_ANALYTICS: -3, //no analytics result are available yet
