@@ -1,10 +1,12 @@
 # Native (librdkafka) Consumer & Producer
 
-- they do not support 100% all features of sinek
-- they have a slightly different API compared to the connect variants
-- they perform a little better than the other clients
-- they support SASL (kerberos)
+- they are incredibly fast: consume 2m messages/sec and produce 1m messsages/sec
+- they have additional analytics and health-check features
+- they require the installation of librdkafka + (native module) node-librdkafka
+- they have a slightly different API compared to the connect (Javascript) variants
+- they support SASL (and Kerberos)
 - you can work directly with Buffers
+- topic drain is not supported
 
 ## Setup (required actions to use the clients)
 
