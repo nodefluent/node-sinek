@@ -4,7 +4,6 @@ module.exports = {
     "node": true,
     "mocha": true
   },
-  "extends": "eslint:recommended",
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": 2017

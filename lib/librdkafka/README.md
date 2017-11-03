@@ -77,6 +77,23 @@ You can find an implementation [example here](../../sasl-ssl-example)
     if it does not already exist)
 - `Metadata` instances offer a few handy formatting functions checkout `/lib/librdkafka/Metadata.js`
 
+## Switching Producer Partition "Finder" mode
+
+- when passing no partition argument to the send or buffer methods, the producer will deterministically
+        identify the partition to produce the message to, by running a modulo (to the partition count of the topic)
+        on the key (or generated key) of the message.
+- as they key is a string it has to be turned into a hash, per default sinek uses murmurhash version 3 for that
+- the JAVA clients use murmurhash version 2 -> if you want to stay compatible when running these clients as well
+    simply pass this a config field
+
+```javascript
+const config = {
+    options: {
+        murmurHashVersion: "2"
+    }
+};
+```
+
 ## Consumer Modes
 
 - 1 by 1 mode by passing **a callback** to `.consume()` - see [test/int/NSinek.test.js](../../test/int/NSinek.test.js)
@@ -172,10 +189,17 @@ To limit memory usage, you need to set noptions to:
 - `consumer.addSubscriptions(["topic1", "topic2"])` -> will add additional subscriptions
 - `consumer.adjustSubscription(["topic1"])` -> will change subcriptions to these only
 
+## Resuming and Pausing Clients
+
+- you can resume and pause clients via
+- `client.pause(topicPartitions);`
+- `client.resume(topicPartitions);`
+- topicPartitions is an array of objects `[{topic: "test", partition: 0}]`
+- be carefull, as a paused producer rejects if you try to send
+
 ## BREAKING CHANGES CONSUMER API (compared to connect/Consumer):
 
 - there is an optional options object for the config named: **noptions** - see [sasl-ssl-example](../../sasl-ssl-example/)
-- pause and resume have been removed
 - `consumeOnce` is not implemented
 - backpressure mode is not implemented
     given in 1 message only commit mode

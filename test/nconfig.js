@@ -9,7 +9,8 @@ const config = {
   }, */
   options: {
     pollIntervalMs: 100,
-    consumeGraceMs: 22
+    consumeGraceMs: 22,
+    murmurHashVersion: "2"
   }
 };
 

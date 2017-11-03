@@ -1,5 +1,12 @@
 # sinek CHANGELOG
 
+## 2017-11-03, Version 6.12.0
+
+* upgraded node-librdkafka dependency to 2.1.1
+* added pause and resume functions for NConsumer
+* added commitMessage method to NConsumer
+* added option to switch partition selection to murmurv2
+
 ## 2017-10-22, Version 6.11.0
 
 * intelligent healthcheck, checkout librdkafka/Health.md
