@@ -82,9 +82,8 @@ You can find an implementation [example here](../../sasl-ssl-example)
 - when passing no partition argument to the send or buffer methods, the producer will deterministically
         identify the partition to produce the message to, by running a modulo (to the partition count of the topic)
         on the key (or generated key) of the message.
-- as they key is a string it has to be turned into a hash, per default sinek uses murmurhash version 3 for that
-- the JAVA clients use murmurhash version 2 -> if you want to stay compatible when running these clients as well
-    simply pass this a config field
+- as the key is a string, it has to be turned into a hash, per default sinek uses murmurhash version 3 for that
+- the JAVA clients use murmurhash version 2 -> so if you want to stay compatible simply pass a config field:
 
 ```javascript
 const config = {
