@@ -46,7 +46,7 @@
     },
     "homepage": "https://github.com/nodefluent/node-sinek#readme",
     "dependencies": {
-        "async": "~2.5.0",
+        "async": "~2.6.0",
         "bluebird": "~3.5.0",
         "debug": "^3.0.0",
         "kafka-node": "^2.2.0",
