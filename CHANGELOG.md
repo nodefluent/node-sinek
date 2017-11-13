@@ -1,5 +1,10 @@
 # sinek CHANGELOG
 
+## 2017-11-13, Version 6.13.0
+
+* now proxying consumer_commit_cb
+* upgraded dependencies: eslint@4.11.0, sinon@4.1.2, node-rdkafka@2.2.0
+
 ## 2017-11-03, Version 6.12.0
 
 * upgraded node-librdkafka dependency to 2.1.1
