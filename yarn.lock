@@ -1173,6 +1173,16 @@ ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
+murmur-hash-js@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/murmur-hash-js/-/murmur-hash-js-1.0.0.tgz#5041049269c96633c866386960b2f4289e75e5b0"
+
+murmur2-partitioner@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/murmur2-partitioner/-/murmur2-partitioner-1.0.0.tgz#887777b4a411a387f8a030a184d0aafbc19e21c0"
+  dependencies:
+    murmur-hash-js "^1.0.0"
+
 murmurhash@~0.0.2:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/murmurhash/-/murmurhash-0.0.2.tgz#6f07bd8a1105e709c26fc89420cb5930c24585fe"
