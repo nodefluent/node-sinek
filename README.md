@@ -1,3 +1,7 @@
+# ATTENTION: This is a fork
+
+The CRM team forked [nodefluent/node-sinek](https://github.com/nodefluent/node-sinek). Find new features at branch `correlation-id`. We are going to create a PR to the original repository with this feature branch.
+
 # High Level Node.js Kafka Client - sinek
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/nodefluent/node-sinek.svg)](https://greenkeeper.io/)
