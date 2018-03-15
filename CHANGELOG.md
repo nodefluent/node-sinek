@@ -1,5 +1,26 @@
 # sinek CHANGELOG
 
+## 2018-03-15, Version 6.15.0
+
+* corrected consumer callback error pass (now also logging warning to not do it)
+* now allows to pass correlation-id (opaque key) when producing with NProducer
+* updated dependencies:
+
+uuid  ~3.1.0  →  ~3.2.1
+bluebird       ~3.5.0  →   ~3.5.1
+debug          ^3.0.0  →   ^3.1.0
+kafka-node     ^2.3.0  →   ^2.4.1
+eslint        ^4.11.0  →  ^4.18.2
+express       ^4.16.2  →  ^4.16.3
+mocha          ~5.0.2  →   ~5.0.4
+sinon          ^4.1.2  →   ^4.4.6
+node-rdkafka   ^2.2.0  →   ^2.3.1
+
+## 2018-02-18, Version 6.14.0
+
+* now starting analytics immediately
+* propagating connection promise correctly
+
 ## 2017-11-13, Version 6.13.0
 
 * now proxying consumer_commit_cb

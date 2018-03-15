@@ -23,6 +23,10 @@ The most advanced Kafka Client.
 * check out :goberserk: [node-kafka-streams](https://github.com/nodefluent/kafka-streams) for a stream processing kafka api
 * check out :fire: [node-kafka-connect](https://github.com/nodefluent/kafka-connect) for a easy datastore <-> kafka transfer
 
+## Latest Changes
+
+Can be found [here](CHANGELOG.md)
+
 ## Install
 
 ```shell

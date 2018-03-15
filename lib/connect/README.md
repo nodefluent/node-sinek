@@ -26,8 +26,8 @@ const withBackpressure = true;
 consumer.connect(withBackpressure).then(_ => {
     consumer.consume((message, callback) => {
         console.log(message);
-        const error = null;
-        callback(error); //you must return this callback to receive further messages
+        //you must return this callback to receive further messages
+        callback();
     });
 });
 
