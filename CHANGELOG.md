@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2018-03-27, Version 6.15.1
+
+* node-rdkafka has seg fault bugs in 2.3.1 -> falling back to 2.2.3
+
 ## 2018-03-15, Version 6.15.0
 
 * corrected consumer callback error pass (now also logging warning to not do it)
