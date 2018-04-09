@@ -49,7 +49,7 @@
         "async": "~2.6.0",
         "bluebird": "~3.5.1",
         "debug": "~3.1.0",
-        "kafka-node": "~2.4.1",
+        "kafka-node": "~2.5.0",
         "murmur2-partitioner": "~1.0.0",
         "murmurhash": "~0.0.2",
         "uuid": "~3.2.1"
