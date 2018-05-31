@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2018-05-31, Version 6.16.0
+
+* updated NConsumer and NProducer to debug and concat errors of require of native lib
+
 ## 2018-03-27, Version 6.15.1
 
 * node-rdkafka has seg fault bugs in 2.3.1 -> falling back to 2.2.3
