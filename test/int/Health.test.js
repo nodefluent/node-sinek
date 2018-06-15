@@ -10,7 +10,7 @@ const {
   ProducerHealth
 } = Health;
 
-describe("Health", () => {
+describe("Health UNIT", () => {
 
   const getFakeProducerAnalyticsResult = (produced = 0, errors = 0) => {
     return {

@@ -1,6 +1,6 @@
 {
     "name": "sinek",
-    "version": "6.16.0",
+    "version": "6.17.0",
     "description": "Node.js kafka client, consumer, producer polite out of the box",
     "main": "index.js",
     "scripts": {
@@ -10,7 +10,7 @@
         "kafka:stop": "./kafka-setup/stop.sh",
         "kafka:logs": "docker-compose --file ./kafka-setup/docker-compose.yml logs -f",
         "kafka:console": "./kafka-setup/kafka-console.sh",
-        "test": "npm run lint && _mocha -- -R spec --exit --timeout 10000 test/int/*",
+        "test": "_mocha --recursive --timeout 32500 --exit -R spec test/int",
         "rd-lt": "NODE_ENV=production node ./perf/RDLoadTest.js"
     },
     "repository": {
@@ -46,23 +46,23 @@
     },
     "homepage": "https://github.com/nodefluent/node-sinek#readme",
     "dependencies": {
-        "async": "~2.6.0",
+        "async": "~2.6.1",
         "bluebird": "~3.5.1",
         "debug": "~3.1.0",
-        "kafka-node": "~2.4.1",
+        "kafka-node": "~2.6.1",
         "murmur2-partitioner": "~1.0.0",
         "murmurhash": "~0.0.2",
         "uuid": "~3.2.1"
     },
     "devDependencies": {
-        "eslint": "~4.18.2",
+        "eslint": "~4.19.1",
         "expect.js": "~0.3.1",
         "express": "~4.16.3",
         "istanbul": "~0.4.5",
-        "mocha": "~5.0.4",
-        "sinon": "^4.4.6"
+        "mocha": "~5.2.0",
+        "sinon": "^6.0.0"
     },
     "optionalDependencies": {
-        "node-rdkafka": "~2.2.3"
+        "node-rdkafka": "~2.3.3"
     }
 }

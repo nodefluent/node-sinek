@@ -1,10 +1,10 @@
 "use strict";
 
 const assert = require("assert");
-const {NConsumer, NProducer} = require("./../../index.js");
-const {producerConfig, consumerConfig, topic} = require("./../nconfig.js");
+const {Consumer, Producer} = require("./../../index.js");
+const {jsProducerConfig, jsConsumerConfig, topic} = require("../config");
 
-describe("NSinek INT String (fast)", () => {
+describe("Javascript Client INT", () => {
 
   let consumer = null;
   let producer = null;
@@ -14,19 +14,22 @@ describe("NSinek INT String (fast)", () => {
 
   before(done => {
 
-    producer = new NProducer(producerConfig);
-    consumer = new NConsumer([topic], consumerConfig);
+    producer = new Producer(jsProducerConfig);
+    consumer = new Consumer([topic], jsConsumerConfig);
 
     producer.on("error", error => console.error(error));
     consumer.on("error", error => console.error(error));
 
     Promise.all([
       producer.connect(),
-      consumer.connect()
+      consumer.connect(false)
     ]).then(() => {
-      consumer.on("message", message => consumedMessages.push(message));
-      consumer.consume().then(() => {
-        firstMessageReceived = true;
+      consumer.consume();
+      consumer.on("message", message => {
+        consumedMessages.push(message);
+        if(!firstMessageReceived){
+          firstMessageReceived = true;
+        }
       });
       setTimeout(done, 1000);
     });
@@ -68,7 +71,7 @@ describe("NSinek INT String (fast)", () => {
   });
 
   it("should be able to consume messages", done => {
-    //console.log(consumedMessages);
+    console.log(consumedMessages);
     assert.ok(consumedMessages.length);
     assert.ok(!Buffer.isBuffer(consumedMessages[0].value));
     assert.equal(consumedMessages[0].value, "a message");

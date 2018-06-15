@@ -1,5 +1,18 @@
 # sinek CHANGELOG
 
+## 2018-05-31, Version 6.17.0
+
+* switched default encoding for messages value and key for JS Kafka client to Buffer
+* simplified integration tests
+* updated dependencies:
+
+ kafka-node     ~2.4.1  →   ~2.6.1
+ eslint        ~4.18.2  →  ~4.19.1
+ mocha          ~5.0.4  →   ~5.2.0
+ sinon          ^4.4.6  →   ^6.0.0
+ node-rdkafka   ~2.2.3  →   ~2.3.3
+ async  ~2.6.0  →  ~2.6.1
+
 ## 2018-05-31, Version 6.16.0
 
 * updated NConsumer and NProducer to debug and concat errors of require of native lib
