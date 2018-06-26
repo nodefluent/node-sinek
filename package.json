@@ -52,7 +52,7 @@
         "kafka-node": "~2.6.1",
         "murmur2-partitioner": "~1.0.0",
         "murmurhash": "~0.0.2",
-        "uuid": "~3.2.1"
+        "uuid": "~3.3.0"
     },
     "devDependencies": {
         "eslint": "~4.19.1",
