@@ -67,7 +67,10 @@ describe("Native Client INT", () => {
 
   it("should have received first message", done => {
     assert.ok(firstMessageReceived);
-    done();
+    producer.getTopicList().then((topics) => {
+      assert.ok(topics.length);
+      done();
+    });
   });
 
   it("should be able to consume messages", done => {

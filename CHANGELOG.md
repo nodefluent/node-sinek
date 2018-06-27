@@ -1,5 +1,14 @@
 # sinek CHANGELOG
 
+## 2018-06-27, Version 6.18.0
+
+* brought getTopicMetadata and getMetadata to NConsumer, was only available on NProducer so far
+* added getTopicList to NProducer and NConsumer to retrieve a list of available topics
+* updated dependencies:
+
+ node-rdkafka   ~2.3.3  →   ~2.3.4
+ (also sinon, eslint and uuid)
+
 ## 2018-05-31, Version 6.17.0
 
 * switched default encoding for messages value and key for JS Kafka client to Buffer
