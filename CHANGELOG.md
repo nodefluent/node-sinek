@@ -1,5 +1,10 @@
 # sinek CHANGELOG
 
+## 2018-07-03, Version 6.19.0
+
+* Health Thresholds are now configurable, pass them via health subobject in the parent config to consumer or producer
+* updated uuid and sinon deps
+
 ## 2018-06-27, Version 6.18.0
 
 * brought getTopicMetadata and getMetadata to NConsumer, was only available on NProducer so far

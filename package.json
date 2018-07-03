@@ -1,8 +1,11 @@
 {
     "name": "sinek",
-    "version": "6.18.0",
+    "version": "6.19.0",
     "description": "Node.js kafka client, consumer, producer polite out of the box",
     "main": "index.js",
+    "engines" : {
+        "node" : ">=8.11.3"
+    },
     "scripts": {
         "lint": "eslint .",
         "fix": "eslint --fix .",
@@ -53,7 +56,7 @@
         "lodash.merge": "^4.6.1",
         "murmur2-partitioner": "~1.0.0",
         "murmurhash": "~0.0.2",
-        "uuid": "~3.3.0"
+        "uuid": "~3.3.2"
     },
     "devDependencies": {
         "eslint": "~5.0.1",
@@ -61,7 +64,7 @@
         "express": "~4.16.3",
         "istanbul": "~0.4.5",
         "mocha": "~5.2.0",
-        "sinon": "^6.0.1"
+        "sinon": "^6.1.0"
     },
     "optionalDependencies": {
         "node-rdkafka": "~2.3.4"
