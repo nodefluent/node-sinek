@@ -1,5 +1,15 @@
 # sinek CHANGELOG
 
+## 2018-09-02, Version 6.20.0
+
+* Added new Experimental functions to NConsumer resetTopicPartitionsToEarliest, resetTopicPartitionsToLatest
+* Marked old Clients as deprecated, added suggestion for Consumer and Producer to move to native versions
+* Updated dependencies:
+
+node-rdkafka  ~2.3.4  →  ~2.4.1
+eslint        ~5.0.1  →  ~5.5.0
+sinon  ~6.1.0  →  ~6.1.5
+
 ## 2018-07-03, Version 6.19.0
 
 * Health Thresholds are now configurable, pass them via health subobject in the parent config to consumer or producer

@@ -1,6 +1,6 @@
 {
     "name": "sinek",
-    "version": "6.19.0",
+    "version": "6.20.0",
     "description": "Node.js kafka client, consumer, producer polite out of the box",
     "main": "index.js",
     "engines" : {
@@ -53,20 +53,20 @@
         "bluebird": "~3.5.1",
         "debug": "~3.1.0",
         "kafka-node": "~2.6.1",
-        "lodash.merge": "^4.6.1",
+        "lodash.merge": "~4.6.1",
         "murmur2-partitioner": "~1.0.0",
         "murmurhash": "~0.0.2",
         "uuid": "~3.3.2"
     },
     "devDependencies": {
-        "eslint": "~5.0.1",
+        "eslint": "~5.5.0",
         "expect.js": "~0.3.1",
         "express": "~4.16.3",
         "istanbul": "~0.4.5",
         "mocha": "~5.2.0",
-        "sinon": "^6.1.0"
+        "sinon": "~6.1.5"
     },
     "optionalDependencies": {
-        "node-rdkafka": "~2.3.4"
+        "node-rdkafka": "~2.4.1"
     }
 }
