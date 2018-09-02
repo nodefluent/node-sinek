@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2018-09-02, Version 6.21.0
+
+* added TypeScript declarations for NConsumer, NProducer, Consumer, Producer and Config
+
 ## 2018-09-02, Version 6.20.0
 
 * Added new Experimental functions to NConsumer resetTopicPartitionsToEarliest, resetTopicPartitionsToLatest
