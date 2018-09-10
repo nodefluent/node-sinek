@@ -51,9 +51,9 @@
     "homepage": "https://github.com/nodefluent/node-sinek#readme",
     "dependencies": {
         "async": "~2.6.1",
-        "bluebird": "~3.5.1",
+        "bluebird": "~3.5.2",
         "debug": "~3.1.0",
-        "kafka-node": "~2.6.1",
+        "kafka-node": "~3.0.0",
         "lodash.merge": "~4.6.1",
         "murmur2-partitioner": "~1.0.0",
         "murmurhash": "~0.0.2",
@@ -65,7 +65,7 @@
         "express": "~4.16.3",
         "istanbul": "~0.4.5",
         "mocha": "~5.2.0",
-        "sinon": "~6.1.5"
+        "sinon": "~6.2.0"
     },
     "optionalDependencies": {
         "node-rdkafka": "~2.4.1"

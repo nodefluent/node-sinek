@@ -26,7 +26,7 @@ declare module "sinek" {
      health?: any;
     }
 
-    interface KafkaMessage {
+    export interface KafkaMessage {
         topic: string;
         partition: number;
         offset: number;
@@ -34,7 +34,7 @@ declare module "sinek" {
         value: Buffer | string | any;
     }
 
-    interface BatchConfig {
+    export interface BatchConfig {
         batchSize: number;
         commitEveryNBatch: number;
         concurrency: number;
@@ -42,7 +42,7 @@ declare module "sinek" {
         noBatchCommits: boolean;
     }
 
-    interface ConsumerStats {
+    export interface ConsumerStats {
         totalIncoming: number;
         lastMessage: number;
         receivedFirstMsg: boolean;
@@ -66,7 +66,7 @@ declare module "sinek" {
         totalErrors: number;
     }
 
-    interface LagStatus {
+    export interface LagStatus {
         topic: string;
         partition: number;
         lowDistance: number;
@@ -78,14 +78,14 @@ declare module "sinek" {
         };
     }
 
-    interface ProducerStats {
+    export interface ProducerStats {
         totalPublished: number;
         last: number;
         isPaused: boolean;
         totalErrors: number;
     }
 
-    interface MessageReturn {
+    export interface MessageReturn {
         key: string;
         partition: number;
     }
@@ -211,15 +211,15 @@ declare module "sinek" {
         constructor(producer: object, partitionCount: number, autoFlushBuffer: number, flushPeriod: number)
     }
 
-    class PartitionDrainer {
+    export class PartitionDrainer {
         constructor(consumer: object, asyncLimit: number, commitOnDrain: boolean, autoJsonParsing: boolean)
     }
 
-    class PartitionQueue {
+    export class PartitionQueue {
         constructor(partition: object, drainEvent: object, drainer: object, asyncLimit: number, queueDrain: object)
     }
 
-    interface MessageType {
+    export interface MessageType {
         key: String;
         value: String;
     }
