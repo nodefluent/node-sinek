@@ -3,6 +3,7 @@
 ## 2018-09-10, Version 6.22.0
 
 * fixed some typescript declaration bugs
+* removed warning from Consumer and Producer, didnt feel too good
 * updated dependencies: kafka-node 2.6.1 -> 3.0.0
 
 ## 2018-09-02, Version 6.21.0
