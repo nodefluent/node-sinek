@@ -138,19 +138,19 @@ declare module "sinek" {
         send(topicName: string, message: string | Buffer, _partition: number, _key?: string | Buffer,
              _partitionKey?: string, _opaqueKey?: string): Promise<MessageReturn>;
 
-        buffer(topic: string, identifier: string, payload: object, partition?: number,
+        buffer(topic: string, identifier: string | undefined, payload: object, partition?: number,
             version?: number, partitionKey?: string): Promise<MessageReturn>;
 
-        bufferFormat(topic: string, identifier: string, payload: object, version?: number,
+        bufferFormat(topic: string, identifier: string | undefined, payload: object, version?: number,
             compressionType?: number, partitionKey?: string): Promise<MessageReturn>;
 
-        bufferFormatPublish(topic: string, identifier: string, _payload: object, version?: number,
+        bufferFormatPublish(topic: string, identifier: string | undefined, _payload: object, version?: number,
              _?: null, partitionKey?: string, partition?: number): Promise<MessageReturn>;
 
-        bufferFormatUpdate(topic: string, identifier: string, _payload: object, version?: number,
+        bufferFormatUpdate(topic: string, identifier: string, | undefined _payload: object, version?: number,
             _?: null, partitionKey?: string, partition?: number): Promise<MessageReturn>;
 
-        bufferFormatUnpublish(topic: string, identifier: string, _payload: object, version?: number,
+        bufferFormatUnpublish(topic: string, identifier: string | undefined, _payload: object, version?: number,
             _?: null, partitionKey?: string, partition?: number): Promise<MessageReturn>;
 
         pause(): void;
