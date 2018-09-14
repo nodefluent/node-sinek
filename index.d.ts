@@ -130,7 +130,7 @@ declare module "sinek" {
     }
 
     export class NProducer {
-        constructor(config: IKafka, _?: null, defaultPartitionCount?: number)
+        constructor(config: IKafka, _?: null, defaultPartitionCount?: number | "auto")
         on(eventName: "error", callback: (error: any) => any): void;
         on(eventName: "ready", callback: () => any): void;
         connect(): Promise<void>;
