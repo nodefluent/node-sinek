@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2018-09-14, Version 6.22.1
+
+* typescript declaration optimizations
+
 ## 2018-09-10, Version 6.22.0
 
 * fixed some typescript declaration bugs
