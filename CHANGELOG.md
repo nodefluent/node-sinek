@@ -1,5 +1,10 @@
 # sinek CHANGELOG
 
+## 2018-09-20, Version 6.22.2
+
+* fixed bug in NProducer partition identification, result of murmur was not passed correctly
+thanks to @elizehavi
+
 ## 2018-09-14, Version 6.22.1
 
 * typescript declaration optimizations
