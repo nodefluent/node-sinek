@@ -147,7 +147,7 @@ declare module "sinek" {
         bufferFormatPublish(topic: string, identifier: string | undefined, _payload: object, version?: number,
              _?: null, partitionKey?: string, partition?: number): Promise<MessageReturn>;
 
-        bufferFormatUpdate(topic: string, identifier: string, | undefined _payload: object, version?: number,
+        bufferFormatUpdate(topic: string, identifier: string | undefined, _payload: object, version?: number,
             _?: null, partitionKey?: string, partition?: number): Promise<MessageReturn>;
 
         bufferFormatUnpublish(topic: string, identifier: string | undefined, _payload: object, version?: number,
