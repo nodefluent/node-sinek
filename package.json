@@ -1,6 +1,6 @@
 {
     "name": "sinek",
-    "version": "6.22.3",
+    "version": "6.23.0",
     "description": "Node.js kafka client, consumer, producer polite out of the box",
     "main": "index.js",
     "typings": "index.d.ts",
@@ -15,7 +15,8 @@
         "kafka:logs": "docker-compose --file ./kafka-setup/docker-compose.yml logs -f",
         "kafka:console": "./kafka-setup/kafka-console.sh",
         "test": "_mocha --recursive --timeout 32500 --exit -R spec test/int",
-        "rd-lt": "NODE_ENV=production node ./perf/RDLoadTest.js"
+        "rd-lt": "NODE_ENV=production node ./perf/RDLoadTest.js",
+        "yarn:openssl": "LDFLAGS='-L/usr/local/opt/openssl/lib' CPPFLAGS='-I/usr/local/opt/openssl/include' yarn"
     },
     "repository": {
         "type": "git",
@@ -52,22 +53,22 @@
     "dependencies": {
         "async": "~2.6.1",
         "bluebird": "~3.5.2",
-        "debug": "~3.1.0",
-        "kafka-node": "~3.0.0",
+        "debug": "~4.1.0",
+        "kafka-node": "~3.0.1",
         "lodash.merge": "~4.6.1",
         "murmur2-partitioner": "~1.0.0",
         "murmurhash": "~0.0.2",
         "uuid": "~3.3.2"
     },
     "devDependencies": {
-        "eslint": "~5.5.0",
+        "eslint": "~5.7.0",
         "expect.js": "~0.3.1",
-        "express": "~4.16.3",
+        "express": "~4.16.4",
         "istanbul": "~0.4.5",
         "mocha": "~5.2.0",
-        "sinon": "~6.2.0"
+        "sinon": "~7.0.0"
     },
     "optionalDependencies": {
-        "node-rdkafka": "~2.4.1"
+        "node-rdkafka": "~2.4.2"
     }
 }

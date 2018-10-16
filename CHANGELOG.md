@@ -1,5 +1,12 @@
 # sinek CHANGELOG
 
+## 2018-10-16, Version 6.23.0
+
+* added advanced configuration declaration to typescript declarations, thanks to Juri Wiens
+* permitted passing of null as message value
+* added .tombstone() function to NProducer to easily delete kafka messages
+* upgraded dependencies (node-rdkafka and kafka-node were updated)
+
 ## 2018-10-04, Version 6.22.3
 
 * fixed bug in typescript declaration, thanks to @holgeradam

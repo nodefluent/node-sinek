@@ -30,7 +30,7 @@
   # Add to your shell profile:
   export CPPFLAGS=-I/usr/local/opt/openssl/include
   export LDFLAGS=-L/usr/local/opt/openssl/lib
-  # and redo the installation.
+  # and redo the installation. (checkout yarn:openssl script in package.json of this project)
 ```
 
 ## Using NConsumer & NProducer
@@ -197,6 +197,12 @@ To limit memory usage, you need to set noptions to:
 - `client.resume(topicPartitions);`
 - topicPartitions is an array of objects `[{topic: "test", partition: 0}]`
 - be carefull, as a paused producer rejects if you try to send
+
+## Deleting messages from topics | producing tombstone messages
+
+- the producer has a simple API to help you with this `producer.tombstone("my-topic", "my-key", null);`
+- **NOTE**: this only works on topics that have key compaction enabled in their configuration
+- please ensure you produce to the right topic
 
 ## BREAKING CHANGES CONSUMER API (compared to connect/Consumer):
 
