@@ -7,7 +7,7 @@ ssl-example/
 test/
 .editorconfig
 .eslintignore
-.eslintrc
+.eslintrc.js
 .gitignore
 .jshintrc
 .travis.yml
