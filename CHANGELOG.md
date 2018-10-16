@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2018-10-16, Version 6.23.1
+
+* small release optimisations
+
 ## 2018-10-16, Version 6.23.0
 
 * added advanced configuration declaration to typescript declarations, thanks to Juri Wiens

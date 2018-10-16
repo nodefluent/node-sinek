@@ -1,0 +1,13 @@
+docs/
+coverage/
+kafka-setup/
+perf/
+sasl-ssl-example/
+ssl-example/
+test/
+.editorconfig
+.eslintignore
+.eslintrc
+.gitignore
+.jshintrc
+.travis.yml
