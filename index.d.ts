@@ -316,7 +316,7 @@ declare module "sinek" {
         pause(): void;
         resume(): void;
         getStats(): object;
-        close(commit: boolean): object;
+        close(commit?: boolean): object;
     }
 
     export class Producer {
@@ -333,7 +333,7 @@ declare module "sinek" {
         resume(): void;
         getStats(): object;
         refreshMetadata(topics: Array<string>): void;
-        close(commit: boolean): object;
+        close(): object;
     }
 
     export class Kafka {
