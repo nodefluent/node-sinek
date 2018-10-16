@@ -303,6 +303,7 @@ declare module "sinek" {
         getTopicList(): Promise<Array<string>>;
         getPartitionCountOfTopic(topic: string): Promise<number>;
         getStoredPartitionCounts(): object;
+        tombstone(topic: string, key: string | Buffer, _partition?: number | null);
     }
 
     export class Consumer {
