@@ -17,7 +17,7 @@ declare module "sinek" {
         };
     }
 
-    interface NCommonKafkaOptions {
+    export interface NCommonKafkaOptions {
         "builtin.features"?: string;
         "client.id"?: string;
         "metadata.broker.list": string;
@@ -77,7 +77,7 @@ declare module "sinek" {
         "event_cb"?: boolean;
     }
 
-    interface NConsumerKafkaOptions extends NCommonKafkaOptions {
+    export interface NConsumerKafkaOptions extends NCommonKafkaOptions {
         "group.id": string;
         "enable.auto.commit"?: boolean;
         "auto.commit.interval.ms"?: number;
@@ -93,7 +93,7 @@ declare module "sinek" {
         "check.crcs"?: boolean;
     }
 
-    interface NProducerKafkaOptions extends NCommonKafkaOptions {
+    export interface NProducerKafkaOptions extends NCommonKafkaOptions {
         "queue.buffering.max.messages"?: number;
         "queue.buffering.max.kbytes"?: number;
         "queue.buffering.max.ms"?: number;
