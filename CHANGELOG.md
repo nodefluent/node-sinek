@@ -1,16 +1,11 @@
 # sinek CHANGELOG
 
-## 2018-10-16, Version 6.23.3
+## 2018-10-16, Version 6.23.1-4
 
 * added tombstone function call to types
-
-## 2018-10-16, Version 6.23.2
-
 * fixed missing exports
-
-## 2018-10-16, Version 6.23.1
-
 * small release optimisations
+* fixed missing return type in tombstone declaration
 
 ## 2018-10-16, Version 6.23.0
 
