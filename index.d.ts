@@ -293,7 +293,7 @@ declare module "sinek" {
         resume(): void;
         getStats(): ProducerStats;
         refreshMetadata(topics: Array<string>): void;
-        close(commit: boolean): object;
+        close(): object;
         enableAnalytics(options: object): void;
         haltAnalytics(): void;
         getAnalytics(): object;
