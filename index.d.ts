@@ -75,6 +75,7 @@ declare module "sinek" {
         "coordinator.query.interval.ms"?: number;
         "group.id"?: string;
         "event_cb"?: boolean;
+        "dr_cb"?: boolean;
     }
 
     export interface NConsumerKafkaOptions extends NCommonKafkaOptions {
