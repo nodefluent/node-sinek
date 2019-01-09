@@ -1,5 +1,10 @@
 # sinek CHANGELOG
 
+## 2019-01-09, Version 6.24.0
+
+* fixed error message typo
+* updated dependencies (node-rdkafka upgraded)
+
 ## 2018-10-16, Version 6.23.1-4
 
 * added tombstone function call to types
