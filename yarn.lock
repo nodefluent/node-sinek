@@ -158,11 +158,6 @@ async@^2.5.0, async@~2.6.1:
   dependencies:
     lodash "^4.17.10"
 
-async@~0.2.7:
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/async/-/async-0.2.10.tgz#b6bbe0b0674b9d719708ca38de8c237cb526c3d1"
-  integrity sha1-trvgsGdLnXGXCMo43owjfLUmw9E=
-
 balanced-match@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
@@ -1009,10 +1004,10 @@ just-extend@^4.0.2:
   resolved "https://registry.yarnpkg.com/just-extend/-/just-extend-4.0.2.tgz#f3f47f7dfca0f989c55410a7ebc8854b07108afc"
   integrity sha512-FrLwOgm+iXrPV+5zDU6Jqu4gCRXbWEQg2O3SKONsWE4w7AXFRkryS53bpWdaL9cNol+AmR3AEYz6kn+o0fCPnw==
 
-kafka-node@~3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/kafka-node/-/kafka-node-3.0.1.tgz#7d0a630a952f742f7c792be24fa762e0b9b488d6"
-  integrity sha512-id9bdOQ35OkrQHHbIjtpC02Y2kTpmLQw/B9wbe6uAzjkLaRyu30GnJoz22vZ8uBB9DZ0JgwjHrKOK7sB3i41LA==
+kafka-node@~4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/kafka-node/-/kafka-node-4.0.0.tgz#223d304ddc6a150b09e7b5550e6aead9ef099d0b"
+  integrity sha512-9ALfCEUcGtsN62ToDre+P0lWybANxv1nG4DjlHWVBTGyvuqGL+kiViYGv2pRq1c9lrr6qxqRP0vrNcB/StdU5A==
   dependencies:
     async "^2.5.0"
     binary "~0.3.0"
@@ -1024,7 +1019,6 @@ kafka-node@~3.0.1:
     lodash "^4.17.4"
     minimatch "^3.0.2"
     nested-error-stacks "^2.0.0"
-    node-zookeeper-client "~0.2.2"
     optional "^0.1.3"
     retry "^0.10.1"
     uuid "^3.0.0"
@@ -1244,14 +1238,6 @@ node-rdkafka@~2.5.1:
   dependencies:
     bindings "^1.3.1"
     nan "^2.11.1"
-
-node-zookeeper-client@~0.2.2:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/node-zookeeper-client/-/node-zookeeper-client-0.2.3.tgz#48c79129c56b8e898df9bd3bdad9e27dcad63851"
-  integrity sha512-V4gVHxzQ42iwhkANpPryzfjmqi3Ql3xeO9E/px7W5Yi774WplU3YtqUpnvcL/eJit4UqcfuLOgZLkpf0BPhHmg==
-  dependencies:
-    async "~0.2.7"
-    underscore "~1.4.4"
 
 noop-logger@^0.1.1:
   version "0.1.1"
@@ -1861,11 +1847,6 @@ uglify-js@^3.1.4:
   dependencies:
     commander "~2.17.1"
     source-map "~0.6.1"
-
-underscore@~1.4.4:
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.4.4.tgz#61a6a32010622afa07963bf325203cf12239d604"
-  integrity sha1-YaajIBBiKvoHljvzJSA88SI51gQ=
 
 unpipe@1.0.0, unpipe@~1.0.0:
   version "1.0.0"
