@@ -42,3 +42,24 @@ topics
 
 - example implementations can be found [here](https://github.com/nodefluent/kafka-streams/blob/master/lib/KafkaClient.js) 
 and [here](https://github.com/nodefluent/kafka-connect/blob/master/lib)
+
+- potential issues/gotcha using `process.exit()` alongside nConsumer instance
+ If for any reason you want your application to fail in an error scenario (to trigger a pod to restart in Kubernetes for example), calling `process.exit()` may not cause the application to exit as nnormal. \- as the consumer runs an a separate thread
+In this scenario, logic to close the consumer should be added and the application will exit as expected
+
+```javascript
+// assuming instance of nConsumer  assigned to a variable 'myConsumer'
+const shutdownConsumer = function(){
+   console.log('Shutting down consumer');
+   myConsumer.close();
+};
+
+
+// whoops something bad happened
+process.exit()
+
+process.on('exit', shutdownConsumer);
+process.on('SIGTERM', shutdownConsumer);
+process.on('SIGINT', shutdownConsumer);
+
+``` 
