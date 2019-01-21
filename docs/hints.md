@@ -50,7 +50,6 @@ In this scenario, logic to close the consumer should be added and the applicatio
 ```javascript
 // assuming instance of nConsumer  assigned to a variable 'myConsumer'
 const shutdownConsumer = function(){
-   console.log('Shutting down consumer');
    myConsumer.close();
 };
 
