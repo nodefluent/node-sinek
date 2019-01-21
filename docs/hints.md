@@ -44,7 +44,7 @@ topics
 and [here](https://github.com/nodefluent/kafka-connect/blob/master/lib)
 
 - potential issues/gotcha using `process.exit()` alongside nConsumer instance
- If for any reason you want your application to fail in an error scenario (to trigger a pod to restart in Kubernetes for example), calling `process.exit()` may not cause the application to exit as nnormal. \- as the consumer runs an a separate thread
+ If for any reason you want your application to fail in an error scenario (to trigger a pod to restart in Kubernetes for example), calling `process.exit()` may not cause the application to exit as normal. \- as the consumer runs an a separate thread
 In this scenario, logic to close the consumer should be added and the application will exit as expected
 
 ```javascript
