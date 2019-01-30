@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2019-01-30, Version 6.24.1
+
+* fixed bug in metadata partition for topic call
+
 ## 2019-01-09, Version 6.24.0
 
 * fixed error message typo
