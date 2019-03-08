@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2019-03-07, Version 6.26.0
+
+* removed custom configs where possible to fallback to librdkafka defaults
+
 ## 2019-03-07, Version 6.25.0
 
 * added `manualBatching` option to NConsumer batch mode options, it will enable you to process messages faster and controll you own commits easily (via callback)
