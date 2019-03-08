@@ -134,6 +134,7 @@ declare module "sinek" {
         "consume.callback.max.messages"?: number;
      };
      noptions?: NConsumerKafkaOptions;
+     logger?: KafkaLogger;
     }
 
     export interface KafkaProducerConfig {
@@ -161,6 +162,7 @@ declare module "sinek" {
           "produce.offset.report"?: boolean;
        };
        noptions?: NProducerKafkaOptions;
+       logger?: KafkaLogger;
     }
 
     export interface KafkaMessage {
@@ -361,5 +363,12 @@ declare module "sinek" {
     export interface MessageType {
         key: String;
         value: String;
+    }
+
+    export interface KafkaLogger {
+        debug(message: string): void;
+        info(message: string): void;
+        warn(message: string, error?: Error): void;
+        error(error: string | Error): void;
     }
 }
