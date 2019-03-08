@@ -114,7 +114,8 @@ const config = {
    *  commitEveryNBatch (default 1) amount of messages that should be processed before committing
    *  concurrency (default 1) the concurrency of the execution per batch
    *  commitSync (default true) if the commit action should be blocking or non-blocking
-   *  noBatchCommits defaults to false, if set to true, no commits will be made for batches
+   *  noBatchCommits (default false) if set to true, no commits will be made for batches
+   *  manualBatching (default false) if set to true, syncEvent will receive a whole batch instead of single messages
    */
 
    const options = {
@@ -122,7 +123,8 @@ const config = {
      commitEveryNBatch: 5, //commit all offsets on every 5th batch
      concurrency: 2, //calls synFunction in parallel * 2 for messages in batch
      commitSync: false, //commits asynchronously (faster, but potential danger of growing offline commit request queue) => default is true
-     noBatchCommits: false //default is false, IF YOU SET THIS TO true THERE WONT BE ANY COMMITS FOR BATCHES
+     noBatchCommits: false, //default is false, IF YOU SET THIS TO true THERE WONT BE ANY COMMITS FOR BATCHES
+     manualBatching: false, // default is false, IF YOU SET THIS TO TRUE consume(syncEvent(messages: [{}])) sync event will receive a whole batch of messages and not single one
    };
 
    myNConsumer.consume(syncFunction, true, false, options);

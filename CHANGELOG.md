@@ -1,5 +1,10 @@
 # sinek CHANGELOG
 
+## 2019-03-07, Version 6.25.0
+
+* added `manualBatching` option to NConsumer batch mode options, it will enable you to process messages faster and controll you own commits easily (via callback)
+setting it to true will result in syncEvent() being called with the whole batch of messages instead of a single message
+
 ## 2019-01-30, Version 6.24.1
 
 * fixed bug in metadata partition for topic call

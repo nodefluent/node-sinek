@@ -172,11 +172,12 @@ declare module "sinek" {
     }
 
     export interface BatchConfig {
-        batchSize: number;
-        commitEveryNBatch: number;
-        concurrency: number;
-        commitSync: boolean;
-        noBatchCommits: boolean;
+        batchSize?: number;
+        commitEveryNBatch?: number;
+        concurrency?: number;
+        commitSync?: boolean;
+        noBatchCommits?: boolean;
+        manualBatching?: boolean;
     }
 
     export interface ConsumerStats {
@@ -237,7 +238,7 @@ declare module "sinek" {
         on(eventName: "first-drain-message", callback: () => void): void;
         connect(asStream?: boolean, opts?: {asString?: boolean, asJSON?: boolean}): Promise<void>;
 
-        consume(syncEvent?: (message: KafkaMessage, callback: (error: any) => void) => void,
+        consume(syncEvent?: (message: KafkaMessage | KafkaMessage[], callback: (error: any) => void) => void,
             asString?: boolean, asJSON?: boolean, options?: BatchConfig): Promise<void>;
 
         pause(topics: Array<string>): void;
