@@ -238,7 +238,7 @@ declare module "sinek" {
     }
 
     export class NConsumer {
-        constructor(topic: Array<string>, config: KafkaConsumerConfig);
+        constructor(topic: Array<string> | string, config: KafkaConsumerConfig);
         on(eventName: "message", callback: (message: KafkaMessage) => any): void;
         on(eventName: "error", callback: (error: any) => any): void;
         on(eventName: "ready", callback: () => any): void;
