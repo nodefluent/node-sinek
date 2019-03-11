@@ -1,6 +1,6 @@
 {
     "name": "sinek",
-    "version": "6.26.1",
+    "version": "6.27.0",
     "description": "Node.js kafka client, consumer, producer polite out of the box",
     "main": "index.js",
     "typings": "index.d.ts",
@@ -51,22 +51,22 @@
     },
     "homepage": "https://github.com/nodefluent/node-sinek#readme",
     "dependencies": {
-        "async": "~2.6.1",
+        "async": "~2.6.2",
         "bluebird": "~3.5.3",
         "debug": "~4.1.1",
-        "kafka-node": "~3.0.1",
+        "kafka-node": "~4.0.2",
         "lodash.merge": "~4.6.1",
         "murmur2-partitioner": "~1.0.0",
         "murmurhash": "~0.0.2",
         "uuid": "~3.3.2"
     },
     "devDependencies": {
-        "eslint": "~5.12.0",
+        "eslint": "~5.15.1",
         "expect.js": "~0.3.1",
         "express": "~4.16.4",
         "istanbul": "~0.4.5",
-        "mocha": "~5.2.0",
-        "sinon": "~7.2.2"
+        "mocha": "~6.0.2",
+        "sinon": "~7.2.7"
     },
     "optionalDependencies": {
         "node-rdkafka": "~2.5.1"

@@ -1,5 +1,18 @@
 # sinek CHANGELOG
 
+## 2019-03-11, Version 6.27.0
+
+* (NConsumer) added batch option sortedManualBatch
+* (NConsumer) added commitLocalOffsetsForTopic method
+* **SEMI-BREAKING** (NConsumer) removed experimental resetTopicPartitionsToEarliest method
+* **SEMI-BREAKING** (NConsumer) removed experimental resetTopicPartitionsToLatest method
+* **SEMI-BREAKING** (NConsumer) removed experimental commitOffsetForAllPartitionsOfTopic method
+* **SEMI-BREAKING** (NConsumer) removed deprecated consumeOnce method
+* added "### Consuming Multiple Topics efficiently" to lib/librdkafka/README.md
+* (NConsumer) passing an empty array to "adjustSubscription" will unsubscribe from all topics
+* upgrade dependencies
+* fix typescript bug (string for topic missing)
+
 ## 2019-03-07, Version 6.26.0
 
 * removed custom configs where possible to fallback to librdkafka defaults
@@ -8,6 +21,7 @@
 
 * added `manualBatching` option to NConsumer batch mode options, it will enable you to process messages faster and controll you own commits easily (via callback)
 setting it to true will result in syncEvent() being called with the whole batch of messages instead of a single message
+* **SEMI-BREAKING** changed types to allow syncEvent single or multi message first argument
 
 ## 2019-01-30, Version 6.24.1
 

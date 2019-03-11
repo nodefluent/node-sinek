@@ -116,6 +116,7 @@ const config = {
    *  commitSync (default true) if the commit action should be blocking or non-blocking
    *  noBatchCommits (default false) if set to true, no commits will be made for batches
    *  manualBatching (default false) if set to true, syncEvent will receive a whole batch instead of single messages
+   *  sortedManualBatch (default false) if set to true, syncEvent will receive a whole batch of sorted messages { topic: { partition: [ messages ] } }
    */
 
    const options = {
@@ -124,7 +125,8 @@ const config = {
      concurrency: 2, //calls synFunction in parallel * 2 for messages in batch
      commitSync: false, //commits asynchronously (faster, but potential danger of growing offline commit request queue) => default is true
      noBatchCommits: false, //default is false, IF YOU SET THIS TO true THERE WONT BE ANY COMMITS FOR BATCHES
-     manualBatching: false, // default is false, IF YOU SET THIS TO TRUE consume(syncEvent(messages: [{}])) sync event will receive a whole batch of messages and not single one
+     manualBatching: false, // default is false, IF YOU SET THIS TO TRUE consume(syncEvent(messages: [{}])) (see above)
+     sortedManualBatch: false, // default is false, IF YOU SET THIS TO TRUE consume(syncEvent({..})) (see above)
    };
 
    myNConsumer.consume(syncFunction, true, false, options);
@@ -132,6 +134,63 @@ const config = {
 
 - when active, this mode will also expose more a field called `batch` with insight stats on the `.getStats()` object
 - and the consumer instance will emit a `consumer.on("batch", messages => {});` event
+
+### Consuming Multiple Topics efficiently
+
+* Do not spawn multiple consumers unless you need a largely split offset handling or message processing
+* Spawn a single consumer and subscribe to multiple topics e.g. `new NConsumer(["topic1", "topic2", ..], ..)`
+* Choose Batch-Mode for consumption with manualy commits per topic like so
+
+```javascript
+const kafkaConfig = {/* .. */};
+const kafkaTopics = ["one", "two", "three"];
+const batchOptions = {
+    batchSize: 1000, // decides on the max size of our "batchOfMessages"
+    commitEveryNBatch: 1, // will be ignored
+    concurrency: 1, // will be ignored
+    commitSync: false, // will be ignored
+    noBatchCommits: true, // important, because we want to commit manually
+    manualBatching: true, // important, because we want to control the concurrency of batches ourselves
+    sortedManualBatch: true, // important, because we want to receive the batch in a per-partition format for easier processing
+};
+
+const consumer = new NConsumer(kafkaTopics, kafkaConfig);
+await consumer.connect();
+consumer.consume(async (batchOfMessages, callback) => {
+
+    /*
+        export interface SortedMessageBatch {
+            [topic: string]: {
+                [partition: number]: KafkaMessage[];
+            };
+        }
+    */
+
+    // parallel processing on topic level
+    const topicPromises = Object.keys(batchOfMessages).map(async (topic) => {
+
+        // parallel processing on partition level
+        const partitionPromises = Object.keys(batchOfMessages[topic]).map((partition) => {
+
+            // sequential processing on message level (to respect ORDER)
+            const messages = batchOfMessages[topic][partition];
+            // write batch of messages to db, process them e.g. async.eachLimit
+            return Promise.resolve();
+        });
+
+        // wait until all partitions of this topic are processed and commit its offset
+        // make sure to keep batch sizes large enough, you dont want to commit too often
+        await Promise.all(partitionPromises);
+        consumer.commitLocalOffsetsForTopic(topic);
+    });
+
+    await Promise.all(topicPromises);
+    // callback still controlls the "backpressure"
+    // as soon as you call it, it will fetch the next batch of messages
+    callback();
+
+}, true, false, batchOptions);
+```
 
 ### Accessing Consumer Offset Information
 

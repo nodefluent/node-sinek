@@ -173,6 +173,12 @@ declare module "sinek" {
         value: Buffer | string | any;
     }
 
+    export interface SortedMessageBatch {
+        [topic: string]: {
+            [partition: number]: KafkaMessage[];
+        };
+    }
+
     export interface BatchConfig {
         batchSize?: number;
         commitEveryNBatch?: number;
@@ -180,6 +186,7 @@ declare module "sinek" {
         commitSync?: boolean;
         noBatchCommits?: boolean;
         manualBatching?: boolean;
+        sortedManualBatch?: boolean;
     }
 
     export interface ConsumerStats {
@@ -201,7 +208,7 @@ declare module "sinek" {
             config: BatchConfig;
             currentEmptyFetches: number;
             avgProcessingTime: number;
-        },
+        };
         lag: any;
         totalErrors: number;
     }
@@ -240,7 +247,7 @@ declare module "sinek" {
         on(eventName: "first-drain-message", callback: () => void): void;
         connect(asStream?: boolean, opts?: {asString?: boolean, asJSON?: boolean}): Promise<void>;
 
-        consume(syncEvent?: (message: KafkaMessage | KafkaMessage[], callback: (error: any) => void) => void,
+        consume(syncEvent?: (message: KafkaMessage | KafkaMessage[] | SortedMessageBatch, callback: (error?: any) => void) => void,
             asString?: boolean, asJSON?: boolean, options?: BatchConfig): Promise<void>;
 
         pause(topics: Array<string>): void;
@@ -254,9 +261,7 @@ declare module "sinek" {
         commit(async: boolean): boolean;
         commitMessage(async: boolean, message: KafkaMessage): boolean;
         commitOffsetHard(topic: string, partition: number, offset: number, async: boolean): boolean;
-        commitOffsetForAllPartitionsOfTopic(topicName: string, offsetPartitionMappingTable: object):  Array<string>;
-        resetTopicPartitionsToEarliest(topicName: string): Array<string>;
-        resetTopicPartitionsToLatest(topicName: string): Array<string>;
+        commitLocalOffsetsForTopic(topic: string): any;
         getOffsetForTopicPartition(topic: string, partition: number, timeout: number): Promise<object>;
         getComittedOffsets(timeout: number): Promise<Array<object>>;
         getAssignedPartitions(): Array<object>;
