@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2019-03-12, Version 6.27.1
+
+* fixed timings for analytics and lag interval in NConsumer and NProducer
+
 ## 2019-03-11, Version 6.27.0
 
 * (NConsumer) added batch option sortedManualBatch
