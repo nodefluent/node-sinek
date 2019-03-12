@@ -175,7 +175,7 @@ declare module "sinek" {
 
     export interface SortedMessageBatch {
         [topic: string]: {
-            [partition: number]: KafkaMessage[];
+            [partition: string]: KafkaMessage[];
         };
     }
 

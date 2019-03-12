@@ -1,8 +1,9 @@
 # sinek CHANGELOG
 
-## 2019-03-12, Version 6.27.1
+## 2019-03-12, Version 6.27.1-6.27.2
 
 * fixed timings for analytics and lag interval in NConsumer and NProducer
+* fixed sortedManualBatch type error
 
 ## 2019-03-11, Version 6.27.0
 
