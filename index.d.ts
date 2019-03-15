@@ -171,6 +171,8 @@ declare module "sinek" {
         offset: number;
         key: Buffer | string;
         value: Buffer | string | any;
+        size: number;
+        timestamp: number;
     }
 
     export interface SortedMessageBatch {
@@ -253,7 +255,7 @@ declare module "sinek" {
         pause(topics: Array<string>): void;
         resume(topics: Array<string>): void;
         getStats(): ConsumerStats;
-        close(commit: boolean): object;
+        close(commit?: boolean): object;
         enableAnalytics(options: object): void;
         haltAnalytics(): void;
         addSubscriptions(topics: Array<string>): Array<string>;
@@ -280,7 +282,7 @@ declare module "sinek" {
         on(eventName: "ready", callback: () => any): void;
         connect(): Promise<void>;
 
-        send(topicName: string, message: string | Buffer, _partition: number, _key?: string | Buffer,
+        send(topicName: string, message: string | Buffer, _partition?: number, _key?: string | Buffer,
              _partitionKey?: string, _opaqueKey?: string): Promise<MessageReturn>;
 
         buffer(topic: string, identifier: string | undefined, payload: object, partition?: number,
