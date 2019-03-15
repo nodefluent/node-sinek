@@ -41,7 +41,7 @@ const {
 } = require("sinek");
 ```
 
-* We suggest using the native clients NConsumer & NProducer implementations, if possible.
+* **We suggest using the native clients NConsumer & NProducer implementations, if possible.**
 * [Native Client (NConsumer & NProducer)](lib/librdkafka/README.md)
 
 ## Usage - Javascript Client

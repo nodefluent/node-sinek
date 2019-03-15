@@ -1,5 +1,10 @@
 # sinek CHANGELOG
 
+## 2019-03-12, Version 6.27.3
+
+* preventing undefined offset value commits for commitLocalOffsetsForTopic
+* added additional debug logs to NConsumer
+
 ## 2019-03-12, Version 6.27.1-6.27.2
 
 * fixed timings for analytics and lag interval in NConsumer and NProducer

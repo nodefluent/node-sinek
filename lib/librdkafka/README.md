@@ -181,7 +181,7 @@ consumer.consume(async (batchOfMessages, callback) => {
         // wait until all partitions of this topic are processed and commit its offset
         // make sure to keep batch sizes large enough, you dont want to commit too often
         await Promise.all(partitionPromises);
-        consumer.commitLocalOffsetsForTopic(topic);
+        await consumer.commitLocalOffsetsForTopic(topic);
     });
 
     await Promise.all(topicPromises);
