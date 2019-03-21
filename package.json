@@ -73,6 +73,7 @@
     "@types/express": "^4.16.1",
     "@types/mocha": "^5.2.5",
     "@types/sinon": "^7.0.11",
+    "@typescript-eslint/parser": "^1.5.0",
     "eslint": "~5.16.0",
     "expect.js": "~0.3.1",
     "express": "~4.16.4",
