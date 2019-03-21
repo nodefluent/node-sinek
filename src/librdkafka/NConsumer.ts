@@ -63,7 +63,7 @@ class NConsumer extends EventEmitter {
 
     this.topics = Array.isArray(topics) ? topics : [topics];
     this.config = config;
-    this._health = new ConsumerHealth(this, this.config.health || {});
+    this._health = new ConsumerHealth(this, this.config.health || {});
 
     this.consumer = null;
     this._resume = true;
@@ -121,7 +121,7 @@ class NConsumer extends EventEmitter {
 
     // Make analytics available immediately
     return this._runAnalytics()
-      .then(() => this._runLagCheck());
+        .then(() => this._runLagCheck());
   }
 
   /**
@@ -534,7 +534,7 @@ class NConsumer extends EventEmitter {
 
         if(this._isAutoCommitting !== null && typeof this._isAutoCommitting !== "undefined"){
           this.config.logger.warn("enable.auto.commit has no effect in 1:n consume-mode, set to null or undefined to remove this message." +
-            "You can pass 'noBatchCommits' as true via options to .consume(), if you want to commit manually.");
+              "You can pass 'noBatchCommits' as true via options to .consume(), if you want to commit manually.");
         }
 
         if(this._isAutoCommitting){
@@ -545,7 +545,7 @@ class NConsumer extends EventEmitter {
         this._batchConfig = options; //store for stats
 
         if(manualBatching) {
-         
+
           this.config.logger.info("Batching manually..");
 
           super.on("batch", (messages) => {
@@ -553,12 +553,12 @@ class NConsumer extends EventEmitter {
             const startBPT = Date.now();
             this._totalIncomingMessages += messages.length;
             this._lastReceived = Date.now();
-            
+
             const mappedMessages = messages.map((message) => {
 
               this.config.logger.debug(message);
               message.value = this._convertMessageValue(message.value, asString, asJSON);
-              
+
               if(!this._firstMessageConsumed){
                 this._firstMessageConsumed = true;
                 super.emit("first-drain-message", message);
@@ -572,7 +572,7 @@ class NConsumer extends EventEmitter {
             const sortedBatch = {};
             if(sortedManualBatch) {
               mappedMessages.forEach((mappedMessage) => {
-                
+
                 if(typeof sortedBatch[mappedMessage.topic] === "undefined"){
                   sortedBatch[mappedMessage.topic] = {};
                 }
@@ -595,7 +595,7 @@ class NConsumer extends EventEmitter {
 
               this._totalProcessedMessages += mappedMessages.length;
               this._lastProcessed = Date.now();
-            
+
               //when all messages from the batch are processed
 
               this._avgBatchProcessingTime = (this._avgBatchProcessingTime + (Date.now() - startBPT)) / 2;
@@ -633,7 +633,7 @@ class NConsumer extends EventEmitter {
               }
             });
           });
-          
+
         } else { // TODO: refactor this monstrousity
 
           this.config.logger.info("Batching automatically..");
@@ -853,7 +853,7 @@ class NConsumer extends EventEmitter {
 
   /**
    * commits all local stored offsets for assigned partitions of a topic
-   * @param {string} topic 
+   * @param {string} topic
    */
   async commitLocalOffsetsForTopic(topic) {
 
@@ -861,12 +861,12 @@ class NConsumer extends EventEmitter {
       this.config.logger.debug(`Committing local offsets for topic ${topic}`);
     }
 
-    const assignedPartitionsOfTopic = 
-      this.getAssignedPartitions()
-        .filter((topicPartition) => topicPartition.topic === topic);
+    const assignedPartitionsOfTopic =
+        this.getAssignedPartitions()
+            .filter((topicPartition) => topicPartition.topic === topic);
 
     const currentLocalOffsets = this.consumer.position(assignedPartitionsOfTopic)
-      .filter((topicPartition) => typeof topicPartition.offset !== "undefined");
+        .filter((topicPartition) => typeof topicPartition.offset !== "undefined");
 
     if (this.config && this.config.logger && this.config.logger.debug) {
       this.config.logger.debug(`Committing local offsets for topic ${topic} as`, currentLocalOffsets);
@@ -1151,8 +1151,8 @@ class NConsumer extends EventEmitter {
     }
 
     return this._analytics.run()
-      .then(res => super.emit("analytics", res))
-      .catch(error => super.emit("error", error));
+        .then(res => super.emit("analytics", res))
+        .catch(error => super.emit("error", error));
   }
 
   /**

@@ -74,7 +74,7 @@ class NProducer extends EventEmitter {
     }
 
     this.config = config;
-    this._health = new ProducerHealth(this, this.config.health || {});
+    this._health = new ProducerHealth(this, this.config.health || {});
 
     this.paused = false;
     this.producer = null;
@@ -92,16 +92,16 @@ class NProducer extends EventEmitter {
     this.config.logger.info(`using murmur ${this._murmurHashVersion} partitioner.`);
 
     switch (this._murmurHashVersion) {
-    case "2":
-      this._murmur = (key, partitionCount) => murmur2Partitioner.partition(key, partitionCount);
-      break;
+      case "2":
+        this._murmur = (key, partitionCount) => murmur2Partitioner.partition(key, partitionCount);
+        break;
 
-    case "3":
-      this._murmur = (key, partitionCount) => murmur.v3(key) % partitionCount;
-      break;
+      case "3":
+        this._murmur = (key, partitionCount) => murmur.v3(key) % partitionCount;
+        break;
 
-    default:
-      throw new Error(`${this._murmurHashVersion} is not a supported murmur hash version. Choose '2' or '3'.`);
+      default:
+        throw new Error(`${this._murmurHashVersion} is not a supported murmur hash version. Choose '2' or '3'.`);
     }
 
     this._errors = 0;
@@ -310,7 +310,7 @@ class NProducer extends EventEmitter {
       maxPartitions = await this.getPartitionCountOfTopic(topicName);
       if (maxPartitions === -1) {
         throw new Error("defaultPartition set to 'auto', but was not able to resolve partition count for topic" +
-          topicName + ", please make sure the topic exists before starting the producer in auto mode.");
+            topicName + ", please make sure the topic exists before starting the producer in auto mode.");
       }
     } else {
       maxPartitions = this.defaultPartitionCount;
@@ -330,7 +330,7 @@ class NProducer extends EventEmitter {
       partition,
       key
     }));
-    
+
     const producedAt = Date.now();
 
     this._lastProcessed = producedAt;
@@ -493,7 +493,7 @@ class NProducer extends EventEmitter {
    * on a key compacted topic/partition this will delete all occurances of the key
    * @param {string} topic - name of the topic
    * @param {string} key - key
-   * @param {number|null} _partition - optional partition 
+   * @param {number|null} _partition - optional partition
    */
   tombstone(topic, key, _partition = null){
 
@@ -577,7 +577,7 @@ class NProducer extends EventEmitter {
 
   /**
    * returns a list of available kafka topics on the connected brokers
-   * @param {number} timeout 
+   * @param {number} timeout
    */
   async getTopicList(timeout = 2500){
     const metadata = await this.getMetadata(timeout);
@@ -675,8 +675,8 @@ class NProducer extends EventEmitter {
     }
 
     this._analytics.run()
-      .then(res => super.emit("analytics", res))
-      .catch(error => super.emit("error", error));
+        .then(res => super.emit("analytics", res))
+        .catch(error => super.emit("error", error));
   }
 
   /**
