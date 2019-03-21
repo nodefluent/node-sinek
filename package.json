@@ -2,8 +2,8 @@
   "name": "sinek",
   "version": "7.29.3",
     "description": "Node.js kafka client, consumer, producer polite out of the box",
-    "main": "index.js",
-    "typings": "index.d.ts",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "engines": {
         "node": ">=8.11.3"
     },
@@ -15,7 +15,8 @@
         "kafka:logs": "docker-compose --file ./kafka-setup/docker-compose.yml logs -f",
         "kafka:console": "./kafka-setup/kafka-console.sh",
         "test": "_mocha --recursive --timeout 32500 --exit -R spec test/int",
-        "yarn:openssl": "LDFLAGS='-L/usr/local/opt/openssl/lib' CPPFLAGS='-I/usr/local/opt/openssl/include' yarn"
+        "yarn:openssl": "LDFLAGS='-L/usr/local/opt/openssl/lib' CPPFLAGS='-I/usr/local/opt/openssl/include' yarn",
+        "prepublishOnly": "tsc -p tsconfig.dist.json"
     },
     "repository": {
         "type": "git",

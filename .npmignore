@@ -4,6 +4,7 @@ kafka-setup/
 perf/
 sasl-ssl-example/
 ssl-example/
+src
 test/
 .idea
 .editorconfig
