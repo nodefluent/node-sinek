@@ -13,12 +13,13 @@ export {default as NProducer} from "./librdkafka/NProducer";
 
 import {ProducerHealth, ConsumerHealth} from "./librdkafka/Health";
 import {ProducerAnalytics, ConsumerAnalytics} from "./librdkafka/Analytics";
+import {DrainerConstructor, KafkaConstructor, PartitionDrainerConstructor, PublisherConstructor} from "./interfaces";
 
 
-const Kafka = util.deprecate(DeprecatedKafka, "Kafka is deprecated, please use 'NConsumer' if possible.");
-const Drainer = util.deprecate(DeprecatedDrainer, "Drainer is deprecated, please use 'NConsumer' if possible.");
-const PartitionDrainer = util.deprecate(DeprecatedPartitionDrainer, "PartitionDrainer is deprecated, please use 'NConsumer' if possible.");
-const Publisher = util.deprecate(DeprecatedPublisher, "Publisher is deprecated, please use 'NProducer' if possible.");
+const Kafka: KafkaConstructor = util.deprecate(DeprecatedKafka, "Kafka is deprecated, please use 'NConsumer' if possible.");
+const Drainer: DrainerConstructor = util.deprecate(DeprecatedDrainer, "Drainer is deprecated, please use 'NConsumer' if possible.");
+const PartitionDrainer: PartitionDrainerConstructor = util.deprecate(DeprecatedPartitionDrainer, "PartitionDrainer is deprecated, please use 'NConsumer' if possible.");
+const Publisher: PublisherConstructor = util.deprecate(DeprecatedPublisher, "Publisher is deprecated, please use 'NProducer' if possible.");
 const Consumer = util.deprecate(DeprecatedConsumer, "Consumer is deprecated, please use (noptions) 'NConsumer' if possible.");
 const Producer = util.deprecate(DeprecatedProducer, "Producer is deprecated, please use (noptions) 'NProducer' if possible.");
 

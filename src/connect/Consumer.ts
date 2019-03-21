@@ -1,118 +1,118 @@
-import Promise from "bluebird";
 import EventEmitter from "events";
 
 import Kafka from "./../kafka/Kafka";
 import Drainer from "./../kafka/Drainer";
+import {IConsumer} from "../interfaces";
 
-export default class Consumer extends EventEmitter {
+export default class Consumer extends EventEmitter implements IConsumer {
+    private kafkaConsumerClient;
+    private consumer;
 
-  constructor(topic, config = { options: {} }) {
-    super();
+    constructor(private topic, private config = {options: {}}) {
+        super();
+        this.kafkaConsumerClient = null;
+        this.consumer = null;
+    }
 
-    this.topic = topic;
-    this.config = config;
+    connect(backpressure = false): Promise<void> {
+        return new Promise(resolve => {
 
-    this.kafkaConsumerClient = null;
-    this.consumer = null;
-  }
+            // @ts-ignore
+            const {zkConStr, kafkaHost, logger, groupId, workerPerPartition, options} = this.config;
 
-  connect(backpressure = false) {
-    return new Promise(resolve => {
+            let conStr = null;
 
-      const { zkConStr, kafkaHost, logger, groupId, workerPerPartition, options } = this.config;
+            if (typeof kafkaHost === "string") {
+                conStr = kafkaHost;
+            }
 
-      let conStr = null;
+            if (typeof zkConStr === "string") {
+                conStr = zkConStr;
+            }
 
-      if(typeof kafkaHost === "string"){
-        conStr = kafkaHost;
-      }
+            if (conStr === null) {
+                throw new Error("One of the following: zkConStr or kafkaHost must be defined.");
+            }
 
-      if(typeof zkConStr === "string"){
-        conStr = zkConStr;
-      }
+            this.kafkaConsumerClient = new Kafka(conStr, logger, conStr === kafkaHost);
 
-      if(conStr === null){
-        throw new Error("One of the following: zkConStr or kafkaHost must be defined.");
-      }
+            this.kafkaConsumerClient.on("ready", () => resolve());
+            this.kafkaConsumerClient.on("error", error => super.emit("error", error));
 
-      this.kafkaConsumerClient = new Kafka(conStr, logger, conStr === kafkaHost);
+            this.kafkaConsumerClient.becomeConsumer([this.topic], groupId, options);
 
-      this.kafkaConsumerClient.on("ready", () => resolve());
-      this.kafkaConsumerClient.on("error", error => super.emit("error", error));
-
-      this.kafkaConsumerClient.becomeConsumer([this.topic], groupId, options);
-
-      const commitManually = !options.autoCommit;
-      this.consumer = new Drainer(this.kafkaConsumerClient, workerPerPartition, false, !backpressure, commitManually);
-    });
-  }
-
-  consume(syncEvent = null) {
-    return new Promise(resolve => {
-
-      this.consumer.drain((message, done) => {
-
-        super.emit("message", message);
-
-        if (!syncEvent) {
-          return done();
-        }
-
-        syncEvent(message, () => {
-
-          /* ### sync event callback does not handle errors ### */
-
-          done();
+            // @ts-ignore
+            const commitManually = !options.autoCommit;
+            this.consumer = new Drainer(this.kafkaConsumerClient, workerPerPartition, false, !backpressure, commitManually);
         });
-      });
-
-      this.consumer.once("first-drain-message", () => resolve());
-    });
-  }
-
-  consumeOnce(syncEvent = null, drainThreshold = 10000, timeout = 0) {
-    return this.consumer.drainOnce((message, done) => {
-
-      super.emit("message", message);
-
-      if (!syncEvent) {
-        return done();
-      }
-
-      syncEvent(message, () => {
-
-        /* ### sync event callback does not handle errors ### */
-
-        done();
-      });
-
-    }, drainThreshold, timeout);
-  }
-
-  pause() {
-
-    if (this.consumer) {
-      this.consumer.pause();
     }
-  }
 
-  resume() {
+    consume(syncEvent = null): Promise<void> {
+        return new Promise(resolve => {
 
-    if (this.consumer) {
-      this.consumer.resume();
+            this.consumer.drain((message, done) => {
+
+                super.emit("message", message);
+
+                if (!syncEvent) {
+                    return done();
+                }
+
+                syncEvent(message, () => {
+
+                    /* ### sync event callback does not handle errors ### */
+
+                    done();
+                });
+            });
+
+            this.consumer.once("first-drain-message", () => resolve());
+        });
     }
-  }
 
-  getStats() {
-    return this.consumer ? this.consumer.getStats() : {};
-  }
+    consumeOnce(syncEvent = null, drainThreshold = 10000, timeout = 0) {
+        return this.consumer.drainOnce((message, done) => {
 
-  close(commit = false) {
+            super.emit("message", message);
 
-    if (this.consumer) {
-      const result = this.consumer.close(commit);
-      this.consumer = null;
-      return result;
+            if (!syncEvent) {
+                return done();
+            }
+
+            syncEvent(message, () => {
+
+                /* ### sync event callback does not handle errors ### */
+
+                done();
+            });
+
+        }, drainThreshold, timeout);
     }
-  }
+
+    pause() {
+
+        if (this.consumer) {
+            this.consumer.pause();
+        }
+    }
+
+    resume() {
+
+        if (this.consumer) {
+            this.consumer.resume();
+        }
+    }
+
+    getStats() {
+        return this.consumer ? this.consumer.getStats() : {};
+    }
+
+    close(commit = false) {
+
+        if (this.consumer) {
+            const result = this.consumer.close(commit);
+            this.consumer = null;
+            return result;
+        }
+    }
 }

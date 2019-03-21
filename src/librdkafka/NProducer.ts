@@ -1,5 +1,4 @@
 import EventEmitter from "events";
-import Promise from "bluebird";
 import uuid from "uuid";
 import murmur from "murmurhash";
 import debug from "debug";
@@ -9,6 +8,8 @@ import Metadata from "./Metadata";
 
 import {ProducerAnalytics} from "./Analytics";
 import {ProducerHealth} from "./Health";
+import {Logger} from "./index";
+import {INProducer, KafkaProducerConfig, MessageReturn} from "../interfaces";
 
 //@OPTIONAL
 let BlizzKafka = null;
@@ -23,7 +24,7 @@ const MAX_PART_AGE_MS = 1e3 * 60 * 5; //5 minutes
 const MAX_PART_STORE_SIZE = 1e4;
 const DEFAULT_MURMURHASH_VERSION = "3";
 
-const DEFAULT_LOGGER = {
+const DEFAULT_LOGGER: Logger = {
   debug: debug("sinek:nproducer:debug"),
   info: debug("sinek:nproducer:info"),
   warn: debug("sinek:nproducer:warn"),
@@ -34,7 +35,21 @@ const DEFAULT_LOGGER = {
  * native producer wrapper for node-librdkafka
  * @extends EventEmitter
  */
-export default class NProducer extends EventEmitter {
+export default class NProducer extends EventEmitter implements INProducer {
+    private _health: ProducerHealth;
+    private paused: boolean;
+    private producer;
+    private _producerPollIntv;
+    private _partitionCounts;
+    private _inClosing: boolean;
+    private _totalSentMessages: number;
+    private _lastProcessed;
+    private _analyticsOptions;
+    private _analyticsIntv;
+    private _analytics;
+    private _murmurHashVersion: string;
+    private _murmur: (key, partitionCount) => any;
+    private _errors: number;
 
   /**
    * creates a new producer instance
@@ -42,7 +57,7 @@ export default class NProducer extends EventEmitter {
    * @param {*} _ - ignore this param (api compatability)
    * @param {number|string} defaultPartitionCount  - amount of default partitions for the topics to produce to
    */
-  constructor(config = { options: {}, health: {} }, _, defaultPartitionCount = 1) {
+  constructor(private config: KafkaProducerConfig = {options: {}, health: {}}, _?: null, private defaultPartitionCount: number | "auto" = 1) {
     super();
 
     if (!config) {
@@ -66,13 +81,11 @@ export default class NProducer extends EventEmitter {
       config.options = {};
     }
 
-    this.config = config;
     this._health = new ProducerHealth(this, this.config.health || {});
 
     this.paused = false;
     this.producer = null;
     this._producerPollIntv = null;
-    this.defaultPartitionCount = defaultPartitionCount;
     this._partitionCounts = {};
     this._inClosing = false;
     this._totalSentMessages = 0;
@@ -81,6 +94,7 @@ export default class NProducer extends EventEmitter {
     this._analyticsIntv = null;
     this._analytics = null;
 
+    // @ts-ignore
     this._murmurHashVersion = this.config.options.murmurHashVersion || DEFAULT_MURMURHASH_VERSION;
     this.config.logger.info(`using murmur ${this._murmurHashVersion} partitioner.`);
 
@@ -112,9 +126,8 @@ export default class NProducer extends EventEmitter {
       throw new Error("analytics intervals are already running.");
     }
 
-    let {
-      analyticsInterval
-    } = options;
+    // @ts-ignore
+    let {analyticsInterval} = options;
     this._analyticsOptions = options;
 
     analyticsInterval = analyticsInterval || 1000 * 150; // 150 sec
@@ -136,21 +149,14 @@ export default class NProducer extends EventEmitter {
    * connects to the broker
    * @returns {Promise.<*>}
    */
-  connect() {
+  connect(): Promise<void> {
     return new Promise((resolve, reject) => {
 
-      let {
-        zkConStr,
-        kafkaHost,
-        logger,
-        options,
-        noptions,
-        tconf
-      } = this.config;
+      // @ts-ignore
+      let {zkConStr, kafkaHost, logger, options, noptions, tconf} = this.config;
 
-      const {
-        pollIntervalMs
-      } = options;
+      // @ts-ignore
+      const {pollIntervalMs} = options;
 
       let conStr = null;
 
@@ -175,13 +181,16 @@ export default class NProducer extends EventEmitter {
         "dr_cb": true
       };
 
+      // @ts-ignore
       noptions = noptions || {};
       noptions = Object.assign({}, config, noptions);
+      // @ts-ignore
       logger.debug(noptions);
 
       tconf = tconf ? tconf : {
         "request.required.acks": 1
       };
+      // @ts-ignore
       logger.debug(tconf);
 
       this.producer = new BlizzKafka.HighLevelProducer(noptions, tconf);
@@ -213,7 +222,7 @@ export default class NProducer extends EventEmitter {
       this.producer.setKeySerializer((value) => {
         return Promise.resolve(value);
       });
-      
+
       this.producer.setValueSerializer((value) => {
         return value;
       });
@@ -278,7 +287,7 @@ export default class NProducer extends EventEmitter {
    * @param {*} _opaqueKey - optional opaque token, which gets passed along to your delivery reports (deprecated)
    * @returns {Promise.<object>}
    */
-  async send(topicName, message, _partition = null, _key = null, _partitionKey = null, _opaqueKey = null) {
+  async send(topicName, message, _partition = null, _key = null, _partitionKey = null, _opaqueKey = null): Promise<MessageReturn> {
 
     if (!this.producer) {
       throw new Error("You must call and await .connect() before trying to produce messages.");
@@ -306,6 +315,7 @@ export default class NProducer extends EventEmitter {
             topicName + ", please make sure the topic exists before starting the producer in auto mode.");
       }
     } else {
+      // @ts-ignore
       maxPartitions = this.defaultPartitionCount;
     }
 
@@ -488,7 +498,7 @@ export default class NProducer extends EventEmitter {
    * @param {string} key - key
    * @param {number|null} _partition - optional partition
    */
-  tombstone(topic, key, _partition = null){
+  tombstone(topic, key, _partition = null): Promise<MessageReturn> {
 
     if(!key){
       return Promise.reject(new Error("Tombstone messages only work on a key compacted topic, please provide a key."));
@@ -538,7 +548,7 @@ export default class NProducer extends EventEmitter {
    * @param {number} timeout - optional, default is 2500
    * @returns {Promise.<Metadata>}
    */
-  getTopicMetadata(topic, timeout = 2500) {
+  getTopicMetadata(topic, timeout = 2500): Promise<Metadata> {
     return new Promise((resolve, reject) => {
 
       if (!this.producer) {

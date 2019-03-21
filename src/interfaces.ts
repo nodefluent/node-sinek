@@ -1,3 +1,8 @@
+import Kafka from "./kafka/Kafka";
+import Drainer from "./kafka/Drainer";
+import Publisher from "./kafka/Publisher";
+import PartitionDrainer from "./kafka/PartitionDrainer";
+
 export interface KafkaHealthConfig {
     thresholds?: {
         consumer?: {
@@ -237,7 +242,6 @@ export interface MessageReturn {
 }
 
 export interface INConsumer {
-    constructor(topic: Array<string> | string, config: KafkaConsumerConfig);
     on(eventName: "message", callback: (message: KafkaMessage) => any): void;
     on(eventName: "error", callback: (error: any) => any): void;
     on(eventName: "ready", callback: () => any): void;
@@ -252,7 +256,7 @@ export interface INConsumer {
     pause(topics: Array<string>): void;
     resume(topics: Array<string>): void;
     getStats(): ConsumerStats;
-    close(commit?: boolean): object;
+    close(commit?: boolean): void;
     enableAnalytics(options: object): void;
     haltAnalytics(): void;
     addSubscriptions(topics: Array<string>): Array<string>;
@@ -273,7 +277,6 @@ export interface INConsumer {
 }
 
 export interface INProducer {
-    constructor(config: KafkaProducerConfig, _?: null, defaultPartitionCount?: number | "auto")
     on(eventName: "error", callback: (error: any) => any): void;
     on(eventName: "ready", callback: () => any): void;
     connect(): Promise<void>;
@@ -300,7 +303,7 @@ export interface INProducer {
     resume(): void;
     getStats(): ProducerStats;
     refreshMetadata(topics: Array<string>): void;
-    close(): object;
+    close(): void;
     enableAnalytics(options: object): void;
     haltAnalytics(): void;
     getAnalytics(): object;
@@ -314,7 +317,6 @@ export interface INProducer {
 }
 
 export interface IConsumer {
-    constructor(topic: string, config: KafkaConsumerConfig);
     on(eventName: "message", callback: (message: object) => any): void;
     on(eventName: "error", callback: (error: any) => any): void;
     connect(backpressure?: boolean): Promise<void>;
@@ -327,7 +329,6 @@ export interface IConsumer {
 }
 
 export interface IProducer {
-    constructor(config: KafkaProducerConfig, topic: Array<string>, defaultPartitionCount: number);
     on(eventName: "error", callback: (error: any) => any): void;
     connect(): Promise<void>;
     send(topic: string, message: string | string[]): Promise<void>;
@@ -340,32 +341,23 @@ export interface IProducer {
     resume(): void;
     getStats(): object;
     refreshMetadata(topics: Array<string>): void;
-    close(): object;
+    close(): void;
 }
 
-export interface IKafka {
-    constructor(conString: string, logger: object, connectDirectlyToBroker: boolean)
+export interface KafkaConstructor {
+    new (conString: string, logger: object, connectDirectlyToBroker: boolean): Kafka;
 }
 
-export interface IDrainer {
-    constructor(consumer: object, asyncLimit: number, autoJsonParsing: boolean, omitQueue: boolean, commitOnDrain: boolean)
+export interface DrainerConstructor {
+    new (consumer: object, asyncLimit: number, autoJsonParsing: boolean, omitQueue: boolean, commitOnDrain: boolean): Drainer;
 }
 
-export interface IPublisher {
-    constructor(producer: object, partitionCount: number, autoFlushBuffer: number, flushPeriod: number)
+export interface PublisherConstructor {
+    new (producer: object, partitionCount: number, autoFlushBuffer: number, flushPeriod: number): Publisher;
 }
 
-export interface IPartitionDrainer {
-    constructor(consumer: object, asyncLimit: number, commitOnDrain: boolean, autoJsonParsing: boolean)
-}
-
-export interface IPartitionQueue {
-    constructor(partition: object, drainEvent: object, drainer: object, asyncLimit: number, queueDrain: object)
-}
-
-export interface MessageType {
-    key: string;
-    value: string;
+export interface PartitionDrainerConstructor {
+    new (consumer: object, asyncLimit: number, commitOnDrain: boolean, autoJsonParsing: boolean): PartitionDrainer;
 }
 
 export interface KafkaLogger {

@@ -1,6 +1,9 @@
 const TYPES = [0,1,2];
 
 class CompressionTypes {
+    public NONE: number;
+    public GZIP: number;
+    public SNAPPY: number;
 
   constructor(){
     this.NONE = 0;

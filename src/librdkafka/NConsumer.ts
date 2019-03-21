@@ -1,4 +1,3 @@
-import Promise from "bluebird";
 import EventEmitter from "events";
 import debug from "debug";
 import async from "async";
@@ -6,6 +5,8 @@ import async from "async";
 import {ConsumerAnalytics} from "./Analytics";
 import {ConsumerHealth} from "./Health";
 import Metadata from "./Metadata";
+import {Logger} from "./index";
+import {BatchConfig, INConsumer, KafkaConsumerConfig, KafkaMessage, SortedMessageBatch} from "../interfaces";
 
 //@OPTIONAL
 let BlizzKafka = null;
@@ -17,25 +18,53 @@ const FETCH_ERROR_GRACE_TIME_MS = 1500;
 const ASYNC_COMMIT_REQ_TIME_MS = 250;
 const MESSAGE_CHARSET = "utf8";
 
-const DEFAULT_LOGGER = {
-  debug: debug("sinek:nconsumer:debug"),
-  info: debug("sinek:nconsumer:info"),
-  warn: debug("sinek:nconsumer:warn"),
-  error: debug("sinek:nconsumer:error")
+const DEFAULT_LOGGER: Logger = {
+    debug: debug("sinek:nconsumer:debug"),
+    info: debug("sinek:nconsumer:info"),
+    warn: debug("sinek:nconsumer:warn"),
+    error: debug("sinek:nconsumer:error")
 };
 
 /**
  * native consumer wrapper for node-librdkafka
  * @extends EventEmitter
  */
-export default class NConsumer extends EventEmitter {
+export default class NConsumer extends EventEmitter implements INConsumer {
+  private _health: ConsumerHealth;
+  private topics: Array<string>;
+  private consumer;
+  private _resume: boolean;
+  private _inClosing: boolean;
+  private _firstMessageConsumed: boolean;
+  private _totalIncomingMessages: number;
+  private _lastReceived;
+  private _totalProcessedMessages: number;
+  private _lastProcessed;
+  private _isAutoCommitting;
+  private _stream;
+  private _asStream;
+  private _batchCount: number;
+  private _batchCommitts: number;
+  private _totalBatches: number;
+  private _batchConfig;
+  private _analyticsIntv;
+  private _lagCheckIntv;
+  private _lagCache;
+  private _analyticsOptions;
+  private _analytics;
+  private _lastLagStatus;
+  private _consumedSinceCommit: number;
+  private _emptyFetches: number;
+  private _avgBatchProcessingTime: number;
+  private _extCommitCallback;
+  private _errors: number;
 
   /**
    * creates a new consumer instance
    * @param {string|Array} topics - topic or topics to subscribe to
    * @param {object} config - configuration object
    */
-  constructor(topics, config = { options: {}, health: {} }) {
+  constructor(topics: string | string[], private config: KafkaConsumerConfig = {options: {}, health: {}}) {
     super();
 
     if(!config){
@@ -105,10 +134,8 @@ export default class NConsumer extends EventEmitter {
       throw new Error("analytics intervals are already running.");
     }
 
-    let {
-      analyticsInterval,
-      lagFetchInterval
-    } = options;
+    // @ts-ignore
+    let {analyticsInterval, lagFetchInterval} = options;
     this._analyticsOptions = options;
 
     analyticsInterval = analyticsInterval || 1000 * 150; // 150 sec
@@ -142,10 +169,13 @@ export default class NConsumer extends EventEmitter {
    * @param {object} opts - optional, options asString, asJSON (booleans)
    * @returns {Promise.<*>}
    */
-  connect(asStream = false, opts = {}) {
+  connect(asStream = false, opts = {}): Promise<void> {
 
+    // @ts-ignore
     let { zkConStr, kafkaHost, logger, groupId, options, noptions, tconf } = this.config;
+    // @ts-ignore
     const { autoCommit } = options;
+    // @ts-ignore
     const {asString = false, asJSON = false} = opts;
 
     let conStr = null;
@@ -183,20 +213,25 @@ export default class NConsumer extends EventEmitter {
       this._extCommitCallback = noptions["offset_commit_cb"];
     }
 
+    // @ts-ignore
     noptions = noptions || {};
     noptions = Object.assign({}, config, noptions, overwriteConfig);
+    // @ts-ignore
     logger.debug(noptions);
     this._isAutoCommitting = noptions["enable.auto.commit"];
 
     tconf = tconf || undefined;
+    // @ts-ignore
     logger.debug(tconf);
 
     this._asStream = asStream;
 
     if(asStream){
+      // @ts-ignore
       return this._connectAsStream(logger, noptions, tconf, {asString, asJSON});
     }
 
+    // @ts-ignore
     return this._connectInFlow(logger, noptions, tconf);
   }
 
@@ -287,6 +322,7 @@ export default class NConsumer extends EventEmitter {
   _connectAsStream(logger, noptions, tconf = {}, opts = {}){
     return new Promise(resolve => {
 
+      // @ts-ignore
       const {asString = false, asJSON = false} = opts;
 
       const topics = this.topics;
@@ -397,6 +433,7 @@ export default class NConsumer extends EventEmitter {
 
         //retry asap
         this._emptyFetches++;
+        // @ts-ignore
         let graceTime = (this.config.options.consumeGraceMs || SINGLE_CONSUME_GRACE_TIME_MS) * GRACE_TIME_FACTOR;
         graceTime = graceTime * (this._emptyFetches > MAX_EMPTY_FETCH_COUNT ? MAX_EMPTY_FETCH_COUNT : this._emptyFetches);
 
@@ -468,7 +505,8 @@ export default class NConsumer extends EventEmitter {
    * @param {object} options - optional object containing options for 1:n mode:
    * @returns {Promise.<*>}
    */
-  consume(syncEvent = null, asString = true, asJSON = false, options = {}) {
+  consume(syncEvent?: (message: KafkaMessage | KafkaMessage[] | SortedMessageBatch, callback: (error?: any) => void) => void,
+          asString?: boolean, asJSON?: boolean, options?: BatchConfig): Promise<void> {
 
     let {
       batchSize,
@@ -539,6 +577,7 @@ export default class NConsumer extends EventEmitter {
           return reject(new Error("Please disable enable.auto.commit when using 1:n consume-mode."));
         }
 
+        // @ts-ignore
         this.config.logger.info("running in", `1:${batchSize}`, "mode");
         this._batchConfig = options; //store for stats
 
@@ -609,6 +648,7 @@ export default class NConsumer extends EventEmitter {
                 return this._singleConsumeRecursive(batchSize);
               }
 
+              // @ts-ignore
               this.config.logger.debug("committing after", this._batchCount, "batches, messages: " + this._consumedSinceCommit);
               super.emit("commit", this._consumedSinceCommit);
               this._batchCount = 0;
@@ -638,7 +678,7 @@ export default class NConsumer extends EventEmitter {
 
           //we do not listen to "data" here
           //we have to grab the whole batch that is delivered via consume(count)
-          super.on("batch", messages => {
+          super.on("batch", (messages: KafkaMessage[]) => {
 
             const startBPT = Date.now();
             this._totalIncomingMessages += messages.length;
@@ -646,6 +686,7 @@ export default class NConsumer extends EventEmitter {
 
             async.eachLimit(messages, concurrency, (message, _callback) => {
 
+              // @ts-ignore
               this.config.logger.debug(message);
 
               message.value = this._convertMessageValue(message.value, asString, asJSON);
@@ -687,6 +728,7 @@ export default class NConsumer extends EventEmitter {
                 return this._singleConsumeRecursive(batchSize);
               }
 
+              // @ts-ignore
               this.config.logger.debug("committing after", this._batchCount, "batches, messages: " + this._consumedSinceCommit);
               super.emit("commit", this._consumedSinceCommit);
               this._batchCount = 0;
@@ -867,6 +909,7 @@ export default class NConsumer extends EventEmitter {
         .filter((topicPartition) => typeof topicPartition.offset !== "undefined");
 
     if (this.config && this.config.logger && this.config.logger.debug) {
+      // @ts-ignore
       this.config.logger.debug(`Committing local offsets for topic ${topic} as`, currentLocalOffsets);
     }
 
@@ -1013,7 +1056,7 @@ export default class NConsumer extends EventEmitter {
    * @param {number} timeout - optional, default is 2500
    * @returns {Promise.<Array>}
    */
-  getComittedOffsets(timeout = 2500){
+  getComittedOffsets(timeout = 2500): Promise<object[]> {
 
     if(!this.consumer){
       return Promise.resolve([]);
@@ -1099,10 +1142,14 @@ export default class NConsumer extends EventEmitter {
         return {
           topic: topicPartition.topic,
           partition: topicPartition.partition,
+          // @ts-ignore
           lowDistance: comittedOffset - brokerState.lowOffset,
+          // @ts-ignore
           highDistance: brokerState.highOffset - comittedOffset,
           detail: {
+            // @ts-ignore
             lowOffset: brokerState.lowOffset,
+            // @ts-ignore
             highOffset: brokerState.highOffset,
             comittedOffset
           }
@@ -1191,7 +1238,7 @@ export default class NConsumer extends EventEmitter {
    * @param {number} timeout - optional, default is 2500
    * @returns {Promise.<Metadata>}
    */
-  getTopicMetadata(topic, timeout = 2500) {
+  getTopicMetadata(topic, timeout = 2500): Promise<Metadata> {
     return new Promise((resolve, reject) => {
 
       if (!this.consumer) {
