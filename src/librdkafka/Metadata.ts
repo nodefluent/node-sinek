@@ -1,9 +1,7 @@
-"use strict";
-
 /**
  * wrapper arround node-librdkafka metadata object
  */
-class Metadata {
+export default class Metadata {
 
   /**
    * creates a new instance
@@ -142,5 +140,3 @@ class Metadata {
     });
   }
 }
-
-module.exports = Metadata;

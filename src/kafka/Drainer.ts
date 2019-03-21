@@ -1,13 +1,11 @@
-"use strict";
-
-const Kafka = require("./Kafka.js");
-const async = require("async");
-const Promise = require("bluebird");
+import Kafka from "./Kafka";
+import async from "async";
+import Promise from "bluebird";
 
 const DEFAULT_DRAIN_INTV = 3000;
 const NOOP = () => {};
 
-class Drainer {
+export default class Drainer {
 
   constructor(consumer = null, asyncLimit = 1, autoJsonParsing = true, omitQueue = false, commitOnDrain = false) {
 
@@ -465,5 +463,3 @@ class Drainer {
     this.consumer.emit(...args);
   }
 }
-
-module.exports = Drainer;

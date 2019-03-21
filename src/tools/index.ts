@@ -1,5 +1,2 @@
-"use strict";
-
-const CompressionTypes = require("./CompressionTypes.js");
-
-module.exports = {CompressionTypes};
+import CompressionTypes from "./CompressionTypes";
+export {CompressionTypes}

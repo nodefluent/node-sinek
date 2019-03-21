@@ -1,6 +1,4 @@
-"use strict";
-
-const merge = require("lodash.merge");
+import merge from "lodash.merge";
 
 const defaultConfig = {
   thresholds: {
@@ -109,7 +107,7 @@ class Health {
  * health check adapted for NConsumers
  * @extends Health
  */
-class ConsumerHealth extends Health {
+export class ConsumerHealth extends Health {
 
   /**
    * creates a new instance
@@ -182,7 +180,7 @@ class ConsumerHealth extends Health {
  * health check adapted for NProducers
  * @extends Health
  */
-class ProducerHealth extends Health {
+export class ProducerHealth extends Health {
 
   /**
    * creates a new instance
@@ -237,8 +235,3 @@ class ProducerHealth extends Health {
     return check;
   }
 }
-
-module.exports = {
-  ConsumerHealth,
-  ProducerHealth
-};

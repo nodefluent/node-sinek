@@ -1,13 +1,11 @@
-"use strict";
+import EventEmitter from "events";
+import Promise from "bluebird";
+import uuid from "uuid";
 
-const EventEmitter = require("events");
-const Promise = require("bluebird");
-const uuid = require("uuid");
+import Kafka from "./../kafka/Kafka";
+import Publisher from "./../kafka/Publisher";
 
-const Kafka = require("./../kafka/Kafka.js");
-const Publisher = require("./../kafka/Publisher.js");
-
-class Producer extends EventEmitter {
+export default class Producer extends EventEmitter {
 
   constructor(config, topic = [], defaultPartitionCount = 1) {
     super();
@@ -191,5 +189,3 @@ class Producer extends EventEmitter {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }
-
-module.exports = Producer;

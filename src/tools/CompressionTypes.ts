@@ -1,5 +1,3 @@
-"use strict";
-
 const TYPES = [0,1,2];
 
 class CompressionTypes {
@@ -20,4 +18,5 @@ class CompressionTypes {
   }
 }
 
-module.exports = new CompressionTypes();
+export default new CompressionTypes();
+

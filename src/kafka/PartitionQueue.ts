@@ -1,8 +1,6 @@
-"use strict";
+import async from "async";
 
-const async = require("async");
-
-class PartitionQueue {
+export default class PartitionQueue {
 
   constructor(partition, drainEvent, drainer, asyncLimit = 1, queueDrain = null){
 
@@ -163,5 +161,3 @@ class PartitionQueue {
     this._getLogger().info("queue closed.");
   }
 }
-
-module.exports = PartitionQueue;

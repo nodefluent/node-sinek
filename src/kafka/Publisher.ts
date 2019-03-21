@@ -1,12 +1,10 @@
-"use strict";
+import Kafka from "./Kafka";
+import Promise from "bluebird";
+import {v3 as murmur} from "murmurhash";
+import uuid from "uuid";
+import {KeyedMessage} from "kafka-node";
 
-const Kafka = require("./Kafka.js");
-const Promise = require("bluebird");
-const murmur = require("murmurhash").v3;
-const uuid = require("uuid");
-const {KeyedMessage} = require("kafka-node");
-
-const {CompressionTypes} = require("./../tools/index.js");
+import {CompressionTypes} from "./../tools/index";
 
 const MESSAGE_TYPES = {
   PUBLISH: "-published",
@@ -14,7 +12,7 @@ const MESSAGE_TYPES = {
   UPDATE: "-updated"
 };
 
-class Publisher {
+export default class Publisher {
 
   constructor(producer = null, partitionCount = 1, autoFlushBuffer = 0, flushPeriod = 100) {
 
@@ -511,5 +509,3 @@ class Publisher {
     this.producer.emit(...args);
   }
 }
-
-module.exports = Publisher;

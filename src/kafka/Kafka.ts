@@ -1,9 +1,7 @@
-"use strict";
-
-const EventEmitter = require("events");
-const {ConsumerGroup, Offset, Client, KafkaClient, HighLevelProducer} = require("kafka-node");
-const Promise = require("bluebird");
-const debug = require("debug");
+import EventEmitter from "events";
+import {ConsumerGroup, Offset, KafkaClient, HighLevelProducer} from "kafka-node";
+import Promise from "bluebird";
+import debug from "debug";
 
 const NOOPL = {
   debug: debug("sinek:debug"),
@@ -22,9 +20,8 @@ const DEFAULT_RETRY_OPTIONS = {
   unref: false
 };
 
-class Kafka extends EventEmitter {
-
-  constructor(conString, logger = null, connectDirectlyToBroker = false){
+export default class Kafka extends EventEmitter {
+  constructor(private conString: string, logger = null, connectDirectlyToBroker = false){
 
     super();
 
@@ -426,5 +423,3 @@ class Kafka extends EventEmitter {
     return null;
   }
 }
-
-module.exports = Kafka;

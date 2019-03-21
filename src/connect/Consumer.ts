@@ -1,12 +1,10 @@
-"use strict";
+import Promise from "bluebird";
+import EventEmitter from "events";
 
-const Promise = require("bluebird");
-const EventEmitter = require("events");
+import Kafka from "./../kafka/Kafka";
+import Drainer from "./../kafka/Drainer";
 
-const Kafka = require("./../kafka/Kafka.js");
-const Drainer = require("./../kafka/Drainer.js");
-
-class Consumer extends EventEmitter {
+export default class Consumer extends EventEmitter {
 
   constructor(topic, config = { options: {} }) {
     super();
@@ -118,5 +116,3 @@ class Consumer extends EventEmitter {
     }
   }
 }
-
-module.exports = Consumer;

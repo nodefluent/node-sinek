@@ -1,5 +1,3 @@
-"use strict";
-
 const INTERESTING_DISTANCE = 10;
 
 /**
@@ -61,7 +59,7 @@ class Analytics {
 /**
  * outsourced analytics for nconsumers
  */
-class ConsumerAnalytics extends Analytics {
+export class ConsumerAnalytics extends Analytics {
 
   /**
    * creates a new instance
@@ -268,7 +266,7 @@ class ConsumerAnalytics extends Analytics {
 /**
  * outsourced analytics for nproducers
  */
-class ProducerAnalytics extends Analytics {
+export class ProducerAnalytics extends Analytics {
 
   /**
    * creates a new instance
@@ -335,8 +333,3 @@ class ProducerAnalytics extends Analytics {
     return this._lastRes;
   }
 }
-
-module.exports = {
-  ConsumerAnalytics,
-  ProducerAnalytics
-};

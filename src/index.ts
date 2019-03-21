@@ -1,1 +1,1 @@
-module.exports = require("./lib/Sinek.js");
+export * from "./Sinek";

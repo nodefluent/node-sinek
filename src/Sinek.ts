@@ -1,30 +1,43 @@
-"use strict";
+import util from "util";
 
-const util = require("util");
+import {default as DeprecatedKafka} from "./kafka/Kafka";
+import {default as DeprecatedDrainer} from "./kafka/Drainer";
+import {default as DeprecatedPublisher} from "./kafka/Publisher";
+import {default as DeprecatedPartitionDrainer} from "./kafka/PartitionDrainer";
 
-const Kafka = require("./kafka/Kafka.js");
-const Drainer = require("./kafka/Drainer.js");
-const Publisher = require("./kafka/Publisher.js");
-const PartitionDrainer = require("./kafka/PartitionDrainer.js");
+import {default as DeprecatedConsumer} from "./connect/Consumer";
+import {default as DeprecatedProducer} from "./connect/Producer";
 
-const Consumer = require("./connect/Consumer.js");
-const Producer = require("./connect/Producer.js");
+export {default as NConsumer} from "./librdkafka/NConsumer";
+export {default as NProducer} from "./librdkafka/NProducer";
 
-const NConsumer = require("./librdkafka/NConsumer.js");
-const NProducer = require("./librdkafka/NProducer.js");
+import {ProducerHealth, ConsumerHealth} from "./librdkafka/Health";
+import {ProducerAnalytics, ConsumerAnalytics} from "./librdkafka/Analytics";
 
-const Health = require("./librdkafka/Health.js");
-const Analytics = require("./librdkafka/Analytics.js");
 
-module.exports = {
-  Kafka: util.deprecate(Kafka, "Kafka is deprecated, please use 'NConsumer' if possible."),
-  Drainer: util.deprecate(Drainer, "Drainer is deprecated, please use 'NConsumer' if possible."),
-  PartitionDrainer: util.deprecate(PartitionDrainer, "PartitionDrainer is deprecated, please use 'NConsumer' if possible."),
-  Publisher: util.deprecate(Publisher, "Publisher is deprecated, please use 'NProducer' if possible."),
-  Consumer: util.deprecate(Consumer, "Consumer is deprecated, please use (noptions) 'NConsumer' if possible."),
-  Producer: util.deprecate(Producer, "Producer is deprecated, please use (noptions) 'NProducer' if possible."),
-  NConsumer,
-  NProducer,
-  Health,
-  Analytics
+const Kafka = util.deprecate(DeprecatedKafka, "Kafka is deprecated, please use 'NConsumer' if possible.");
+const Drainer = util.deprecate(DeprecatedDrainer, "Drainer is deprecated, please use 'NConsumer' if possible.");
+const PartitionDrainer = util.deprecate(DeprecatedPartitionDrainer, "PartitionDrainer is deprecated, please use 'NConsumer' if possible.");
+const Publisher = util.deprecate(DeprecatedPublisher, "Publisher is deprecated, please use 'NProducer' if possible.");
+const Consumer = util.deprecate(DeprecatedConsumer, "Consumer is deprecated, please use (noptions) 'NConsumer' if possible.");
+const Producer = util.deprecate(DeprecatedProducer, "Producer is deprecated, please use (noptions) 'NProducer' if possible.");
+
+const Health = {
+    ProducerHealth,
+    ConsumerHealth,
 };
+
+const Analytics = {
+    ProducerAnalytics,
+    ConsumerAnalytics,
+};
+
+
+export {
+    Kafka, Drainer, PartitionDrainer, Publisher,
+
+    Consumer, Producer,
+
+    Health,
+    Analytics
+}
