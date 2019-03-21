@@ -37,7 +37,7 @@ const MESSAGES = {
 /**
  * little pojso class around the check object
  */
-class Check {
+export class Check {
     public messages: string[];
 
     /**
@@ -121,7 +121,7 @@ export class ConsumerHealth extends Health {
     /**
      * runs the health check
      * @async
-     * @returns {Promise.<Check>}
+     * @returns {BluebirdPromise.<Check>}
      */
     async check() {
 
@@ -195,7 +195,7 @@ export class ProducerHealth extends Health {
     /**
      * runs the health check
      * @async
-     * @returns {Promise.<Check>}
+     * @returns {BluebirdPromise.<Check>}
      */
     async check() {
 
