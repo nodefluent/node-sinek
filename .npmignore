@@ -5,7 +5,9 @@ perf/
 sasl-ssl-example/
 ssl-example/
 test/
+.idea
 .editorconfig
+.envrc
 .eslintignore
 .eslintrc.js
 .gitignore
