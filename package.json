@@ -54,7 +54,7 @@
         "async": "~2.6.2",
         "bluebird": "~3.5.3",
         "debug": "~4.1.1",
-        "kafka-node": "~4.0.2",
+        "kafka-node": "~4.0.3",
         "lodash.merge": "~4.6.1",
         "murmur2-partitioner": "~1.0.0",
         "murmurhash": "~0.0.2",
