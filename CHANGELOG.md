@@ -1,5 +1,18 @@
 # sinek CHANGELOG
 
+## 2019-03-29, Version 7.29.0
+
+* moving away from semver minor resetting after major
+* removed rd-lt (old RD Load Test)
+* upgraded dependencies latest node-rdkafka
+* **BREAKING** marked (JS) Consumer as deprecated
+* **BREAKING** marked (JS) Producer as deprecated
+* **BREAKING** swapped node-rdkafka from optional to dependencies
+* **BREAKING** swapped kafka-node from dependencies to optional
+* cleaned-up documentation
+* added best-practice example for consumer and producer
+* adjusted test configuration
+
 ## 2019-03-12, Version 6.27.3
 
 * preventing undefined offset value commits for commitLocalOffsetsForTopic

@@ -1,7 +1,7 @@
 # NConsumer and NProducer health checks
 
 - as of sinek@6.11.0 the native clients support additional health check features
-- intelligent health checks require enabled [analytics features](Analytics.md)
+- intelligent health checks require enabled [analytics features](analytics.md)
 - checkout the usage example below
 
 ```javascript

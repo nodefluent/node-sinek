@@ -1,4 +1,4 @@
-# High Level Node.js Kafka Client - sinek
+# High Level Node.js Kafka Client
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/nodefluent/node-sinek.svg)](https://greenkeeper.io/)
 [![npm version](https://badge.fury.io/js/sinek.svg)](https://badge.fury.io/js/sinek)
@@ -42,31 +42,15 @@ const {
 ```
 
 * **We suggest using the native clients NConsumer & NProducer implementations, if possible.**
-* [Native Client (NConsumer & NProducer)](lib/librdkafka/README.md)
+* [Native Client (NConsumer & NProducer)](docs/native.md)
+* [Best-practice example](examples/best-practice-example)
 
-## Usage - Javascript Client
+# Further Docs
 
-```javascript
-const {
-  Consumer,
-  Producer
-} = require("sinek");
-```
-
-* If you cannot use the native clients, you can still use sinek's fallbacks JS implementations
-* [Kafka Client (Consumer & Producer)](lib/connect/README.md)
-
-# Docs
-
-* [SSL example](ssl-example/)
-* [SASL example with the Native Client](sasl-ssl-example/)
+* [SSL example](examples/ssl-example/)
+* [SASL+SSL example](examples/sasl-ssl-example/)
 * [Alpine based docker example](kafka-setup/alpine.Dockerfile)
 * [Debian based docker example](kafka-setup/debian.Dockerfile)
-* The older client implementations:
-* [Publisher](docs/publisher.md)
-* [Drainer](docs/drainer.md)
-* [PartitionDrainer](docs/partition-drainer.md)
-* [Hints & Help](docs/hints.md)
 
 > make it about them, not about you
 > - Simon Sinek

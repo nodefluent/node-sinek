@@ -50,7 +50,7 @@ describe("Native Client INT", () => {
       producer.bufferFormatPublish(topic, "1", {content: "a message 1"}, 1, null, 0),
       producer.bufferFormatUpdate(topic, "2", {content: "a message 2"}, 1, null, 0),
       producer.bufferFormatUnpublish(topic, "3", {content: "a message 3"}, 1, null, 0),
-      producer.send(topic, new Buffer("a message buffer"))
+      producer.send(topic, Buffer.from("a message buffer")),
     ];
 
     return Promise.all(promises);
