@@ -91,6 +91,9 @@ describe("Native Client INT", () => {
     // console.log(consumedMessages);
     assert.ok(consumedMessages.length >= 5);
     assert.ok(!Buffer.isBuffer(consumedMessages[0].value));
+    assert.ok(consumedMessages[1].key, "1");
+    assert.ok(consumedMessages[2].key, "2");
+    assert.ok(consumedMessages[3].key, "3");
     assert.equal(consumedMessages[0].value, "a message");
     assert.equal(JSON.parse(consumedMessages[1].value).payload.content, "a message 1");
     assert.equal(JSON.parse(consumedMessages[2].value).payload.content, "a message 2");

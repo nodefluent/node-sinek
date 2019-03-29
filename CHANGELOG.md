@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2019-03-29, Version 7.29.1
+
+* fixed bug in produce where partition and key would be ignored
+
 ## 2019-03-29, Version 7.29.0
 
 * moving away from semver minor resetting after major
