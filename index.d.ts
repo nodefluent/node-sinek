@@ -237,6 +237,7 @@ declare module "sinek" {
     export interface MessageReturn {
         key: string;
         partition: number;
+        offset?: number | null;
     }
 
     export class NConsumer {

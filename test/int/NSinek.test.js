@@ -1,8 +1,8 @@
 "use strict";
 
 const assert = require("assert");
-const {NConsumer, NProducer} = require("./../../index.js");
-const {producerConfig, consumerConfig, topic} = require("../config");
+const { NConsumer, NProducer } = require("./../../index.js");
+const { producerConfig, consumerConfig, topic, batchOptions } = require("../config");
 
 describe("Native Client INT", () => {
 
@@ -11,10 +11,11 @@ describe("Native Client INT", () => {
   const consumedMessages = [];
   let firstMessageReceived = false;
   let messagesChecker;
+  let offsets = [];
 
   before(done => {
 
-    producer = new NProducer(producerConfig);
+    producer = new NProducer(producerConfig, null, 1);
     consumer = new NConsumer([topic], consumerConfig);
 
     producer.on("error", error => console.error(error));
@@ -22,16 +23,22 @@ describe("Native Client INT", () => {
 
     Promise.all([
       producer.connect(),
-      consumer.connect()
+      consumer.connect(),
     ]).then(() => {
-      consumer.consume();
-      consumer.on("message", message => {
-        consumedMessages.push(message);
-        if(!firstMessageReceived){
-          firstMessageReceived = true;
-        }
-      });
-      setTimeout(done, 1000);
+
+      consumer.consume((messages, callback) => {
+
+        messages.forEach((message) => {
+          consumedMessages.push(message);
+          if(!firstMessageReceived){
+            firstMessageReceived = true;
+          }
+        });
+
+        callback();
+      }, true, false, batchOptions);
+
+      setTimeout(done, 100);
     });
   });
 
@@ -39,7 +46,7 @@ describe("Native Client INT", () => {
     if(producer && consumer){
       producer.close();
       consumer.close(true); //commit
-      setTimeout(done, 500);
+      setTimeout(done, 100);
     }
   });
 
@@ -53,7 +60,14 @@ describe("Native Client INT", () => {
       producer.send(topic, Buffer.from("a message buffer")),
     ];
 
-    return Promise.all(promises);
+    return Promise.all(promises).then((produceResults) => {
+      produceResults.forEach((produceResult) => {
+        if(produceResult.offset !== null) {
+          offsets.push(produceResult.offset);
+        }
+      });
+      assert.ok(offsets.length > 0);
+    });
   });
 
   it("should be able to wait", done => {
@@ -62,7 +76,7 @@ describe("Native Client INT", () => {
         clearInterval(messagesChecker);
         done();
       }
-    }, 500);
+    }, 100);
   });
 
   it("should have received first message", done => {
@@ -74,14 +88,26 @@ describe("Native Client INT", () => {
   });
 
   it("should be able to consume messages", done => {
-    console.log(consumedMessages);
-    assert.ok(consumedMessages.length);
+    // console.log(consumedMessages);
+    assert.ok(consumedMessages.length >= 5);
     assert.ok(!Buffer.isBuffer(consumedMessages[0].value));
     assert.equal(consumedMessages[0].value, "a message");
     assert.equal(JSON.parse(consumedMessages[1].value).payload.content, "a message 1");
     assert.equal(JSON.parse(consumedMessages[2].value).payload.content, "a message 2");
     assert.equal(JSON.parse(consumedMessages[3].value).payload.content, "a message 3");
     assert.equal(consumedMessages[4].value, "a message buffer");
+    done();
+  });
+
+  it("should see produced offset in consumed messages", done => {
+    const anOffset = offsets[0];
+    let seen = false;
+    consumedMessages.forEach((message) => {
+      if(message.offset === anOffset){
+        seen = true;
+      }
+    });
+    assert.ok(seen);
     done();
   });
 });

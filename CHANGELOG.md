@@ -11,7 +11,8 @@
 * **BREAKING** swapped kafka-node from dependencies to optional
 * cleaned-up documentation
 * added best-practice example for consumer and producer
-* adjusted test configuration
+* adjusted test configuration to fit the best-practice example
+* **BREAKING** changed NProducer from Producer to HighLevelProducer to ensure message delivery based on the send promise
 
 ## 2019-03-12, Version 6.27.3
 

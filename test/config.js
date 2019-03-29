@@ -1,16 +1,16 @@
 "use strict";
 
 const config = {
-  logger: {
+  /*logger: {
     debug: console.log,
     info: console.log,
     warn: console.log,
     error: console.log
-  }, 
+  }, */
   options: {
     pollIntervalMs: 100,
     consumeGraceMs: 22,
-    murmurHashVersion: "2"
+    murmurHashVersion: "2",
   },
 };
 
@@ -24,7 +24,7 @@ const producerConfig = Object.assign({}, config, {
     "batch.num.messages": 5,
   },
   tconf: {
-    "request.required.acks": 1
+    "request.required.acks": 1,
   },
 });
 
@@ -51,16 +51,23 @@ const jsConsumerConfig = {
   kafkaHost: "localhost:9092",
   groupId: "n-test-group-js",
   options: {
-    autoCommit: true
+    autoCommit: true,
   },
 };
 
 const topic = "n-test-topic";
 
+const batchOptions = {
+  batchSize: 1000,
+  commitEveryNBatch: 1,
+  manualBatching: true,
+};
+
 module.exports = {
-  producerConfig, 
-  consumerConfig, 
-  jsProducerConfig, 
-  jsConsumerConfig, 
   topic,
+  producerConfig, 
+  consumerConfig,
+  batchOptions,
+  jsProducerConfig,
+  jsConsumerConfig,
 };
