@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2019-04-01, Version 7.29.2
+
+* "enable.auto.commit" now defaults to `false` to prevent frustration with batching logic
+
 ## 2019-03-29, Version 7.29.1
 
 * fixed bug in produce where partition and key would be ignored

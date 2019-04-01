@@ -1,6 +1,6 @@
 {
     "name": "sinek",
-    "version": "7.29.1",
+    "version": "7.29.2",
     "description": "Node.js kafka client, consumer, producer polite out of the box",
     "main": "index.js",
     "typings": "index.d.ts",
