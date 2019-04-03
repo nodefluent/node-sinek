@@ -41,3 +41,20 @@ export {
     Health,
     Analytics
 }
+
+export {
+    KafkaHealthConfig,
+    NCommonKafkaOptions,
+    NConsumerKafkaOptions,
+    NProducerKafkaOptions,
+    KafkaConsumerConfig,
+    KafkaProducerConfig,
+    KafkaMessage,
+    SortedMessageBatch,
+    BatchConfig,
+    ConsumerStats,
+    LagStatus,
+    ProducerStats,
+    MessageReturn,
+    KafkaLogger,
+} from "./interfaces";
