@@ -1,8 +1,5 @@
-"use strict";
-
-const assert = require("assert");
-const {Consumer, Producer} = require("./../../index.js");
-const {jsProducerConfig, jsConsumerConfig, topic} = require("../config");
+import assert from "assert";
+import {topic} from "../config";
 
 describe("Javascript Client INT", () => {
 

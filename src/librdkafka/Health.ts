@@ -114,7 +114,7 @@ export class ConsumerHealth extends Health {
      * creates a new instance
      * @param {NConsumer} nconsumer
      */
-    constructor(nconsumer, config) {
+    constructor(nconsumer, config = {}) {
         super(nconsumer, config);
     }
 
@@ -188,7 +188,7 @@ export class ProducerHealth extends Health {
      * creates a new instance
      * @param {NProducer} nproducer
      */
-    constructor(nproducer, config) {
+    constructor(nproducer, config = {}) {
         super(nproducer, config);
     }
 

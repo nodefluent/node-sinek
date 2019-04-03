@@ -1,8 +1,6 @@
-"use strict";
-
-const assert = require("assert");
-const { NConsumer, NProducer } = require("./../../index.js");
-const { producerConfig, consumerConfig, topic, batchOptions } = require("../config");
+import assert from "assert";
+import {batchOptions, consumerConfig, producerConfig, topic} from "../config";
+import {NConsumer, NProducer} from "../../src";
 
 describe("Native Client INT", () => {
 
@@ -15,8 +13,8 @@ describe("Native Client INT", () => {
 
   before(done => {
 
-    producer = new NProducer(producerConfig, null, 1);
-    consumer = new NConsumer([topic], consumerConfig);
+    producer = new NProducer(producerConfig as any, null, 1);
+    consumer = new NConsumer([topic], consumerConfig as any);
 
     producer.on("error", error => console.error(error));
     consumer.on("error", error => console.error(error));

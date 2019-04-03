@@ -1,14 +1,5 @@
-"use strict";
-
-const assert = require("assert");
-
-const {
-  Health
-} = require("./../../index.js");
-const {
-  ConsumerHealth,
-  ProducerHealth
-} = Health;
+import assert from "assert";
+import {ConsumerHealth, ProducerHealth} from "../../src/librdkafka/Health";
 
 describe("Health UNIT", () => {
 

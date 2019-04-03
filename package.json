@@ -14,7 +14,7 @@
         "kafka:stop": "./kafka-setup/stop.sh",
         "kafka:logs": "docker-compose --file ./kafka-setup/docker-compose.yml logs -f",
         "kafka:console": "./kafka-setup/kafka-console.sh",
-        "test": "_mocha --recursive --timeout 32500 --exit -R spec test/int",
+        "test": "_mocha -R spec test/int",
         "yarn:openssl": "LDFLAGS='-L/usr/local/opt/openssl/lib' CPPFLAGS='-I/usr/local/opt/openssl/include' yarn",
         "prepublishOnly": "tsc -p tsconfig.dist.json"
     },
@@ -85,5 +85,17 @@
   },
   "optionalDependencies": {
     "kafka-node": "~4.1.3"
+  },
+  "mocha": {
+    "extension": [
+        "ts"
+    ],
+    "exit": true,
+    "timeout": 32500,
+    "recursive": true,
+    "require": [
+        "ts-node/register",
+        "source-map-support/register"
+    ]
   }
 }

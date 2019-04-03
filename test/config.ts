@@ -1,5 +1,3 @@
-"use strict";
-
 const config = {
   /*logger: {
     debug: console.log,
@@ -14,7 +12,7 @@ const config = {
   },
 };
 
-const producerConfig = Object.assign({}, config, {
+export const producerConfig = Object.assign({}, config, {
   noptions: {
     "metadata.broker.list": "localhost:9092",
     "client.id": "n-test-producer",
@@ -28,7 +26,7 @@ const producerConfig = Object.assign({}, config, {
   },
 });
 
-const consumerConfig = Object.assign({}, config, {
+export const consumerConfig = Object.assign({}, config, {
   noptions: {
     "metadata.broker.list": "localhost:9092",
     "group.id": "n-test-group",
@@ -41,13 +39,13 @@ const consumerConfig = Object.assign({}, config, {
   },
 });
 
-const jsProducerConfig = {
+export const jsProducerConfig = {
   kafkaHost: "localhost:9092",
   clientName: "n-test-producer-js",
   options: {},
 };
 
-const jsConsumerConfig = {
+export const jsConsumerConfig = {
   kafkaHost: "localhost:9092",
   groupId: "n-test-group-js",
   options: {
@@ -55,19 +53,10 @@ const jsConsumerConfig = {
   },
 };
 
-const topic = "n-test-topic";
+export const topic = "n-test-topic";
 
-const batchOptions = {
+export const batchOptions = {
   batchSize: 1000,
   commitEveryNBatch: 1,
   manualBatching: true,
-};
-
-module.exports = {
-  topic,
-  producerConfig, 
-  consumerConfig,
-  batchOptions,
-  jsProducerConfig,
-  jsConsumerConfig,
 };
