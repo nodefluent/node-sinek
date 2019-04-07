@@ -68,6 +68,6 @@
         "sinon": "~7.3.1"
     },
     "optionalDependencies": {
-        "kafka-node": "~4.0.4"
+        "kafka-node": "~4.1.0"
     }
 }
