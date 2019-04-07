@@ -1544,10 +1544,10 @@ just-extend@^4.0.2:
   resolved "https://registry.yarnpkg.com/just-extend/-/just-extend-4.0.2.tgz#f3f47f7dfca0f989c55410a7ebc8854b07108afc"
   integrity sha512-FrLwOgm+iXrPV+5zDU6Jqu4gCRXbWEQg2O3SKONsWE4w7AXFRkryS53bpWdaL9cNol+AmR3AEYz6kn+o0fCPnw==
 
-kafka-node@~4.0.4:
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/kafka-node/-/kafka-node-4.0.4.tgz#5f775737bcbda86c4e7bcde7d5c4409d555ee11e"
-  integrity sha512-wS9tvnfdbqXKLNhMrXgm1OP1BtmmK7h+rrag2zxh99K9Yp3a1xBZqr2+RZNVigSBjIcyT5kLzrZkEatFNGVtEw==
+kafka-node@~4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/kafka-node/-/kafka-node-4.1.0.tgz#031c23456d2e56847ecf2c26c3c4af7bfa0e75d1"
+  integrity sha512-ndyE9ug81RoQDlxq6F5xEr51sszvDE5ElG1CSAI0LAQC4MOFyeFoVaExtQx6Ac+IrElFebGfSGY4T6kFLj/RYw==
   dependencies:
     async "^2.6.2"
     binary "~0.3.0"
