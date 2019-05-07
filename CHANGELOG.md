@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2019-05-07, Version 7.29.3
+
+* dependency upgrade
+
 ## 2019-04-01, Version 7.29.2
 
 * "enable.auto.commit" now defaults to `false` to prevent frustration with batching logic

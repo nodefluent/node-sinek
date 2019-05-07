@@ -1,73 +1,73 @@
 {
-    "name": "sinek",
-    "version": "7.29.2",
-    "description": "Node.js kafka client, consumer, producer polite out of the box",
-    "main": "index.js",
-    "typings": "index.d.ts",
-    "engines" : {
-        "node" : ">=8.11.3"
-    },
-    "scripts": {
-        "lint": "eslint .",
-        "fix": "eslint --fix .",
-        "kafka:start": "./kafka-setup/start.sh",
-        "kafka:stop": "./kafka-setup/stop.sh",
-        "kafka:logs": "docker-compose --file ./kafka-setup/docker-compose.yml logs -f",
-        "kafka:console": "./kafka-setup/kafka-console.sh",
-        "test": "_mocha --recursive --timeout 32500 --exit -R spec test/int",
-        "yarn:openssl": "LDFLAGS='-L/usr/local/opt/openssl/lib' CPPFLAGS='-I/usr/local/opt/openssl/include' yarn"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/nodefluent/node-sinek.git"
-    },
-    "keywords": [
-        "polite",
-        "kafka",
-        "client",
-        "sinek",
-        "simon",
-        "nice",
-        "easy",
-        "producer",
-        "consumer",
-        "backpressure",
-        "control",
-        "flow",
-        "queue",
-        "ssl",
-        "secure",
-        "sasl",
-        "kerberos",
-        "librdkafka",
-        "stream",
-        "batch"
-    ],
-    "author": "Christian Fröhlingsdorf",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/nodefluent/node-sinek/issues"
-    },
-    "homepage": "https://github.com/nodefluent/node-sinek#readme",
-    "dependencies": {
-        "async": "~2.6.2",
-        "bluebird": "~3.5.3",
-        "debug": "~4.1.1",
-        "lodash.merge": "~4.6.1",
-        "murmur2-partitioner": "~1.0.0",
-        "murmurhash": "~0.0.2",
-        "uuid": "~3.3.2",
-        "node-rdkafka": "~2.6.1"
-    },
-    "devDependencies": {
-        "eslint": "~5.15.3",
-        "expect.js": "~0.3.1",
-        "express": "~4.16.4",
-        "istanbul": "~0.4.5",
-        "mocha": "~6.0.2",
-        "sinon": "~7.3.1"
-    },
-    "optionalDependencies": {
-        "kafka-node": "~4.0.4"
-    }
+  "name": "sinek",
+  "version": "7.29.3",
+  "description": "Node.js kafka client, consumer, producer polite out of the box",
+  "main": "index.js",
+  "typings": "index.d.ts",
+  "engines": {
+    "node": ">=8.11.3"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "fix": "eslint --fix .",
+    "kafka:start": "./kafka-setup/start.sh",
+    "kafka:stop": "./kafka-setup/stop.sh",
+    "kafka:logs": "docker-compose --file ./kafka-setup/docker-compose.yml logs -f",
+    "kafka:console": "./kafka-setup/kafka-console.sh",
+    "test": "_mocha --recursive --timeout 32500 --exit -R spec test/int",
+    "yarn:openssl": "LDFLAGS='-L/usr/local/opt/openssl/lib' CPPFLAGS='-I/usr/local/opt/openssl/include' yarn"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nodefluent/node-sinek.git"
+  },
+  "keywords": [
+    "polite",
+    "kafka",
+    "client",
+    "sinek",
+    "simon",
+    "nice",
+    "easy",
+    "producer",
+    "consumer",
+    "backpressure",
+    "control",
+    "flow",
+    "queue",
+    "ssl",
+    "secure",
+    "sasl",
+    "kerberos",
+    "librdkafka",
+    "stream",
+    "batch"
+  ],
+  "author": "Christian Fröhlingsdorf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nodefluent/node-sinek/issues"
+  },
+  "homepage": "https://github.com/nodefluent/node-sinek#readme",
+  "dependencies": {
+    "async": "~2.6.2",
+    "bluebird": "~3.5.4",
+    "debug": "~4.1.1",
+    "lodash.merge": "~4.6.1",
+    "murmur2-partitioner": "~1.0.0",
+    "murmurhash": "~0.0.2",
+    "uuid": "~3.3.2",
+    "node-rdkafka": "~2.6.1"
+  },
+  "devDependencies": {
+    "eslint": "~5.16.0",
+    "expect.js": "~0.3.1",
+    "express": "~4.16.4",
+    "istanbul": "~0.4.5",
+    "mocha": "~6.1.4",
+    "sinon": "~7.3.2"
+  },
+  "optionalDependencies": {
+    "kafka-node": "~4.1.3"
+  }
 }
