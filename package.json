@@ -50,7 +50,7 @@
   },
   "homepage": "https://github.com/nodefluent/node-sinek#readme",
   "dependencies": {
-    "async": "~2.6.2",
+    "async": "~3.0.1",
     "bluebird": "~3.5.4",
     "debug": "~4.1.1",
     "lodash.merge": "~4.6.1",
