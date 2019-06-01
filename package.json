@@ -57,7 +57,7 @@
     "murmur2-partitioner": "~1.0.0",
     "murmurhash": "~0.0.2",
     "uuid": "~3.3.2",
-    "node-rdkafka": "~2.6.1"
+    "node-rdkafka": "~2.7.0"
   },
   "devDependencies": {
     "eslint": "~5.16.0",
