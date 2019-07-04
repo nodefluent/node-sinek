@@ -1,5 +1,17 @@
 # sinek CHANGELOG
 
+## 2019-07-04, Version 7.30.0
+
+* upgraded dependencies
+```
+async          ~2.6.2  →   ~3.1.0
+bluebird       ~3.5.4  →   ~3.5.5
+node-rdkafka   ~2.6.1  →   ~2.7.0
+eslint         ~5.16.0  →   ~6.0.1
+express        ~4.16.4  →  ~4.17.1
+```
+* for now you have to stick with a maximum node version of v11.15.0 (node-rdkafka does not support any higher version yet)
+
 ## 2019-05-07, Version 7.29.3
 
 * dependency upgrade
