@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2019-07-30, Version 7.30.1
+
+* pinned node-rdkafka to 2.7.0, please only use this version with node 11.15.0
+
 ## 2019-07-04, Version 7.30.0
 
 * upgraded dependencies
