@@ -53,18 +53,18 @@
     "async": "~3.1.0",
     "bluebird": "~3.5.5",
     "debug": "~4.1.1",
-    "lodash.merge": "~4.6.1",
+    "lodash.merge": "~4.6.2",
     "murmur2-partitioner": "~1.0.0",
     "murmurhash": "~0.0.2",
     "uuid": "~3.3.2",
     "node-rdkafka": "2.7.0"
   },
   "devDependencies": {
-    "eslint": "~6.0.1",
+    "eslint": "~6.1.0",
     "expect.js": "~0.3.1",
     "express": "~4.17.1",
     "istanbul": "~0.4.5",
-    "mocha": "~6.1.4",
+    "mocha": "~6.2.0",
     "sinon": "~7.3.2"
   },
   "optionalDependencies": {
