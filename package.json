@@ -65,7 +65,7 @@
     "express": "~4.17.1",
     "istanbul": "~0.4.5",
     "mocha": "~6.2.0",
-    "sinon": "~7.3.2"
+    "sinon": "~7.5.0"
   },
   "optionalDependencies": {
     "kafka-node": "~4.1.3"
