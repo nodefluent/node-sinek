@@ -1,5 +1,13 @@
 # sinek CHANGELOG
 
+## 2019-10-15, Version 8.0.0
+
+* this is a major version bump and might break your setup
+* upgraded all dependencies
+* **BREAKING** node-rdkafka is now an optional dependency
+* **BREAKING** added as default kafkajs client dependency
+
+
 ## 2019-07-30, Version 7.30.1
 
 * pinned node-rdkafka to 2.7.0, please only use this version with node 11.15.0
