@@ -1,7 +1,7 @@
 "use strict";
 
 const assert = require("assert");
-const {Consumer, Producer} = require("./../../index.js");
+const {JSConsumer, JSProducer} = require("./../../index.js");
 const {jsProducerConfig, jsConsumerConfig, topic} = require("../config");
 
 describe("Javascript Client INT", () => {
@@ -14,9 +14,8 @@ describe("Javascript Client INT", () => {
 
   before(done => {
 
-    /*
-    producer = new Producer(jsProducerConfig);
-    consumer = new Consumer([topic], jsConsumerConfig);
+    producer = new JSProducer(jsProducerConfig);
+    consumer = new JSConsumer([topic], jsConsumerConfig);
 
     producer.on("error", error => console.error(error));
     consumer.on("error", error => console.error(error));
@@ -33,21 +32,24 @@ describe("Javascript Client INT", () => {
         }
       });
       setTimeout(done, 1000);
-    }); */
-    done();
+    });
   });
 
   after(done => {
-    /*
     if(producer && consumer){
-      producer.close();
-      consumer.close(true); //commit
+
+      try {
+        producer.close();
+        consumer.close(true); //commit
+      } catch(error) {
+        console.error(error);
+      }
+
       setTimeout(done, 500);
-    } */
-    done();
+    }
   });
 
-  xit("should be able to produce messages", () => {
+  it("should be able to produce messages", () => {
 
     const promises = [
       producer.send(topic, "a message"),
@@ -60,7 +62,7 @@ describe("Javascript Client INT", () => {
     return Promise.all(promises);
   });
 
-  xit("should be able to wait", done => {
+  it("should be able to wait", done => {
     messagesChecker = setInterval(()=>{
       if(consumedMessages.length >= 5){
         clearInterval(messagesChecker);
@@ -69,13 +71,12 @@ describe("Javascript Client INT", () => {
     }, 500);
   });
 
-  xit("should have received first message", done => {
+  it("should have received first message", done => {
     assert.ok(firstMessageReceived);
     done();
   });
 
-  xit("should be able to consume messages", done => {
-    console.log(consumedMessages);
+  it("should be able to consume messages", done => {
     assert.ok(consumedMessages.length);
     assert.ok(!Buffer.isBuffer(consumedMessages[0].value));
     assert.equal(consumedMessages[0].value, "a message");
