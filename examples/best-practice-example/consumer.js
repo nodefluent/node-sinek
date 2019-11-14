@@ -21,12 +21,6 @@ const consumerConfiguration = {
     },
 };
 
-const batchOptions = {
-    batchSize: 1000,
-    commitEveryNBatch: 1,
-    manualBatching: true,
-};
-
 (async () => {
     const consumer = new JSConsumer(kafkaTopics, consumerConfiguration);
     consumer.on("error", (error) => console.error(error));
@@ -35,5 +29,5 @@ const batchOptions = {
         // deal with array of messages
         // and when your done call the callback to commit (depending on your batch settings)
         callback();
-    }, true, false, batchOptions);
+    }, true, false); // batchOptions are only supported with NConsumer
 })().catch(console.error);
