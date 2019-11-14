@@ -1,6 +1,8 @@
 "use strict";
 
-const { NProducer } = require("sinek");
+const { JSProducer } = require("sinek");
+// const { NProducer } = require("sinek");
+// simply replace to use the native lib-rdkafka producer
 
 const producerConfiguration = {
     noptions: {
@@ -21,7 +23,7 @@ const producerConfiguration = {
 const partitionCount = 1; // all messages to partition 0
 
 (async () => {
-    const producer = new NProducer(producerConfiguration, null, partitionCount);
+    const producer = new JSProducer(producerConfiguration, null, partitionCount);
     producer.on("error", error => console.error(error));
     await producer.connect();
     const { offset } = await producer.send("my-topic", "my-message", 0, "my-key", "my-partition-key");
