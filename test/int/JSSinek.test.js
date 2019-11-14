@@ -1,8 +1,8 @@
 "use strict";
 
 const assert = require("assert");
-const {Consumer, Producer} = require("./../../index.js");
-const {jsProducerConfig, jsConsumerConfig, topic} = require("../config");
+const { JSConsumer, JSProducer } = require("./../../index.js");
+const { jsProducerConfig, jsConsumerConfig, topic } = require("../config");
 
 describe("Javascript Client INT", () => {
 
@@ -14,9 +14,8 @@ describe("Javascript Client INT", () => {
 
   before(done => {
 
-    /*
-    producer = new Producer(jsProducerConfig);
-    consumer = new Consumer([topic], jsConsumerConfig);
+    producer = new JSProducer(jsProducerConfig);
+    consumer = new JSConsumer([topic], jsConsumerConfig);
 
     producer.on("error", error => console.error(error));
     consumer.on("error", error => console.error(error));
@@ -25,57 +24,72 @@ describe("Javascript Client INT", () => {
       producer.connect(),
       consumer.connect(false)
     ]).then(() => {
-      consumer.consume();
-      consumer.on("message", message => {
-        consumedMessages.push(message);
-        if(!firstMessageReceived){
-          firstMessageReceived = true;
-        }
+      consumer.consume(async (messages, callback) => {
+        messages.forEach((message) => {
+          if(!firstMessageReceived){
+            firstMessageReceived = true;
+          }
+          consumedMessages.push(message);
+        })
+        callback();
+      }, true, false, {
+        batchSize: 1000,
+        commitEveryNBatch: 1,
+        manualBatching: true,
       });
+      // consumer.consume();
+      // consumer.on("message", message => {
+      //   consumedMessages.push(message);
+      //   if(!firstMessageReceived){
+      //     firstMessageReceived = true;
+      //   }
+      // });
       setTimeout(done, 1000);
-    }); */
-    done();
+    });
   });
 
   after(done => {
-    /*
-    if(producer && consumer){
-      producer.close();
-      consumer.close(true); //commit
+    if (producer && consumer) {
+
+      try {
+        producer.close();
+        consumer.close(); //commit
+      } catch (error) {
+        console.error(error);
+      }
+
       setTimeout(done, 500);
-    } */
-    done();
+    }
   });
 
-  xit("should be able to produce messages", () => {
+  it("should be able to produce messages", () => {
 
     const promises = [
       producer.send(topic, "a message"),
-      producer.bufferFormatPublish(topic, "1", {content: "a message 1"}, 1, null, 0),
-      producer.bufferFormatUpdate(topic, "2", {content: "a message 2"}, 1, null, 0),
-      producer.bufferFormatUnpublish(topic, "3", {content: "a message 3"}, 1, null, 0),
+      producer.bufferFormatPublish(topic, "1", { content: "a message 1" }, 1, null, 0),
+      producer.bufferFormatUpdate(topic, "2", { content: "a message 2" }, 1, null, 0),
+      producer.bufferFormatUnpublish(topic, "3", { content: "a message 3" }, 1, null, 0),
       producer.send(topic, new Buffer("a message buffer"))
     ];
 
     return Promise.all(promises);
   });
 
-  xit("should be able to wait", done => {
-    messagesChecker = setInterval(()=>{
-      if(consumedMessages.length >= 5){
+  it("should be able to wait", done => {
+    messagesChecker = setInterval(() => {
+      if (consumedMessages.length >= 5) {
         clearInterval(messagesChecker);
         done();
       }
     }, 500);
   });
 
-  xit("should have received first message", done => {
+  it("should have received first message", done => {
     assert.ok(firstMessageReceived);
     done();
   });
 
-  xit("should be able to consume messages", done => {
-    console.log(consumedMessages);
+  it("should be able to consume messages", done => {
     assert.ok(consumedMessages.length);
     assert.ok(!Buffer.isBuffer(consumedMessages[0].value));
     assert.equal(consumedMessages[0].value, "a message");

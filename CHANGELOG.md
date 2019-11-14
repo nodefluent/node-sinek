@@ -1,5 +1,17 @@
 # sinek CHANGELOG
 
+## 2019-10-15, Version 8.0.0
+
+* this is a major version bump and might break your setup
+* upgraded all dependencies
+* **BREAKING** node-rdkafka is now an optional dependency
+* **BREAKING** added as default kafkajs client dependency
+* `batchSize` on kafkajs is not used, so it is deprecated
+* `consumer.commit()` function on kafkajs is not natively supported, needs to be handled on the callback function, to commit manually
+* some statistics/analytics functions will not work with kafkajs
+* use best practice from the `examples` directory
+
+
 ## 2019-07-30, Version 7.30.1
 
 * pinned node-rdkafka to 2.7.0, please only use this version with node 11.15.0
