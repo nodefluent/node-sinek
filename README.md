@@ -33,7 +33,22 @@ Can be found [here](CHANGELOG.md)
 npm install --save sinek
 ```
 
-## Usage - Native Client
+## Usage
+
+### General
+
+* [Best-practice example](examples/best-practice-example)
+
+### Usage - JS Client
+
+```javascript
+const {
+  JSConsumer,
+  JSProducer
+} = require("sinek");
+```
+
+### Usage - Native Client
 
 ```javascript
 const {
@@ -42,9 +57,7 @@ const {
 } = require("sinek");
 ```
 
-* **We suggest using the native clients NConsumer & NProducer implementations, if possible.**
 * [Native Client (NConsumer & NProducer)](docs/native.md)
-* [Best-practice example](examples/best-practice-example)
 
 # Further Docs
 
