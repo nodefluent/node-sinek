@@ -1,6 +1,9 @@
 "use strict";
 
-const { NConsumer } = require("sinek");
+const { JSConsumer } = require("sinek");
+
+// const { NConsumer } = require("sinek");
+// simply replace to use the native lib-rdkafka consumer
 
 const kafkaTopics = ["one", "two", "three"];
 
@@ -25,7 +28,7 @@ const batchOptions = {
 };
 
 (async () => {
-    const consumer = new NConsumer(kafkaTopics, consumerConfiguration);
+    const consumer = new JSConsumer(kafkaTopics, consumerConfiguration);
     consumer.on("error", (error) => console.error(error));
     await consumer.connect();
     consumer.consume(async (messages, callback) => {
