@@ -1,6 +1,11 @@
 # sinek CHANGELOG
 
-## 2019-10-15, Version 8.0.0
+## 2019-10-15, Version 8.1.0
+
+* upgraded deps
+* node-rdkafka is now capabale of dealing with node.js versions > 11.15.0
+
+## 2019-10-14, Version 8.0.0
 
 * this is a major version bump and might break your setup
 * upgraded all dependencies
