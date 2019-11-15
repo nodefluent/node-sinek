@@ -1371,7 +1371,7 @@ mute-stream@0.0.7:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
   integrity sha1-MHXOk7whuPq0PhvE2n6BFe0ee6s=
 
-nan@^2.11.1, nan@^2.14.0:
+nan@^2.14.0:
   version "2.14.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
   integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
@@ -1432,13 +1432,13 @@ node-environment-flags@1.0.5:
     object.getownpropertydescriptors "^2.0.3"
     semver "^5.7.0"
 
-node-rdkafka@2.7.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/node-rdkafka/-/node-rdkafka-2.7.0.tgz#3e96fc3dd31f28a7c4fea6277f943a88da84edc2"
-  integrity sha512-pSO60jT0AC0eEzXlRxUoNpEp7nCdtglHMBJ2r5lP0y+TqXDAUrV1it1ZtXfi4yeKShksLdRfMI/jeLXWXMMpLA==
+node-rdkafka@2.7.4:
+  version "2.7.4"
+  resolved "https://registry.yarnpkg.com/node-rdkafka/-/node-rdkafka-2.7.4.tgz#b777f5ba9dd08578c6f1d4fe58d51f3c13372413"
+  integrity sha512-415Hfu2SkAo9+mSj3xxw+dHwJqC0jRY0D/OKqUdPfvEE1r4p+N0OfbsAmmSR5FSxZFRFTY3j+/tGntp6ssqHWw==
   dependencies:
     bindings "^1.3.1"
-    nan "^2.11.1"
+    nan "^2.14.0"
 
 noop-logger@^0.1.1:
   version "0.1.1"
