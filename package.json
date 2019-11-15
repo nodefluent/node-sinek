@@ -69,6 +69,6 @@
   },
   "optionalDependencies": {
     "kafka-node": "~4.1.3",
-    "node-rdkafka": "2.7.0"
+    "node-rdkafka": "2.7.4"
   }
 }
