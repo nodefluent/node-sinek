@@ -1196,10 +1196,10 @@ kafka-node@~4.1.3:
   optionalDependencies:
     snappy "^6.0.1"
 
-kafkajs@1.11.0:
-  version "1.11.0"
-  resolved "https://registry.yarnpkg.com/kafkajs/-/kafkajs-1.11.0.tgz#d9599b02ada63ec7c63948b6ddfe0bc3a02c6dcc"
-  integrity sha512-dLRCcFIBygZucR+e8U2ZqH2wgMrAu114K0szUyUseJoeOii3cG5bHZPIdqKecXxI6begPVCfGS3R0nJY4zHW2A==
+kafkajs@1.12.0:
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/kafkajs/-/kafkajs-1.12.0.tgz#50ad336baee95f3324af8ae8df6fadc96e07c613"
+  integrity sha512-Izkd9iFRgeeKaHEgVpGQH08ygzCbHSxTbnu8W3G3uiNaVjGibUTmTwjv1Qf2M8NORXcPfzwVyg6bBlVj4SKr9g==
   dependencies:
     long "^4.0.0"
 
