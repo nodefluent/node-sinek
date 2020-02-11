@@ -272,8 +272,8 @@ declare module "sinek" {
         getLagStatus(noCache: boolean): Promise<Array<LagStatus>>;
         getAnalytics(): object;
         checkHealth(): object;
-        getTopicMetadata(topic: string, timeout: number): Promise<any>;
-        getMetadata(timeout: number): Promise<any>;
+        getTopicMetadata(topic: string, timeout?: number): Promise<any>;
+        getMetadata(timeout?: number): Promise<any>;
         getTopicList(): Promise<Array<string>>;
     }
 
@@ -310,8 +310,8 @@ declare module "sinek" {
         haltAnalytics(): void;
         getAnalytics(): object;
         checkHealth(): object;
-        getTopicMetadata(topic: string, timeout: number): Promise<any>;
-        getMetadata(timeout: number): Promise<any>;
+        getTopicMetadata(topic: string, timeout?: number): Promise<any>;
+        getMetadata(timeout?: number): Promise<any>;
         getTopicList(): Promise<Array<string>>;
         getPartitionCountOfTopic(topic: string): Promise<number>;
         getStoredPartitionCounts(): object;
