@@ -1,5 +1,9 @@
 # sinek CHANGELOG
 
+## 2020-02-24, Version 8.2.0
+
+* upgraded deps
+
 ## 2019-10-15, Version 8.1.0
 
 * upgraded deps
