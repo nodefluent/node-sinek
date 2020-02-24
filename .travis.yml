@@ -19,8 +19,9 @@ before_install:
   - wget https://archive.apache.org/dist/kafka/1.1.0/kafka_2.11-1.1.0.tgz -O kafka.tgz
   - mkdir -p kafka && tar xzf kafka.tgz -C kafka --strip-components 1
   - nohup bash -c "cd kafka && bin/zookeeper-server-start.sh config/zookeeper.properties &"
-  - nohup bash -c "cd kafka && bin/kafka-server-start.sh config/server.properties &"
   - sleep 5
+  - nohup bash -c "cd kafka && bin/kafka-server-start.sh config/server.properties &"
+  - sleep 10
   - kafka/bin/kafka-topics.sh --create --partitions 1 --replication-factor 1 --topic sinek-test-topic-travis --zookeeper localhost:2181
   - kafka/bin/kafka-topics.sh --create --partitions 1 --replication-factor 1 --topic n-test-topic --zookeeper localhost:2181
   - sleep 2
