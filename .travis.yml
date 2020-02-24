@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "11"
+  - "12"
 env:
   global:
     - ZOOKEEPER_PEERS=localhost:2181
@@ -9,7 +9,10 @@ env:
     - CXX=g++-4.8
 
 script:
-  - npm run lint
+  - rm -rf node_modules
+  - yarn
+  - yarn add --frozen-lockfile node-rdkafka@2.7.4
+  - yarn lint
   - mocha --exit --timeout 60000 -R spec test/int/*
 
 before_install:
