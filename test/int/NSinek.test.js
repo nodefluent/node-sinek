@@ -58,6 +58,11 @@ describe("Native Client INT", () => {
       producer.bufferFormatUpdate(topic, "2", {content: "a message 2"}, 1, null, 0),
       producer.bufferFormatUnpublish(topic, "3", {content: "a message 3"}, 1, null, 0),
       producer.send(topic, Buffer.from("a message buffer")),
+      producer.send(topic, "a message with headers", null, null, null, [{ myCustomKey: "myCustomValue" }]),
+      producer.bufferFormatPublish(topic, "1", {content: "a message with headers 1"}, 1, null, 0, null, [{ myCustomKey: "myCustomValue 1" }]),
+      producer.bufferFormatUpdate(topic, "2", {content: "a message with headers 2"}, 1, null, 0, null, [{ myCustomKey: "myCustomValue 2" }]),
+      producer.bufferFormatUnpublish(topic, "3", {content: "a message with headers 3"}, 1, null, 0, null, [{ myCustomKey: "myCustomValue 3" }]),
+      producer.send(topic, Buffer.from("a message buffer with headers"), null, null, null, [{ myCustomKey: "myCustomValue buffer" }]),
     ];
 
     return Promise.all(promises).then((produceResults) => {
@@ -89,7 +94,7 @@ describe("Native Client INT", () => {
 
   it("should be able to consume messages", done => {
     // console.log(consumedMessages);
-    assert.ok(consumedMessages.length >= 5);
+    assert.ok(consumedMessages.length >= 10);
     assert.ok(!Buffer.isBuffer(consumedMessages[0].value));
     assert.ok(consumedMessages[1].key, "1");
     assert.ok(consumedMessages[2].key, "2");
@@ -99,6 +104,12 @@ describe("Native Client INT", () => {
     assert.equal(JSON.parse(consumedMessages[2].value).payload.content, "a message 2");
     assert.equal(JSON.parse(consumedMessages[3].value).payload.content, "a message 3");
     assert.equal(consumedMessages[4].value, "a message buffer");
+    assert.equal(consumedMessages[5].headers[0].myCustomKey, "myCustomValue");
+    assert.equal(consumedMessages[6].headers[0].myCustomKey, "myCustomValue 1");
+    assert.equal(consumedMessages[7].headers[0].myCustomKey, "myCustomValue 2");
+    assert.equal(consumedMessages[8].headers[0].myCustomKey, "myCustomValue 3");
+    assert.equal(consumedMessages[9].headers[0].myCustomKey, "myCustomValue buffer");
+
     done();
   });
 
