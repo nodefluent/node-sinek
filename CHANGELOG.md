@@ -1,5 +1,10 @@
 # sinek CHANGELOG
 
+## 2020-04-19, Version 9.1.0
+
+* support for message headers in NProducer
+* upgraded dependencies
+
 ## 2020-02-24, Version 9.0.0
 
 * upgraded deps
