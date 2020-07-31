@@ -15,7 +15,7 @@ describe("Javascript Client INT", () => {
   before(done => {
 
     producer = new JSProducer(jsProducerConfig);
-    consumer = new JSConsumer([topic], jsConsumerConfig);
+    consumer = new JSConsumer(topic, jsConsumerConfig);
 
     producer.on("error", error => console.error(error));
     consumer.on("error", error => console.error(error));
@@ -30,20 +30,13 @@ describe("Javascript Client INT", () => {
             firstMessageReceived = true;
           }
           consumedMessages.push(message);
-        })
+        });
         callback();
       }, true, false, {
         batchSize: 1000,
         commitEveryNBatch: 1,
         manualBatching: true,
       });
-      // consumer.consume();
-      // consumer.on("message", message => {
-      //   consumedMessages.push(message);
-      //   if(!firstMessageReceived){
-      //     firstMessageReceived = true;
-      //   }
-      // });
       setTimeout(done, 1000);
     });
   });
