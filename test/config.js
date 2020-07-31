@@ -16,7 +16,7 @@ const config = {
 
 const jsProducerConfig = Object.assign({}, config, {
   noptions: {
-    "metadata.broker.list": "localhost:9092",
+    "broker.list": "localhost:9092",
     "client.id": "n-test-produce-js",
     "compression.codec": "none",
     "socket.keepalive.enable": true,
@@ -30,7 +30,7 @@ const jsProducerConfig = Object.assign({}, config, {
 
 const jsConsumerConfig = Object.assign({}, config, {
   noptions: {
-    "metadata.broker.list": "localhost:9092",
+    "broker.list": "localhost:9092",
     "client.id": "n-test-consumer-js",
     "group.id": "n-test-group-js",
     "enable.auto.commit": false,

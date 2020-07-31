@@ -14,31 +14,36 @@ describe("Javascript Client INT", () => {
 
   before(done => {
 
-    producer = new JSProducer(jsProducerConfig);
-    consumer = new JSConsumer(topic, jsConsumerConfig);
+    try {
+      producer = new JSProducer(jsProducerConfig);
+      consumer = new JSConsumer(topic, jsConsumerConfig);
 
-    producer.on("error", error => console.error(error));
-    consumer.on("error", error => console.error(error));
+      producer.on("error", error => console.error(error));
+      consumer.on("error", error => console.error(error));
 
-    Promise.all([
-      producer.connect(),
-      consumer.connect(false)
-    ]).then(() => {
-      consumer.consume(async (messages, callback) => {
-        messages.forEach((message) => {
-          if(!firstMessageReceived){
-            firstMessageReceived = true;
-          }
-          consumedMessages.push(message);
+      Promise.all([
+        producer.connect(),
+        consumer.connect(false)
+      ]).then(() => {
+        consumer.consume(async (messages, callback) => {
+          messages.forEach((message) => {
+            if(!firstMessageReceived){
+              firstMessageReceived = true;
+            }
+            consumedMessages.push(message);
+          });
+          callback();
+        }, true, false, {
+          batchSize: 1000,
+          commitEveryNBatch: 1,
+          manualBatching: true,
         });
-        callback();
-      }, true, false, {
-        batchSize: 1000,
-        commitEveryNBatch: 1,
-        manualBatching: true,
+        setTimeout(done, 1000);
       });
-      setTimeout(done, 1000);
-    });
+    } catch (e) {
+      console.log(e);
+    }
+
   });
 
   after(done => {
