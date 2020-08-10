@@ -40,3 +40,6 @@ logs
 .vscode
 
 certs
+
+# generated files
+dist

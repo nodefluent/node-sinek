@@ -1,14 +1,5 @@
-"use strict";
-
-const assert = require("assert");
-
-const {
-  Health
-} = require("./../../index.js");
-const {
-  ConsumerHealth,
-  ProducerHealth
-} = Health;
+import assert from "assert";
+import { ConsumerHealth, ProducerHealth } from "../../src/index";
 
 describe("Health UNIT", () => {
 
@@ -136,8 +127,8 @@ describe("Health UNIT", () => {
 
   it("should be no analytics", () => {
 
-    const ph = getPHI(getFakeProducer(null));
-    const ch = getCHI(getFakeConsumer(null));
+    const ph = getPHI(getFakeProducer());
+    const ch = getCHI(getFakeConsumer());
 
     return Promise.all([
       ph.check(),

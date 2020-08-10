@@ -379,4 +379,32 @@ declare module "sinek" {
         warn(message: string, error?: Error): void;
         error(error: string | Error): void;
     }
+
+    export class JSConsumer {
+        constructor(topics: string | string[], config: { options: {}, health: {} });
+        connect(asStream: boolean, opts: object): Promise<any>;
+        consume(syncEvent: any, asString: boolean, asJSON: boolean, options: object): Promise<any>;
+        pause(topicPartitions: object[]): void;
+        resume(topicPartitions: object[]): void;
+        getStats(): ConsumerStats;
+        close(): Promise<void>;
+        getOffsetForTopicPartition(topic: string, partition: number, timeout: number);
+        getComittedOffsets(timeout: number): {
+            partition: number;
+            offset: string;
+            metadata: string;
+        };
+        getAssignedPartitions(): Promise<any[]>;
+        findPartitionOffset(topic: string, partition: number, offsets: any[]): any;
+        getLagStatus(noCache: boolean): LagStatus;
+        getAnalytics(): any;
+        checkHealth(): Promise<any>;
+        getTopicMetadata(topic: string, timeout: number): Promise<any>;
+        getMetadata(timeout: number): Promise<any>;
+        getTopicList(timeout: number): Promise<any>;
+    }
+
+    export interface JSProducer {
+
+    }
 }

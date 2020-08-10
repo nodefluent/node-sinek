@@ -1,11 +1,49 @@
-"use strict";
+import { LagStatus, AnalyticsLagChange } from '../interfaces';
+import { JSConsumer, JSProducer } from '../kafkajs';
 
 const INTERESTING_DISTANCE = 10;
+
+interface RunResult {
+  generatedAt: number;
+  interval: number;
+  errors: number | null;
+}
+
+export interface ConsumerRunResult extends RunResult {
+  lagChange: AnalyticsLagChange;
+  largestLag: {
+    topic: string;
+    partition: number;
+    lowDistance: number;
+    highDistance: number;
+    detail: {
+      lowOffset: number,
+      highOffset: number,
+      comittedOffset: number
+    }
+  };
+  consumed: number | null;
+}
+
+export interface ProducerRunResult extends RunResult {
+  produced: number | null;
+  interval: number;
+}
 
 /**
  * parent analytics class
  */
-class Analytics {
+abstract class Analytics {
+
+  client: JSConsumer | JSProducer;
+  config;
+  logger;
+
+  _lastErrors: number =  0;
+  _consumedCount: number = 0;
+
+  abstract _lastRes: RunResult | null = null;
+  _producedCount: number = 0;
 
   /**
    * creates a new instance
@@ -13,12 +51,11 @@ class Analytics {
    * @param {object} config
    * @param {object} logger
    */
-  constructor(client, config, logger) {
-    this.client = client;
+  constructor(client: JSConsumer | JSProducer, config, logger) {
+    this.client = client; // consumer or producer.
     this.config = config;
     this.logger = logger;
 
-    this._lastErrors = 0;
   }
 
   /**
@@ -27,7 +64,7 @@ class Analytics {
    * @param {object} stats - getStats() client result
    * @returns {number}
    */
-  _errorsInInterval(stats) {
+  _errorsInInterval(stats): number {
     const diff = (stats.totalErrors || 0) - this._lastErrors;
     this._lastErrors = stats.totalErrors || 0;
     return diff;
@@ -37,7 +74,7 @@ class Analytics {
    * @static
    * @param {Array} offsets
    */
-  static statusArrayToKeyedObject(offsets = []) {
+  static statusArrayToKeyedObject(offsets: LagStatus[] = []) {
 
     const obj = {};
 
@@ -56,36 +93,37 @@ class Analytics {
 
     return obj;
   }
+
+  abstract run();
 }
 
 /**
  * outsourced analytics for nconsumers
  */
-class ConsumerAnalytics extends Analytics {
+export class ConsumerAnalytics extends Analytics {
 
-  /**
-   * creates a new instance
-   * @param {NConsumer} nconsumer
-   * @param {object} config
-   * @param {object} logger
-   */
-  constructor(nconsumer, config, logger) {
-    super(nconsumer, config, logger);
+  // /**
+  //  * creates a new instance
+  //  * @param {NConsumer} nconsumer
+  //  * @param {object} config
+  //  * @param {object} logger
+  //  */
+  // constructor(nconsumer, config, logger) {
+  //   super(nconsumer, config, logger);
+  // }
 
-    this._lastRes = null;
-    this._consumedCount = 0;
-  }
+  _lastRes: ConsumerRunResult | null = null;
 
   /**
    * resolves a comparison between lag states
    * @private
    * @returns {Promise.<object>}
    */
-  async _checkLagChanges() {
+  async _checkLagChanges(): Promise<AnalyticsLagChange | {error: string}> {
 
-    const last = this.client._lastLagStatus;
+    const last = this.client.getLastLagStatus();
     await this.client.getLagStatus(); //await potential refresh
-    const newest = this.client._lagCache;
+    const newest = this.client.getLagCache();
 
     if (!last || !newest) {
       return {
@@ -180,7 +218,7 @@ class ConsumerAnalytics extends Analytics {
       highDistance: -1
     };
 
-    const newest = this.client._lagCache;
+    const newest = this.client.getLagCache();
 
     if (!newest) {
       return {
@@ -214,25 +252,29 @@ class ConsumerAnalytics extends Analytics {
    * called in interval
    * @returns {object}
    */
-  async run() {
+  async run(): Promise<ConsumerRunResult> {
 
-    const res = {
+    let res = {
       generatedAt: Date.now(),
-      interval: this.config.analyticsInterval
+      interval: this.config.analyticsInterval,
+      lagChange: {},
+      largestLag: {},
+      consumed: 0,
+      errors: 0,
     };
 
     try {
       res.lagChange = await this._checkLagChanges();
     } catch (error) {
       this.logger.error(`Failed to calculate lag changes ${error.message}.`);
-      res.lagChange = null;
+      // res.lagChange = null;
     }
 
     try {
       res.largestLag = this._identifyLargestLag();
     } catch (error) {
       this.logger.error(`Failed to calculate largest lag ${error.message}.`);
-      res.largestLag = null;
+      // res.largestLag = null;
     }
 
     const stats = this.client.getStats();
@@ -241,26 +283,26 @@ class ConsumerAnalytics extends Analytics {
       res.consumed = this._consumed(stats);
     } catch (error) {
       this.logger.error(`Failed to get consumed count ${error.message}.`);
-      res.consumed = null;
+      // res.consumed = null;
     }
 
     try {
       res.errors = this._errorsInInterval(stats);
     } catch (error) {
       this.logger.error(`Failed to get error count ${error.message}.`);
-      res.errors = null;
+      // res.errors = null;
     }
 
     this.logger.debug(res);
-    this._lastRes = res;
-    return res;
+    this._lastRes = res as ConsumerRunResult;
+    return res as ConsumerRunResult;
   }
 
   /**
    * returns the last result of run()
    * @returns {object}
    */
-  getLastResult() {
+  getLastResult(): ConsumerRunResult | null {
     return this._lastRes;
   }
 }
@@ -268,7 +310,9 @@ class ConsumerAnalytics extends Analytics {
 /**
  * outsourced analytics for nproducers
  */
-class ProducerAnalytics extends Analytics {
+export class ProducerAnalytics extends Analytics {
+
+  _lastRes: ProducerRunResult | null = null;
 
   /**
    * creates a new instance
@@ -278,9 +322,6 @@ class ProducerAnalytics extends Analytics {
    */
   constructor(nproducer, config, logger) {
     super(nproducer, config, logger);
-
-    this._lastRes = null;
-    this._producedCount = 0;
   }
 
   /**
@@ -299,11 +340,13 @@ class ProducerAnalytics extends Analytics {
    * called in interval
    * @returns {object}
    */
-  async run() {
+  async run(): Promise<ProducerRunResult> {
 
-    const res = {
+    const res: ProducerRunResult = {
       generatedAt: Date.now(),
-      interval: this.config.analyticsInterval
+      interval: this.config.analyticsInterval,
+      produced: 0,
+      errors: null,
     };
 
     const stats = this.client.getStats();
@@ -331,12 +374,7 @@ class ProducerAnalytics extends Analytics {
    * returns the last result of run()
    * @returns {object}
    */
-  getLastResult() {
+  getLastResult(): ProducerRunResult | null {
     return this._lastRes;
   }
 }
-
-module.exports = {
-  ConsumerAnalytics,
-  ProducerAnalytics
-};

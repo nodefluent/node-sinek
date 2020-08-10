@@ -1,6 +1,6 @@
-"use strict";
-
-const merge = require("lodash.merge");
+import merge from 'lodash.merge';
+import { KafkaHealthConfig } from '../interfaces';
+import { JSProducer, JSConsumer } from '../kafkajs';
 
 const defaultConfig = {
   thresholds: {
@@ -17,7 +17,7 @@ const defaultConfig = {
   }
 };
 
-const STATES = {
+export const STATES = {
   DIS_ANALYTICS: -4,
   NO_ANALYTICS: -3,
   UNKNOWN: -2,
@@ -33,20 +33,24 @@ const MESSAGES = {
   NO_ANALYTICS: "Analytics have not yet run, checks will be available after first run.",
   UNKNOWN: "State is unknown.",
   UNCONNECTED: "The client is not connected.",
-  HEALTHY: "No problems detected, client is healthy."
+  HEALTHY: "No problems detected, client is healthy.",
+  ERRORS: "There was an error."
 };
 
 /**
  * little pojso class around the check object
  */
-class Check {
+export class Check {
+
+  status: number;
+  messages: string[];
 
   /**
    * creates a new instance
    * @param {number} status - status code
    * @param {Array|string} message - message/s, pass an empty array to initialise clean
    */
-  constructor(status = STATES.HEALTHY, message = MESSAGES.HEALTHY) {
+  constructor(status = STATES.HEALTHY, message: string | string[] = MESSAGES.HEALTHY) {
     this.status = status;
     this.messages = Array.isArray(message) ? message : [message];
   }
@@ -79,20 +83,19 @@ class Check {
 /**
  * health parent class
  */
-class Health {
+abstract class Health {
+
+  config: KafkaHealthConfig;
+  abstract client;
+  STATES = STATES;
+  MESSAGES = MESSAGES
 
   /**
    * creates a new instance
-   * @param {NConsumer|NProducer} client
+   * @param {config} config
    */
-  constructor(client, config) {
-    this.client = client;
-
+  constructor(config?: KafkaHealthConfig) {
     this.config = merge({}, defaultConfig, config);
-
-    //make them accessable
-    this.STATES = STATES;
-    this.MESSAGES = MESSAGES;
   }
 
   /**
@@ -100,7 +103,7 @@ class Health {
    * @param {number} status
    * @param {Array|string} message
    */
-  createCheck(status, message) {
+  createCheck(status, message): Check {
     return new Check(status, message);
   }
 }
@@ -109,14 +112,18 @@ class Health {
  * health check adapted for NConsumers
  * @extends Health
  */
-class ConsumerHealth extends Health {
+export class ConsumerHealth extends Health {
+
+  client: JSConsumer;
 
   /**
    * creates a new instance
    * @param {NConsumer} nconsumer
+   * @param {config} config optional
    */
-  constructor(nconsumer, config) {
-    super(nconsumer, config);
+  constructor(nconsumer, config?: KafkaHealthConfig) {
+    super(config);
+    this.client = nconsumer;
   }
 
   /**
@@ -138,7 +145,7 @@ class ConsumerHealth extends Health {
 
     const analytics = this.client._analytics.getLastResult();
 
-    if (!analytics) {
+    if (!analytics || Object.keys(analytics).length === 0) {
       return super.createCheck(STATES.NO_ANALYTICS, MESSAGES.NO_ANALYTICS);
     }
 
@@ -182,14 +189,18 @@ class ConsumerHealth extends Health {
  * health check adapted for NProducers
  * @extends Health
  */
-class ProducerHealth extends Health {
+export class ProducerHealth extends Health {
+
+  client: JSProducer;
 
   /**
    * creates a new instance
    * @param {NProducer} nproducer
+   * @param {config} config
    */
-  constructor(nproducer, config) {
-    super(nproducer, config);
+  constructor(nproducer, config?: KafkaHealthConfig) {
+    super(config);
+    this.client = nproducer;
   }
 
   /**
@@ -197,7 +208,7 @@ class ProducerHealth extends Health {
    * @async
    * @returns {Promise.<Check>}
    */
-  async check() {
+  async check(): Promise<Check> {
 
     /* ### preparation ### */
 
@@ -211,13 +222,13 @@ class ProducerHealth extends Health {
 
     const analytics = this.client._analytics.getLastResult();
 
-    if (!analytics) {
+    if (!analytics || Object.keys(analytics).length === 0) {
       return super.createCheck(STATES.NO_ANALYTICS, MESSAGES.NO_ANALYTICS);
     }
 
     /* ### eof preparation ### */
 
-    const check = new Check(STATES.HEALTHY, []);
+    const check = new Check(STATES.HEALTHY);
 
     if (analytics.errors !== null && analytics.errors >= this.config.thresholds.producer.errors) {
       check.changeStatus(STATES.CRITICAL);
@@ -237,8 +248,3 @@ class ProducerHealth extends Health {
     return check;
   }
 }
-
-module.exports = {
-  ConsumerHealth,
-  ProducerHealth
-};

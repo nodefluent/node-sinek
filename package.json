@@ -2,8 +2,8 @@
   "name": "sinek",
   "version": "9.1.0",
   "description": "Node.js kafka client, consumer, producer polite out of the box",
-  "main": "index.js",
-  "typings": "index.d.ts",
+  "main": "build/dist/index.js",
+  "types": "build/dist/index.d.ts",
   "engines": {
     "node": ">=8.11.3"
   },
@@ -15,7 +15,8 @@
     "kafka:logs": "docker-compose --file ./kafka-setup/docker-compose.yml logs -f",
     "kafka:console": "./kafka-setup/kafka-console.sh",
     "test": "_mocha --recursive --timeout 32500 --exit -R spec test/int",
-    "yarn:openssl": "LDFLAGS='-L/usr/local/opt/openssl/lib' CPPFLAGS='-I/usr/local/opt/openssl/include' yarn"
+    "yarn:openssl": "LDFLAGS='-L/usr/local/opt/openssl/lib' CPPFLAGS='-I/usr/local/opt/openssl/include' yarn",
+    "prepublishOnly": "tsc -p tsconfig.dist.json"
   },
   "repository": {
     "type": "git",
@@ -60,11 +61,27 @@
     "uuid": "~7.0.3"
   },
   "devDependencies": {
+    "@types/mocha": "^8.0.1",
+    "@types/node": "^14.0.27",
     "eslint": "~6.8.0",
     "expect.js": "~0.3.1",
     "express": "~4.17.1",
     "istanbul": "~0.4.5",
     "mocha": "~7.1.1",
-    "sinon": "~9.0.2"
+    "sinon": "~9.0.2",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
+  },
+  "mocha": {
+    "extension": [
+      "ts"
+    ],
+    "exit": true,
+    "timeout": 32500,
+    "recursive": true,
+    "require": [
+      "ts-node/register",
+      "source-map-support/register"
+    ]
   }
 }

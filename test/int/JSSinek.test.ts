@@ -1,20 +1,19 @@
-"use strict";
-
-const assert = require("assert");
-const { JSConsumer, JSProducer } = require("./../../index.js");
-const { jsProducerConfig, jsConsumerConfig, topic } = require("../config");
+import assert from "assert";
+import { JSConsumer, JSProducer } from '../../src'
+import { jsProducerConfig, jsConsumerConfig, topic } from '../config';
 
 describe("Javascript Client INT", () => {
 
-  let consumer = null;
-  let producer = null;
-  const consumedMessages = [];
+  let consumer: JSConsumer;
+  let producer: JSProducer;
+  const consumedMessages: any[] = [];
   let firstMessageReceived = false;
   let messagesChecker;
 
   before(done => {
 
     try {
+
       producer = new JSProducer(jsProducerConfig);
       consumer = new JSConsumer(topic, jsConsumerConfig);
 
@@ -64,9 +63,9 @@ describe("Javascript Client INT", () => {
 
     const promises = [
       producer.send(topic, "a message"),
-      producer.bufferFormatPublish(topic, "1", { content: "a message 1" }, 1, null, 0),
-      producer.bufferFormatUpdate(topic, "2", { content: "a message 2" }, 1, null, 0),
-      producer.bufferFormatUnpublish(topic, "3", { content: "a message 3" }, 1, null, 0),
+      producer.bufferFormatPublish(topic, "1", { content: "a message 1" }, 1, null, null, 0),
+      producer.bufferFormatUpdate(topic, "2", { content: "a message 2" }, 1, null, null, 0),
+      producer.bufferFormatUnpublish(topic, "3", { content: "a message 3" }, 1, null, null, 0),
       producer.send(topic, new Buffer("a message buffer"))
     ];
 

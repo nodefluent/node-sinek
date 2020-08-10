@@ -1,9 +1,13 @@
-"use strict";
+import { ITopicMetadata } from 'kafkajs';
 
 /**
  * wrapper arround node-librdkafka metadata object
  */
-class Metadata {
+export class Metadata {
+  
+  raw: {
+    topics: ITopicMetadata[] | [];
+  } = {topics: []};
 
   /**
    * creates a new instance
@@ -21,7 +25,7 @@ class Metadata {
    */
   getPartitionCountOfTopic(topicName) {
 
-    const topic = this.raw.topics.filter(topic => topic.name === topicName)[0];
+    const topic = this.raw.topics.filter(topic => topic.name === topicName).pop();
 
     if (!topic) {
       throw new Error(topicName + " does not exist in fetched metadata.");
@@ -38,13 +42,13 @@ class Metadata {
    */
   getPartitionsForTopic(topicName) {
 
-    const topic = this.raw.topics.filter(topic => topic.name === topicName)[0];
+    const topic = this.raw.topics.filter((topic:ITopicMetadata) => topic.name === topicName).pop();
 
     if (!topic) {
       throw new Error(topicName + " does not exist in fetched metadata.");
     }
 
-    return topic.partitions.map((partition) => partition.id);
+    return topic.partitions.map((partition) => partition.partitionId);
   }
 
   /**
@@ -52,9 +56,9 @@ class Metadata {
    * returns a list of topic names
    */
   asTopicList() {
-    return this.raw.topics.map(topic => topic.name).filter(topic => {
-      return topic !== "__consumer_offsets";
-    });
+    return this.raw.topics
+      .filter((topic:ITopicMetadata) => topic.name !== "__consumer_offsets")
+      .map((topic: ITopicMetadata) => topic.name);
   }
 
   /**
@@ -69,7 +73,7 @@ class Metadata {
       return {};
     }
 
-    let topic = null;
+    let topic;
     for (let i = 0; i < this.raw.topics.length; i++) {
       if (this.raw.topics[i].name === topicName) {
         topic = this.raw.topics[i];
@@ -80,10 +84,12 @@ class Metadata {
     if (!topic) {
       return {};
     }
-
+    
     return {
+      // @ts-ignore
       name: topic.name,
       configs: null,
+      // @ts-ignore
       partitions: Metadata.formatPartitions(topic.partitions)
     };
   }
@@ -94,13 +100,13 @@ class Metadata {
    * @param {string} topicName - name of the kafka topic
    * @returns {Array}
    */
-  asTopicPartitions(topicName) {
+  asTopicPartitions(topicName: string): object {
 
     if (!this.raw.topics || !this.raw.topics.length) {
       return {};
     }
 
-    let topic = null;
+    let topic: object | null = null;
     for (let i = 0; i < this.raw.topics.length; i++) {
       if (this.raw.topics[i].name === topicName) {
         topic = this.raw.topics[i];
@@ -111,18 +117,19 @@ class Metadata {
     if (!topic) {
       return {};
     }
-
+    // @ts-ignore
     return Metadata.formatPartitions(topic.partitions);
   }
 
   /**
+   * @deprecated
    * @throws
    * gets a broker object (list of broker ids)
    * @returns {object}
    */
   asBrokers() {
     return {
-      brokers: this.raw.brokers.map(broker => broker.id)
+      brokers: []
     };
   }
 
@@ -132,7 +139,7 @@ class Metadata {
    * @param {Array} partitions - array of partitions
    * @returns {Array}
    */
-  static formatPartitions(partitions) {
+  static formatPartitions(partitions): [] {
     return partitions.map((p) => {
       p.partition = p.id;
       p.replicas = p.replicas.map((r) => ({ broker: r, in_sync: p.isrs.indexOf(r) !== -1, leader: r === p.leader }));
@@ -142,5 +149,3 @@ class Metadata {
     });
   }
 }
-
-module.exports = Metadata;
