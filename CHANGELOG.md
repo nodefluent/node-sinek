@@ -1,5 +1,11 @@
 # sinek CHANGELOG
 
+## 2020-08-10, Version 10.0.0
+** **BREAKING removed deprecated client versions
+* **BREAKING** removed node-rdkafka
+* KafkaJS and primary connection to kafka
+* Convert to typescript.
+
 ## 2020-04-19, Version 9.1.0
 
 * support for message headers in NProducer
