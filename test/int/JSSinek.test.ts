@@ -59,22 +59,27 @@ describe("Javascript Client INT", () => {
     }
   });
 
-  it("should be able to produce messages", () => {
+  it("should be able to produce messages", async () => {
 
-    const promises = [
-      producer.send(topic, "a message"),
-      producer.bufferFormatPublish(topic, "1", { content: "a message 1" }, 1, null, null, 0),
-      producer.bufferFormatUpdate(topic, "2", { content: "a message 2" }, 1, null, null, 0),
-      producer.bufferFormatUnpublish(topic, "3", { content: "a message 3" }, 1, null, null, 0),
-      producer.send(topic, new Buffer("a message buffer"))
-    ];
-
-    return Promise.all(promises);
+    // Change to await instead of promise.all in order to ensure the message order
+    // for tests further down.
+    try {
+      await producer.send(topic, "a message");
+      await producer.bufferFormatPublish(topic, "1", { content: "a message 1" }, 1, null, null, 0);
+      await producer.bufferFormatUpdate(topic, "2", { content: "a message 2" }, 1, null, null, 0);
+      await producer.bufferFormatUnpublish(topic, "3", { content: "a message 3" }, 1, null, null, 0);
+      await producer.send(topic, new Buffer("a message buffer"));
+      
+      return true;
+    } catch(e) {
+      console.error(e)
+      return false;
+    }    
   });
 
   it("should be able to wait", done => {
     messagesChecker = setInterval(() => {
-      if (consumedMessages.length >= 5) {
+      if (consumedMessages.length >= 2) {
         clearInterval(messagesChecker);
         done();
       }
