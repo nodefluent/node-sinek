@@ -316,13 +316,12 @@ export class JSProducer extends EventEmitter {
     if (message !== null) {
       message = Buffer.isBuffer(message) ? message : Buffer.from(message);
     }
-    console.log('raw string send...', key, message);
+
     let maxPartitions = 0;
     //find correct max partition count
     if (typeof _partition !== "number") { //manual check to improve performance
       maxPartitions = await this.getPartitionCountOfTopic(topicName);
       if (maxPartitions === -1) {
-        console.log(maxPartitions, topicName);
         throw new Error("defaultPartition set to 'auto', but was not able to resolve partition count for topic" +
           topicName + ", please make sure the topic exists before starting the producer in auto mode.");
       }
@@ -648,7 +647,6 @@ export class JSProducer extends EventEmitter {
       this._adminClient.fetchTopicMetadata({
         topics,
       }).then((raw) => {
-        console.log('topic metadata', raw);
         resolve(new Metadata(raw));
       }).catch((e) => reject(e));
     });
@@ -695,10 +693,8 @@ export class JSProducer extends EventEmitter {
       let count = -1;
       try {
         const metadata = await this.getMetadata(); //prevent creation of topic, if it does not exist
-        console.log(metadata);
         count = metadata.getPartitionCountOfTopic(topic);
       } catch (error) {
-        console.log(error);
         this.emit("error", new Error(`Failed to get metadata for topic ${topic}, because: ${error}.`));
         return -1;
       }
@@ -797,17 +793,5 @@ export class JSProducer extends EventEmitter {
    */
   checkHealth(): Promise<Check> {
     return this._health.check();
-  }
-
-  getLastLagStatus() {
-
-  }
-
-  getLagCache() {
-
-  }
-
-  async getLagStatus() {
-
   }
 }

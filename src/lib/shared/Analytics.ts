@@ -35,7 +35,7 @@ export interface ProducerRunResult extends RunResult {
  */
 abstract class Analytics {
 
-  client: JSConsumer | JSProducer;
+  abstract client: JSConsumer | JSProducer;
   config;
   logger;
 
@@ -47,15 +47,12 @@ abstract class Analytics {
 
   /**
    * creates a new instance
-   * @param {NConsumer|NProducer} client
    * @param {object} config
    * @param {object} logger
    */
-  constructor(client: JSConsumer | JSProducer, config, logger) {
-    this.client = client; // consumer or producer.
+  constructor(config, logger) {
     this.config = config;
     this.logger = logger;
-
   }
 
   /**
@@ -102,17 +99,20 @@ abstract class Analytics {
  */
 export class ConsumerAnalytics extends Analytics {
 
-  // /**
-  //  * creates a new instance
-  //  * @param {NConsumer} nconsumer
-  //  * @param {object} config
-  //  * @param {object} logger
-  //  */
-  // constructor(nconsumer, config, logger) {
-  //   super(nconsumer, config, logger);
-  // }
-
   _lastRes: ConsumerRunResult | null = null;
+
+  client: JSConsumer;
+
+  /**
+   * creates a new instance
+   * @param {NConsumer|NProducer} client
+   * @param {object} config
+   * @param {object} logger
+   */
+  constructor(client: JSConsumer, config, logger) {
+    super(config, logger);
+    this.client = client; // consumer or producer.
+  }
 
   /**
    * resolves a comparison between lag states
@@ -314,14 +314,16 @@ export class ProducerAnalytics extends Analytics {
 
   _lastRes: ProducerRunResult | null = null;
 
+  client: JSProducer;
+
   /**
    * creates a new instance
-   * @param {NProducer} nproducer
    * @param {object} config
    * @param {object} logger
    */
-  constructor(nproducer, config, logger) {
-    super(nproducer, config, logger);
+  constructor(client: JSProducer, config, logger) {
+    super(config, logger);
+    this.client = client; // consumer or producer.
   }
 
   /**
