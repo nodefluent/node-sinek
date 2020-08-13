@@ -1,5 +1,5 @@
-import { JSKafkaProducerConfig, JSKafkaConsumerConfig } from '../src/lib/interfaces';
-import { CompressionTypes } from 'kafkajs';
+import { JSKafkaProducerConfig, JSKafkaConsumerConfig } from "../src/lib/interfaces";
+import { CompressionTypes } from "kafkajs";
 
 export const jsProducerConfig: JSKafkaProducerConfig = {
   noptions: {
@@ -9,6 +9,7 @@ export const jsProducerConfig: JSKafkaProducerConfig = {
     "socket.keepalive.enable": true,
     "queue.buffering.max.ms": 100,
     "batch.num.messages": 5,
+    "log_level": 0,
   },
   options: {
     murmurHashVersion: "2",

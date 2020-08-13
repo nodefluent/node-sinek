@@ -1,6 +1,6 @@
-import merge from 'lodash.merge';
-import { KafkaHealthConfig } from '../interfaces';
-import { JSProducer, JSConsumer } from '../kafkajs';
+import merge from "lodash.merge";
+import { KafkaHealthConfig } from "../interfaces";
+import { JSProducer, JSConsumer } from "../kafkajs";
 
 const defaultConfig = {
   thresholds: {
@@ -60,7 +60,7 @@ export class Check {
    * @param {number} status - new status code
    * @returns {boolean}
    */
-  changeStatus(status = STATES.UNKNOWN) {
+  changeStatus(status: number = STATES.UNKNOWN): boolean {
 
     if (status > this.status) {
       this.status = status;
@@ -75,7 +75,7 @@ export class Check {
    * @param {string} message - string message to attach
    * @returns {number}
    */
-  add(message = MESSAGES.UNKNOWN) {
+  add(message: string = MESSAGES.UNKNOWN): number {
     return this.messages.push(message);
   }
 }
@@ -103,7 +103,7 @@ abstract class Health {
    * @param {number} status
    * @param {Array|string} message
    */
-  createCheck(status, message): Check {
+  createCheck(status: number, message: string | string[]): Check {
     return new Check(status, message);
   }
 }
@@ -121,7 +121,7 @@ export class ConsumerHealth extends Health {
    * @param {NConsumer} nconsumer
    * @param {config} config optional
    */
-  constructor(nconsumer, config?: KafkaHealthConfig) {
+  constructor(nconsumer: JSConsumer, config?: KafkaHealthConfig) {
     super(config);
     this.client = nconsumer;
   }
@@ -131,7 +131,7 @@ export class ConsumerHealth extends Health {
    * @async
    * @returns {Promise.<Check>}
    */
-  async check() {
+  async check(): Promise<Check> {
 
     /* ### preparation ### */
 
@@ -198,7 +198,7 @@ export class ProducerHealth extends Health {
    * @param {NProducer} nproducer
    * @param {config} config
    */
-  constructor(nproducer, config?: KafkaHealthConfig) {
+  constructor(nproducer: JSProducer, config?: KafkaHealthConfig) {
     super(config);
     this.client = nproducer;
   }

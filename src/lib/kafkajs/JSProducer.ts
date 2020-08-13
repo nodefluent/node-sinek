@@ -1,13 +1,13 @@
-import { Promise } from 'bluebird';
-import Debug from 'debug';
-import { EventEmitter } from 'events';
-import { v4 as uuidv4} from 'uuid';
-import { murmur } from 'murmurhash';
-import { murmur2Partitioner } from 'murmur2-partitioner';
-import { Kafka, SASLMechanism, Admin, Producer, RecordMetadata, CompressionTypes } from 'kafkajs';
-import { Metadata, ProducerAnalytics, ProducerHealth, Check } from '../shared';
-import { MessageReturn, JSKafkaProducerConfig } from '../interfaces';
-import fs from 'fs';
+import { Promise } from "bluebird";
+import Debug from "debug";
+import { EventEmitter } from "events";
+import { v4 as uuidv4} from "uuid";
+import { murmur } from "murmurhash";
+import { murmur2Partitioner } from "murmur2-partitioner";
+import { Kafka, SASLMechanism, Admin, Producer, RecordMetadata, CompressionTypes } from "kafkajs";
+import { Metadata, ProducerAnalytics, ProducerHealth, Check, ProducerRunResult, defaultAnalyticsInterval } from "../shared";
+import { MessageReturn, JSKafkaProducerConfig, ProducerStats, AnalyticsConfig, KafkaLogger } from "../interfaces";
+import fs from "fs";
 
 const MESSAGE_TYPES = {
   PUBLISH: "-published",
@@ -35,24 +35,24 @@ export class JSProducer extends EventEmitter {
   kafkaClient: Kafka;
   config: JSKafkaProducerConfig;
 
-  paused: boolean = false;
+  paused = false;
   producer: Producer | undefined;
 
   private _health: ProducerHealth;
   private _adminClient: Admin;
-  private _producerPollIntv: number = 0;
+  private _producerPollIntv = 0;
   private _partitionCounts = {};
-  private _inClosing: boolean = false;
-  private _totalSentMessages: number = 0;
-  private _lastProcessed: number = 0;
-  private _analyticsOptions: object = {};
+  private _inClosing = false;
+  private _totalSentMessages = 0;
+  private _lastProcessed = 0;
+  private _analyticsOptions: AnalyticsConfig | null = null;
   private _analyticsIntv: NodeJS.Timeout | null = null;
   _analytics: ProducerAnalytics | undefined;
   private _murmurHashVersion: string = DEFAULT_MURMURHASH_VERSION;
   private _murmur;
-  private _errors: number = 0;
+  private _errors = 0;
   
-  defaultPartitionCount: number = 1;
+  defaultPartitionCount = 1;
 
   /**
    * creates a new producer instance
@@ -60,27 +60,19 @@ export class JSProducer extends EventEmitter {
    * @param {*} _ - ignore this param (api compatability)
    * @param {number} defaultPartitionCount  - amount of default partitions for the topics to produce to
    */
-  constructor(config: JSKafkaProducerConfig, defaultPartitionCount: number = 1) {
+  constructor(config: JSKafkaProducerConfig, defaultPartitionCount = 1) {
     super();
 
     if (!config) {
       throw new Error("You are missing a config object.");
     }
 
-    // @ts-ignore
     if (!config.logger || typeof config.logger !== "object") {
-      // @ts-ignore
       config.logger = DEFAULT_LOGGER;
     }
 
     if (!config.options) {
       config.options = {};
-    }
-
-    // @ts-ignore
-    if (!config.noptions) {
-      // @ts-ignore
-      config.noptions = {};
     }
 
     const { 
@@ -95,7 +87,6 @@ export class JSProducer extends EventEmitter {
       "sasl.username": username,
       "sasl.password": password,
     } = config.noptions;
-
 
     const brokers = brokerList.split(",");
 
@@ -133,16 +124,16 @@ export class JSProducer extends EventEmitter {
     this.defaultPartitionCount = defaultPartitionCount;
 
     switch (this._murmurHashVersion) {
-      case "2":
-        this._murmur = (key, partitionCount) => murmur2Partitioner.partition(key, partitionCount);
-        break;
+    case "2":
+      this._murmur = (key, partitionCount) => murmur2Partitioner.partition(key, partitionCount);
+      break;
 
-      case "3":
-        this._murmur = (key, partitionCount) => murmur.v3(key) % partitionCount;
-        break;
+    case "3":
+      this._murmur = (key, partitionCount) => murmur.v3(key) % partitionCount;
+      break;
 
-      default:
-        throw new Error(`${this._murmurHashVersion} is not a supported murmur hash version. Choose '2' or '3'.`);
+    default:
+      throw new Error(`${this._murmurHashVersion} is not a supported murmur hash version. Choose '2' or '3'.`);
     }
 
     this.on("error", () => this._errors++);
@@ -153,7 +144,7 @@ export class JSProducer extends EventEmitter {
    * starts analytics tasks
    * @param {object} options - analytic options
    */
-  enableAnalytics(options: { analyticsInterval: number } = {analyticsInterval: 1000 * 150}): void {
+  enableAnalytics(options: { analyticsInterval: number } = {analyticsInterval: defaultAnalyticsInterval}): void {
 
     if (this._analyticsIntv) {
       throw new Error("analytics intervals are already running.");
@@ -162,7 +153,7 @@ export class JSProducer extends EventEmitter {
     let { analyticsInterval } = options;
     this._analyticsOptions = options;
 
-    analyticsInterval = analyticsInterval || 1000 * 150; // 150 sec
+    analyticsInterval = analyticsInterval || defaultAnalyticsInterval; // 150 sec
 
     this._analyticsIntv = setInterval(this._runAnalytics.bind(this), analyticsInterval);
   }
@@ -182,14 +173,9 @@ export class JSProducer extends EventEmitter {
    * @returns {Promise.<*>}
    */
   connect(): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-
-      let {
-        kafkaHost,
-        logger,
-        noptions,
-        tconf
-      } = this.config;
+    return new Promise((resolve, reject) => {
+      const { kafkaHost, logger } = this.config;
+      let { noptions, tconf } = this.config;
 
       let conStr: string | null = null;
 
@@ -206,7 +192,6 @@ export class JSProducer extends EventEmitter {
         "dr_cb": true
       };
 
-      noptions = noptions;
       noptions = Object.assign({}, config, noptions);
       logger!.debug(JSON.stringify(noptions));
 
@@ -224,7 +209,6 @@ export class JSProducer extends EventEmitter {
       });
 
       /* ### EOF STUFF ### */
-
       this.producer.on(DISCONNECT, () => {
         if (this._inClosing) {
           this._reset();
@@ -234,7 +218,7 @@ export class JSProducer extends EventEmitter {
       });
 
       this.producer.on(CONNECT, () => {
-        logger!.info(`KafkaJS producer is ready.`);
+        logger!.info("KafkaJS producer is ready.");
         this.emit("ready");
       });
 
@@ -242,17 +226,15 @@ export class JSProducer extends EventEmitter {
 
       try {
 
-        await Promise.all([
+        Promise.all([
           this.producer.connect(),
           this._adminClient.connect(),
-        ]);
+        ]).then(resolve);
 
       } catch (error) {
         this.emit("error", error);
         return reject(error);
       }
-
-      resolve();
     });
   }
 
@@ -263,7 +245,7 @@ export class JSProducer extends EventEmitter {
    * @param {number} - partition count of topic, if 0 defaultPartitionCount is used
    * @returns {string} - deterministic partition value for key
    */
-  _getPartitionForKey(key, partitionCount = 1): number {
+  _getPartitionForKey(key: string, partitionCount = 1): number {
 
     if (typeof key !== "string") {
       throw new Error("key must be a string.");
@@ -288,7 +270,7 @@ export class JSProducer extends EventEmitter {
    */
   async send(
     topicName: string,
-    message: object | string | null,
+    message: Record<string, unknown> | string | null | Buffer,
     _partition: number | null = null,
     _key: string | null = null,
     _partitionKey: string | null = null
@@ -313,8 +295,10 @@ export class JSProducer extends EventEmitter {
     }
 
     const key = _key ? _key : uuidv4();
+    let convertedMessage: Buffer;
+
     if (message !== null) {
-      message = Buffer.isBuffer(message) ? message : Buffer.from(message);
+      convertedMessage = Buffer.isBuffer(message) ? message : Buffer.from(message);
     }
 
     let maxPartitions = 0;
@@ -351,31 +335,31 @@ export class JSProducer extends EventEmitter {
     const timestamp = producedAt.toString();
     const acks = this.config && this.config.tconf && this.config.tconf["request.required.acks"] || 1;
     const compression = (this.config.noptions) 
-    ? this.config.noptions['compression.codec']
-    : CompressionTypes.None
+      ? this.config.noptions["compression.codec"]
+      : CompressionTypes.None;
 
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       this.producer!.send({
         topic: topicName,
         acks,
         compression,
         messages: [{
           key, 
-          value: message as string | Buffer | null,
+          value: convertedMessage,
           partition,
           timestamp
         }],
       })
-      .then((metadata: RecordMetadata[] ) => {
-        resolve({
-          key,
-          partition,
-          offset: metadata[0].offset,
+        .then((metadata: RecordMetadata[] ) => {
+          resolve({
+            key,
+            partition,
+            offset: metadata[0].offset,
+          });
+        })
+        .catch((error) => {
+          reject(error);
         });
-      })
-      .catch((error) => {
-        reject(error);
-      });
 
     });
   }
@@ -394,7 +378,7 @@ export class JSProducer extends EventEmitter {
   async buffer(
     topic: string,
     identifier: string,
-    payload: object,
+    payload: Record<string, unknown>,
     partition: number | null = null,
     version: number | null = null,
     partitionKey: string | null = null
@@ -412,15 +396,11 @@ export class JSProducer extends EventEmitter {
       throw new Error("expecting payload to be of type object.");
     }
 
-    //@ts-ignore
     if (typeof payload.id === "undefined") {
-      //@ts-ignore
       payload.id = identifier;
     }
 
-    //@ts-ignore
     if (version && typeof payload.version === "undefined") {
-      //@ts-ignore
       payload.version = version;
     }
 
@@ -444,12 +424,12 @@ export class JSProducer extends EventEmitter {
   async _sendBufferFormat(
     topic: string,
     identifier: string,
-    _payload: object,
-    version: number = 1,
+    _payload: Record<string, unknown>,
+    version = 1,
     _: null | number,
     partitionKey: string | null = null,
     partition: number | null = null,
-    messageType: string = ""
+    messageType = ""
   ): Promise<MessageReturn> {
 
     if (typeof identifier === "undefined") {
@@ -464,15 +444,11 @@ export class JSProducer extends EventEmitter {
       throw new Error("expecting payload to be of type object.");
     }
 
-    //@ts-ignore
     if (typeof _payload.id === "undefined") {
-      //@ts-ignore
       _payload.id = identifier;
     }
 
-    //@ts-ignore
     if (version && typeof _payload.version === "undefined") {
-      //@ts-ignore
       _payload.version = version;
     }
 
@@ -494,9 +470,9 @@ export class JSProducer extends EventEmitter {
   bufferFormat(
     topic: string,
     identifier: string,
-    payload: object,
-    version: number = 1,
-    compressionType: number = 0,
+    payload: Record<string, unknown>,
+    version = 1,
+    compressionType = 0,
     partitionKey: string | null = null
   ): Promise<MessageReturn> {
     return this.bufferFormatPublish(topic, identifier, payload, version, compressionType, partitionKey);
@@ -516,8 +492,8 @@ export class JSProducer extends EventEmitter {
   bufferFormatPublish(
     topic: string,
     identifier: string,
-    _payload: object,
-    version: number = 1,
+    _payload: Record<string, unknown>,
+    version = 1,
     _: null | number,
     partitionKey: string | null = null,
     partition: number | null = null
@@ -539,8 +515,8 @@ export class JSProducer extends EventEmitter {
   bufferFormatUpdate(
     topic: string,
     identifier: string,
-    _payload: object,
-    version: number = 1,
+    _payload: Record<string, unknown>,
+    version = 1,
     _: null | number,
     partitionKey: string | null = null,
     partition: number | null = null
@@ -562,8 +538,8 @@ export class JSProducer extends EventEmitter {
   bufferFormatUnpublish(
     topic: string,
     identifier: string,
-    _payload: object,
-    version: number = 1,
+    _payload: Record<string, unknown>,
+    version = 1,
     _: null | number,
     partitionKey: string | null = null,
     partition: number | null = null
@@ -610,7 +586,7 @@ export class JSProducer extends EventEmitter {
    * * @todo -  update type for producer stats.
    * @returns {object}
    */
-  getStats() {
+  getStats(): ProducerStats {
     return {
       totalPublished: this._totalSentMessages,
       last: this._lastProcessed,
@@ -640,7 +616,7 @@ export class JSProducer extends EventEmitter {
         return reject(new Error("You must call and await .connect() before trying to get metadata."));
       }
 
-      const topics = (topic === '')
+      const topics = (topic === "")
         ? []
         : [topic];
 
@@ -657,13 +633,13 @@ export class JSProducer extends EventEmitter {
    * @returns {Promise.<Metadata>}
    */
   getMetadata(): Promise<Metadata> {
-    return this.getTopicMetadata('');
+    return this.getTopicMetadata("");
   }
 
   /**
    * returns a list of available kafka topics on the connected brokers
    */
-  async getTopicList() {
+  async getTopicList(): Promise<string[]> {
     const metadata: Metadata = await this.getMetadata();
     return metadata.asTopicList();
   }
@@ -676,7 +652,7 @@ export class JSProducer extends EventEmitter {
    * @param {string} topic - name of topic
    * @returns {Promise.<number>}
    */
-  async getPartitionCountOfTopic(topic): Promise<number> {
+  async getPartitionCountOfTopic(topic: string): Promise<number> {
 
     if (!this.producer) {
       throw new Error("You must call and await .connect() before trying to get metadata.");
@@ -714,7 +690,7 @@ export class JSProducer extends EventEmitter {
    * gets the local partition count cache
    * @returns {object}
    */
-  getStoredPartitionCounts() {
+  getStoredPartitionCounts(): Record<string, unknown> {
     return this._partitionCounts;
   }
 
@@ -761,10 +737,10 @@ export class JSProducer extends EventEmitter {
    * called in interval
    * @private
    */
-  private _runAnalytics() {
+  private _runAnalytics(): void {
 
     if (!this._analytics) {
-      this._analytics = new ProducerAnalytics(this, this._analyticsOptions || {}, this.config.logger);
+      this._analytics = new ProducerAnalytics(this, this._analyticsOptions, this.config.logger as KafkaLogger);
     }
 
     this._analytics.run()
@@ -777,11 +753,11 @@ export class JSProducer extends EventEmitter {
    * @throws
    * @returns {object}
    */
-  getAnalytics() {
+  getAnalytics(): ProducerRunResult|null {
 
     if (!this._analytics) {
       this.emit("error", new Error("You have not enabled analytics on this consumer instance."));
-      return {};
+      return null;
     }
 
     return this._analytics.getLastResult();

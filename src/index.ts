@@ -1,1 +1,1 @@
-export * from './lib/Sinek'
+export * from "./lib/Sinek";

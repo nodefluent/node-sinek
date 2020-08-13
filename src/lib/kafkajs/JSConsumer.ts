@@ -1,12 +1,23 @@
-import { Promise } from 'bluebird';
-import Debug from 'debug';
-import { Kafka, Admin, Consumer, SASLMechanism } from 'kafkajs';
-import fs from 'fs';
-import { EventEmitter } from 'events';
-import { BatchConfig, LagStatus, JSKafkaConsumerConfig } from '../interfaces';
-import { ConsumerAnalytics, ConsumerHealth, Metadata } from '../shared';
+import { Promise } from "bluebird";
+import Debug from "debug";
+import { Kafka, Admin, Consumer, SASLMechanism, KafkaMessage } from "kafkajs";
+import fs from "fs";
+import { EventEmitter } from "events";
+import { BatchConfig, LagStatus, JSKafkaConsumerConfig, KafkaLogger, ConsumerStats, AnalyticsConfig } from "../interfaces";
+import { ConsumerAnalytics, ConsumerHealth, Metadata, Check, ConsumerRunResult } from "../shared";
 
 const MESSAGE_CHARSET = "utf8";
+
+export interface FormattedKafkaMessage extends Omit<KafkaMessage, "value"> {
+  value: Buffer | string | Record<string, unknown>;
+}
+
+export interface ComittedOffsets {
+  partition: number;
+  offset: string;
+  metadata: string | null;
+  topic: string;
+}
 
 const DEFAULT_LOGGER = {
   debug: Debug("sinek:jsconsumer:debug"),
@@ -21,11 +32,13 @@ type Lag = {
   took: number
 }
 
+type ConsumeCallback = ((messages, callback) => void) | null;
+
 const defaultLag = {
   status: [],
   at: 0,
   took: 0,
-}
+};
 
 /**
  * wrapper around kafkajs that immitates nconsumer
@@ -36,37 +49,37 @@ export class JSConsumer extends EventEmitter {
   kafkaClient: Kafka;
   topics: string[];
   config: JSKafkaConsumerConfig;
-  asString: boolean = true;
-  asJSON: boolean = false;
-  asStream: boolean = false;
+  asString = true;
+  asJSON = false;
+  asStream = false;
   consumer: Consumer | undefined;
   
-  private _firstMessageConsumed: boolean = false;
-  private _totalIncomingMessages: number = 0;
-  private _lastReceived: number = 0;
-  private _totalProcessedMessages: number = 0;
-  private _lastProcessed: number = 0;
-  private _isAutoCommitting: boolean = false;
-  private _batchCount: number = 0;
-  private _batchCommitts: number = 0;
-  private _totalBatches: number = 0;
+  private _firstMessageConsumed = false;
+  private _totalIncomingMessages = 0;
+  private _lastReceived = 0;
+  private _totalProcessedMessages = 0;
+  private _lastProcessed = 0;
+  private _isAutoCommitting = false;
+  private _batchCount = 0;
+  private _batchCommitts = 0;
+  private _batchConfig: BatchConfig = {};
+  private _totalBatches = 0;
   
-  // @ts-ignore
   private _lastLagStatus: Lag = defaultLag;
   private _lagCache: Lag = defaultLag;
 
-  private _analyticsOptions = null;
+  private _analyticsOptions: AnalyticsConfig | null = null;
   _analytics: ConsumerAnalytics | undefined;
-  private _consumedSinceCommit: number = 0;
-  private _emptyFetches: number = 0;
-  private _avgBatchProcessingTime: number = 0;
-  private _extCommitCallback: Function | null = null;
+  private _consumedSinceCommit = 0;
+  private _emptyFetches = 0;
+  private _avgBatchProcessingTime = 0;
+  private _extCommitCallback: ((e: Error, partitions: any[]) => void) | undefined;
 
-  private _errors: number = 0;
-  private _groupId: string = '';
+  private _errors = 0;
+  private _groupId = "";
   private _adminClient: Admin;
   private _health: ConsumerHealth;
-  private _inClosing: boolean = false;
+  private _inClosing = false;
 
   /**
    * creates a new consumer instance
@@ -80,9 +93,7 @@ export class JSConsumer extends EventEmitter {
       throw new Error("You are missing a config object.");
     }
 
-    // @ts-ignore
     if (!config.logger || typeof config.logger !== "object") {
-      // @ts-ignore
       config.logger = DEFAULT_LOGGER;
     }
 
@@ -131,7 +142,7 @@ export class JSConsumer extends EventEmitter {
     this._health = new ConsumerHealth(this, this.config.health);
 
     this.on("error", () => {
-      this._errors++
+      this._errors++;
     });
 
     this.on("batch", (messages, { resolveOffset, syncEvent }) => {
@@ -143,8 +154,7 @@ export class JSConsumer extends EventEmitter {
       const messageOffsets: any[] = [];
 
       const mappedMessages = messages.map((message) => {
-        // @ts-ignore
-        this.config.logger.debug(message);
+        this.config.logger!.debug(message);
         message.value = this._convertMessageValue(message.value, this.asString, this.asJSON);
         this.emit("message", message);
         messageOffsets.push(message.offset);
@@ -184,8 +194,8 @@ export class JSConsumer extends EventEmitter {
       return Promise.reject(new Error("JSConsumer does not support streaming mode."));
     }
 
-    let { logger, groupId, noptions, tconf } = this.config;
-
+    const { logger, groupId } = this.config;
+    let { noptions, tconf } = this.config;
 
     const config = {
       "broker.list": null,
@@ -204,12 +214,11 @@ export class JSConsumer extends EventEmitter {
       this._extCommitCallback = noptions["offset_commit_cb"];
     }
 
-    noptions = noptions;
     noptions = Object.assign({}, config, noptions, overwriteConfig);
 
     logger!.debug(JSON.stringify(noptions));
-    // @ts-ignore
-    this._isAutoCommitting = noptions["enable.auto.commit"];
+
+    this._isAutoCommitting = noptions["enable.auto.commit"] || false;
 
     tconf = tconf || undefined;
     logger!.debug(JSON.stringify(tconf));
@@ -220,7 +229,7 @@ export class JSConsumer extends EventEmitter {
       return Promise.reject(new Error("Group need to be configured on noptions['groupId.id']"));
     }
 
-    return this._connectInFlow(logger);
+    return this._connectInFlow(logger as KafkaLogger);
   }
 
   /**
@@ -229,7 +238,7 @@ export class JSConsumer extends EventEmitter {
    * @param {Error} error
    * @param {Array} partitions
    */
-  _onOffsetCommit(error: Error, partitions): void {
+  _onOffsetCommit(error: Error, partitions: any[]): void {
 
     if (this._extCommitCallback) {
       try {
@@ -243,7 +252,7 @@ export class JSConsumer extends EventEmitter {
       return this.config.logger!.warn("commit request failed with an error: " + JSON.stringify(error));
     }
 
-    this.config.logger!.debug(partitions);
+    this.config.logger!.debug(JSON.stringify(partitions));
   }
 
   /**
@@ -254,9 +263,9 @@ export class JSConsumer extends EventEmitter {
    * @param {object} tconf
    * @returns {Promise.<*>}
    */
-  _connectInFlow(logger): Promise {
+  _connectInFlow(logger: KafkaLogger): Promise {
 
-    return new Promise(async (resolve, reject) => {
+    return new Promise(( resolve, reject ) => {
 
       this.consumer = this.kafkaClient.consumer({ groupId: this._groupId });
       const { CONNECT, CRASH, DISCONNECT } = this.consumer.events;
@@ -281,16 +290,14 @@ export class JSConsumer extends EventEmitter {
       logger.debug("Connecting..");
 
       try {
-        await Promise.all([
+        Promise.all([
           this.consumer.connect(),
           this._adminClient.connect(),
-        ]);
+        ]).then(resolve);
       } catch (error) {
         this.emit("error", error);
         return reject(error);
       }
-
-      resolve();
     });
   }
 
@@ -300,7 +307,7 @@ export class JSConsumer extends EventEmitter {
    * read a certain size of messages from the broker
    * @returns {boolean}
    */
-  _consumerRun(syncEvent): Promise<boolean> {
+  _consumerRun(syncEvent: ConsumeCallback): Promise<boolean> {
 
     if (!this.resume || !this.consumer) {
       return false;
@@ -353,9 +360,9 @@ export class JSConsumer extends EventEmitter {
    */
   _convertMessageValue(
     _value: Buffer,
-    asString: boolean = true,
-    asJSON: boolean = false
-  ): Buffer|string|object {
+    asString = true,
+    asJSON = false
+  ): Buffer | string| Record<string, unknown> {
     if (!_value) {
       return _value;
     }
@@ -381,7 +388,7 @@ export class JSConsumer extends EventEmitter {
     return value;
   }
 
-  _bumpVariableOfBatch(startBPT, batchLength: number): void {
+  _bumpVariableOfBatch(startBPT: number, batchLength: number): void {
 
     this._totalProcessedMessages += batchLength;
     this._lastProcessed = Date.now();
@@ -399,9 +406,7 @@ export class JSConsumer extends EventEmitter {
     this._consumedSinceCommit = 0;
   }
 
-  async _consumeHandler(syncEvent, {
-    manualBatching,
-  }) {
+  async _consumeHandler(syncEvent: ConsumeCallback, { manualBatching }: { manualBatching: boolean }): Promise<void> {
 
     if (this._isAutoCommitting !== null && typeof this._isAutoCommitting !== "undefined") {
       this.config.logger!.warn("enable.auto.commit has no effect in 1:n consume-mode, set to null or undefined to remove this message." +
@@ -435,7 +440,7 @@ export class JSConsumer extends EventEmitter {
    * @param {object} options - optional object containing options for 1:n mode:
    * @returns {Promise.<*>}
    */
-  consume(syncEvent: Function | null = null, asString: boolean = true, asJSON: boolean = false, options: BatchConfig) {
+  consume(syncEvent: ConsumeCallback = null, asString = true, asJSON = false, options: BatchConfig): Promise<void> {
 
     let {
       batchSize,
@@ -454,6 +459,16 @@ export class JSConsumer extends EventEmitter {
     noBatchCommits = typeof noBatchCommits === "undefined" ? false : noBatchCommits; //default is false
     manualBatching = typeof manualBatching === "undefined" ? true : manualBatching; //default is true
     sortedManualBatch = typeof sortedManualBatch === "undefined" ? false : sortedManualBatch; //default is false
+
+    this._batchConfig = {
+      batchSize,
+      commitEveryNBatch,
+      concurrency,
+      commitSync,
+      noBatchCommits,
+      manualBatching,
+      sortedManualBatch
+    } as BatchConfig;
 
     this.asString = asString;
     this.asJSON = asJSON;
@@ -492,22 +507,21 @@ export class JSConsumer extends EventEmitter {
     if (!syncEvent) {
       return this.consumer.run({
         eachMessage: async ({ message }) => {
+          const m: FormattedKafkaMessage = message;
 
           this.config.logger!.debug(JSON.stringify(message));
 
           this._totalIncomingMessages++;
           this._lastReceived = Date.now();
 
-          // @ts-ignore
-          // @todo - fix this .
-          message.value = this._convertMessageValue(message.value, asString, asJSON);
+          m.value = this._convertMessageValue(message.value, asString, asJSON);
 
           if (!this._firstMessageConsumed) {
             this._firstMessageConsumed = true;
-            this.emit("first-drain-message", message);
+            this.emit("first-drain-message", m);
           }
 
-          this.emit("message", message);
+          this.emit("message", m);
         }
       });
     }
@@ -533,7 +547,7 @@ export class JSConsumer extends EventEmitter {
    * @param {Array.<{}>} topicPartitions
    * @throws {LibrdKafkaError}
    */
-  resume(topicPartitions = []) {
+  resume(topicPartitions = []): void {
     if (this.consumer) {
       return this.consumer.resume(topicPartitions);
     }
@@ -544,7 +558,7 @@ export class JSConsumer extends EventEmitter {
    * @todo -  update type for consumer stats.
    * @returns {object}
    */
-  getStats() {
+  getStats(): ConsumerStats {
     return {
       totalIncoming: this._totalIncomingMessages,
       lastMessage: this._lastReceived,
@@ -562,7 +576,8 @@ export class JSConsumer extends EventEmitter {
         committs: this._batchCommitts,
         total: this._totalBatches,
         currentEmptyFetches: this._emptyFetches,
-        avgProcessingTime: this._avgBatchProcessingTime
+        avgProcessingTime: this._avgBatchProcessingTime,
+        config: this._batchConfig,
       },
       lag: this._lagCache, //read from private cache
       totalErrors: this._errors
@@ -573,7 +588,7 @@ export class JSConsumer extends EventEmitter {
    * @private
    * resets internal values
    */
-  _reset() {
+  _reset(): void {
     this._firstMessageConsumed = false;
     this._inClosing = false;
     this._totalIncomingMessages = 0;
@@ -590,13 +605,13 @@ export class JSConsumer extends EventEmitter {
     this._emptyFetches = 0;
     this._avgBatchProcessingTime = 0;
     this._errors = 0;
-    this._extCommitCallback = null;
+    this._extCommitCallback = undefined;
   }
 
   /**
    * closes connection if open
    */
-  async close() {
+  async close(): Promise {
 
     if (this.consumer) {
       this._inClosing = true;
@@ -615,7 +630,7 @@ export class JSConsumer extends EventEmitter {
    * @param {number} partition - optional, default is 0
    * @returns {Promise.<object>}
    */
-  async getOffsetForTopicPartition(topic: string, partition: number = 0) {
+  async getOffsetForTopicPartition(topic: string, partition = 0): Promise<ComittedOffsets[]> {
 
     if (!this.consumer) {
       return Promise.reject(new Error("Consumer not yet connected."));
@@ -635,12 +650,7 @@ export class JSConsumer extends EventEmitter {
    * @param {number} timeout - optional, default is 2500
    * @returns {Promise.<Array>}
    */
-  async getComittedOffsets(timeout = 2500): Promise<{
-    partition: number;
-    offset: string;
-    metadata: string | null;
-    topic: string;
-  }[]> {
+  async getComittedOffsets(timeout = 2500): Promise<ComittedOffsets[]> {
 
     if (!this.consumer) {
       return [];
@@ -650,7 +660,7 @@ export class JSConsumer extends EventEmitter {
       this.config.logger.debug(`Fetching committed offsets ${timeout}`);
     }
 
-    return [].concat.apply([],
+    return [].concat([],
       await Promise.all(
 
         this.topics.map(async (topic) => {
@@ -660,11 +670,7 @@ export class JSConsumer extends EventEmitter {
             topic,
           });
 
-          return offsets.map((offsetInfo) => {
-            // @ts-ignore.
-            offsetInfo.topic = topic;
-            return offsetInfo;
-          });
+          return offsets.map((offsetInfo) => ({...offsetInfo, topic}));
         })
       )
     );
@@ -690,7 +696,7 @@ export class JSConsumer extends EventEmitter {
    * @param {number} partition - partition
    * @param {Array} offsets - commit offsets from getComittedOffsets()
    */
-  static findPartitionOffset(topic, partition, offsets) {
+  static findPartitionOffset(topic: string, partition: number, offsets: ComittedOffsets[]): string {
 
     for (let i = 0; i < offsets.length; i++) {
       if (offsets[i].topic === topic && offsets[i].partition === partition) {
@@ -708,7 +714,7 @@ export class JSConsumer extends EventEmitter {
    * @param {boolean} noCache - when analytics are enabled the results can be taken from cache
    * @returns {Promise.<Array>}
    */
-  async getLagStatus(noCache = false) {
+  async getLagStatus(noCache = false): Promise<LagStatus[]> {
 
     if (!this.consumer) {
       return [];
@@ -778,10 +784,10 @@ export class JSConsumer extends EventEmitter {
    * called in interval
    * @private
    */
-  _runAnalytics() {
+  _runAnalytics(): Promise<void> {
 
     if (!this._analytics) {
-      this._analytics = new ConsumerAnalytics(this, this._analyticsOptions || {}, this.config.logger);
+      this._analytics = new ConsumerAnalytics(this, this._analyticsOptions, this.config.logger as KafkaLogger);
     }
 
     return this._analytics.run()
@@ -794,11 +800,11 @@ export class JSConsumer extends EventEmitter {
    * @throws
    * @returns {object}
    */
-  getAnalytics() {
+  getAnalytics(): ConsumerRunResult | null {
 
     if (!this._analytics) {
       this.emit("error", new Error("You have not enabled analytics on this consumer instance."));
-      return {};
+      return null;
     }
 
     return this._analytics.getLastResult();
@@ -808,15 +814,15 @@ export class JSConsumer extends EventEmitter {
    * called in interval
    * @private
    */
-  _runLagCheck() {
-    return this.getLagStatus(true).catch(() => { });
+  _runLagCheck(): LagStatus[] {
+    return this.getLagStatus(true).catch(error => this.emit("error", error));
   }
 
   /**
    * runs a health check and returns object with status and message
    * @returns {Promise.<object>}
    */
-  checkHealth() {
+  checkHealth(): Promise<Check> {
     return this._health.check();
   }
 
@@ -826,8 +832,8 @@ export class JSConsumer extends EventEmitter {
    * @param {string} topic - name of the topic to query metadata for
    * @returns {Promise.<Metadata>}
    */
-  getTopicMetadata(topic) {
-    return new Promise((resolve, reject) => {
+  getTopicMetadata(topic: string): Promise<Metadata|Error> {
+    return new Promise(( resolve, reject ) => {
 
       if (!this.consumer) {
         return reject(new Error("You must call and await .connect() before trying to get metadata."));
@@ -839,9 +845,9 @@ export class JSConsumer extends EventEmitter {
 
       this._adminClient.fetchTopicMetadata({
         topics: [topic],
-      }).then((raw) => {
-        resolve(new Metadata(raw[0]));
-      }).catch((e) => reject(e));
+      })
+        .then((raw) => resolve(new Metadata(raw[0])))
+        .catch((e) => reject(e));
     });
   }
 
@@ -850,23 +856,33 @@ export class JSConsumer extends EventEmitter {
    * @param {number} timeout - optional, default is 2500
    * @returns {Promise.<Metadata>}
    */
-  getMetadata() {
-    return this.getTopicMetadata(null);
+  getMetadata(): Promise<Metadata|Error> {
+    return this.getTopicMetadata("");
   }
 
   /**
    * returns a list of available kafka topics on the connected brokers
    */
-  async getTopicList() {
-    const metadata = await this.getMetadata();
+  async getTopicList(): Promise<string[]> {
+    const metadata: Metadata = await this.getMetadata();
     return metadata.asTopicList();
   }
 
-  getLastLagStatus() {
+  /**
+   * Gets the last lag status
+   * 
+   * @returns {Lag}
+   */
+  getLastLagStatus(): Lag {
     return this._lastLagStatus;
   }
 
-  getLagCache() {
+  /**
+   * Gets the lag cache
+   * 
+   * @returns {Lag}
+   */
+  getLagCache(): Lag {
     return this._lagCache;
   }
 }

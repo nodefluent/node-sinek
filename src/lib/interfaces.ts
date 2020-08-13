@@ -1,4 +1,4 @@
-import { CompressionTypes } from 'kafkajs';
+import { CompressionTypes } from "kafkajs";
 
 export interface KafkaHealthConfig {
   thresholds: {
@@ -220,7 +220,7 @@ export interface ConsumerStats {
   };
   lag: any;
   totalErrors: number;
-  drainStats: object|null;
+  drainStats: Record<string, unknown>|null;
 }
 
 export interface LagStatus {
@@ -264,10 +264,14 @@ export interface KafkaLogger {
 export interface AnalyticsLagChange {
   timelyDifference: number;
   fetchPerformance: number;
-  newLags: object;
-  changedLags: object;
+  newLags: Record<string, unknown>;
+  changedLags: Record<string, unknown>;
   resolvedLags: {
-    [key: string]: object
+    [key: string]: Record<string, unknown>;
   },
-  stallLags: object;
+  stallLags: Record<string, unknown>;
+}
+
+export interface AnalyticsConfig {
+  analyticsInterval: number;
 }

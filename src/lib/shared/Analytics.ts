@@ -1,7 +1,8 @@
-import { LagStatus, AnalyticsLagChange } from '../interfaces';
-import { JSConsumer, JSProducer } from '../kafkajs';
+import { LagStatus, AnalyticsLagChange, KafkaLogger, AnalyticsConfig, ConsumerStats, ProducerStats } from "../interfaces";
+import { JSConsumer, JSProducer } from "../kafkajs";
 
 const INTERESTING_DISTANCE = 10;
+export const defaultAnalyticsInterval = 1000 * 150;
 
 interface RunResult {
   generatedAt: number;
@@ -36,21 +37,21 @@ export interface ProducerRunResult extends RunResult {
 abstract class Analytics {
 
   abstract client: JSConsumer | JSProducer;
-  config;
-  logger;
+  config: AnalyticsConfig | null = null;
+  logger: KafkaLogger;
 
-  _lastErrors: number =  0;
-  _consumedCount: number = 0;
+  _lastErrors =  0;
+  _consumedCount = 0;
 
   abstract _lastRes: RunResult | null = null;
-  _producedCount: number = 0;
+  _producedCount = 0;
 
   /**
    * creates a new instance
    * @param {object} config
    * @param {object} logger
    */
-  constructor(config, logger) {
+  constructor(config: AnalyticsConfig | null = null, logger: KafkaLogger) {
     this.config = config;
     this.logger = logger;
   }
@@ -109,7 +110,7 @@ export class ConsumerAnalytics extends Analytics {
    * @param {object} config
    * @param {object} logger
    */
-  constructor(client: JSConsumer, config, logger) {
+  constructor(client: JSConsumer, config: AnalyticsConfig | null = null, logger: KafkaLogger) {
     super(config, logger);
     this.client = client; // consumer or producer.
   }
@@ -212,7 +213,7 @@ export class ConsumerAnalytics extends Analytics {
    * @private
    * @returns {object}
    */
-  _identifyLargestLag() {
+  _identifyLargestLag(): { highDistance?: number, error?: string } {
 
     let lag = {
       highDistance: -1
@@ -241,7 +242,7 @@ export class ConsumerAnalytics extends Analytics {
    * @param {object} stats - getStats() client result
    * @returns {number}
    */
-  _consumed(stats) {
+  _consumed(stats: ConsumerStats): number {
     const diff = (stats.totalIncoming || 0) - this._consumedCount;
     this._consumedCount = stats.totalIncoming || 0;
     return diff;
@@ -254,9 +255,9 @@ export class ConsumerAnalytics extends Analytics {
    */
   async run(): Promise<ConsumerRunResult> {
 
-    let res = {
+    const res = {
       generatedAt: Date.now(),
-      interval: this.config.analyticsInterval,
+      interval: (this.config) ? this.config.analyticsInterval : defaultAnalyticsInterval,
       lagChange: {},
       largestLag: {},
       consumed: 0,
@@ -293,7 +294,7 @@ export class ConsumerAnalytics extends Analytics {
       // res.errors = null;
     }
 
-    this.logger.debug(res);
+    this.logger.debug(JSON.stringify(res));
     this._lastRes = res as ConsumerRunResult;
     return res as ConsumerRunResult;
   }
@@ -321,7 +322,7 @@ export class ProducerAnalytics extends Analytics {
    * @param {object} config
    * @param {object} logger
    */
-  constructor(client: JSProducer, config, logger) {
+  constructor(client: JSProducer, config: AnalyticsConfig | null = null, logger: KafkaLogger) {
     super(config, logger);
     this.client = client; // consumer or producer.
   }
@@ -332,7 +333,7 @@ export class ProducerAnalytics extends Analytics {
    * @param {object} stats - getStats() client result
    * @returns {number}
    */
-  _produced(stats) {
+  _produced(stats: ProducerStats): number {
     const diff = (stats.totalPublished || 0) - this._producedCount;
     this._producedCount = stats.totalPublished || 0;
     return diff;
@@ -346,7 +347,7 @@ export class ProducerAnalytics extends Analytics {
 
     const res: ProducerRunResult = {
       generatedAt: Date.now(),
-      interval: this.config.analyticsInterval,
+      interval: (this.config) ? this.config.analyticsInterval : defaultAnalyticsInterval,
       produced: 0,
       errors: null,
     };
@@ -367,7 +368,7 @@ export class ProducerAnalytics extends Analytics {
       res.errors = null;
     }
 
-    this.logger.debug(res);
+    this.logger.debug(JSON.stringify(res));
     this._lastRes = res;
     return res;
   }

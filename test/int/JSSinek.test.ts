@@ -79,7 +79,7 @@ describe("Javascript Client INT", () => {
 
   it("should be able to wait", done => {
     messagesChecker = setInterval(() => {
-      if (consumedMessages.length >= 2) {
+      if (consumedMessages.length >= 5) {
         clearInterval(messagesChecker);
         done();
       }
