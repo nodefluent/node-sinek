@@ -4,10 +4,14 @@ module.exports = {
     "node": true,
     "mocha": true
   },
-  "parserOptions": {
-    "sourceType": "module",
-    "ecmaVersion": 2017
-  },
+  "parser": '@typescript-eslint/parser',
+  "plugins": [
+    '@typescript-eslint',
+  ],
+  "extends": [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
   "rules": {
     "indent": [
       "error",
