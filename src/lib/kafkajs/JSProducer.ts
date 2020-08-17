@@ -1,24 +1,13 @@
-"use strict";
-
-const EventEmitter = require("events");
-const Promise = require("bluebird");
-const uuid = require("uuid");
-const murmur = require("murmurhash");
-const debug = require("debug");
-const murmur2Partitioner = require("murmur2-partitioner");
-
-const Metadata = require("./../shared/Metadata.js");
-
-const {
-  ProducerAnalytics
-} = require("./../shared/Analytics.js");
-
-const {
-  ProducerHealth
-} = require("./../shared/Health.js");
-
-//@OPTIONAL
-let BlizzKafka = null;
+import { Promise } from "bluebird";
+import Debug from "debug";
+import { EventEmitter } from "events";
+import { v4 as uuidv4} from "uuid";
+import { murmur } from "murmurhash";
+import { murmur2Partitioner } from "murmur2-partitioner";
+import { Kafka, SASLMechanism, Admin, Producer, RecordMetadata, CompressionTypes } from "kafkajs";
+import { Metadata, ProducerAnalytics, ProducerHealth, Check, ProducerRunResult, defaultAnalyticsInterval } from "../shared";
+import { MessageReturn, JSKafkaProducerConfig, ProducerStats, AnalyticsConfig, KafkaLogger } from "../interfaces";
+import fs from "fs";
 
 const MESSAGE_TYPES = {
   PUBLISH: "-published",
@@ -31,25 +20,47 @@ const MAX_PART_STORE_SIZE = 1e4;
 const DEFAULT_MURMURHASH_VERSION = "3";
 
 const DEFAULT_LOGGER = {
-  debug: debug("sinek:nproducer:debug"),
-  info: debug("sinek:nproducer:info"),
-  warn: debug("sinek:nproducer:warn"),
-  error: debug("sinek:nproducer:error")
+  debug: Debug("sinek:jsproducer:debug"),
+  info: Debug("sinek:jsproducer:info"),
+  warn: Debug("sinek:jsproducer:warn"),
+  error: Debug("sinek:jsproducer:error")
 };
 
 /**
  * native producer wrapper for node-librdkafka
  * @extends EventEmitter
  */
-class NProducer extends EventEmitter {
+export class JSProducer extends EventEmitter {
+
+  kafkaClient: Kafka;
+  config: JSKafkaProducerConfig;
+
+  paused = false;
+  producer: Producer | undefined;
+
+  private _health: ProducerHealth;
+  private _adminClient: Admin;
+  private _producerPollIntv = 0;
+  private _partitionCounts = {};
+  private _inClosing = false;
+  private _totalSentMessages = 0;
+  private _lastProcessed = 0;
+  private _analyticsOptions: AnalyticsConfig | null = null;
+  private _analyticsIntv: NodeJS.Timeout | null = null;
+  _analytics: ProducerAnalytics | undefined;
+  private _murmurHashVersion: string = DEFAULT_MURMURHASH_VERSION;
+  private _murmur;
+  private _errors = 0;
+  
+  defaultPartitionCount = 1;
 
   /**
    * creates a new producer instance
    * @param {object} config - configuration object
    * @param {*} _ - ignore this param (api compatability)
-   * @param {number|string} defaultPartitionCount  - amount of default partitions for the topics to produce to
+   * @param {number} defaultPartitionCount  - amount of default partitions for the topics to produce to
    */
-  constructor(config = { options: {}, health: {} }, _, defaultPartitionCount = 1) {
+  constructor(config: JSKafkaProducerConfig, defaultPartitionCount = 1) {
     super();
 
     if (!config) {
@@ -60,52 +71,72 @@ class NProducer extends EventEmitter {
       config.logger = DEFAULT_LOGGER;
     }
 
-    try {
-      if (!BlizzKafka) {
-        BlizzKafka = require("node-rdkafka");
-      }
-    } catch (error) {
-      config.logger.error(error);
-      throw new Error("You have to install node-rdkafka to use NProducer. " + error.message);
-    }
-
     if (!config.options) {
       config.options = {};
     }
 
-    this.config = config;
-    this._health = new ProducerHealth(this, this.config.health || {});
+    const { 
+      "metadata.broker.list": brokerList,
+      "client.id": clientId,
+      "security.protocol": securityProtocol,
+      "ssl.ca.location": sslCALocation,
+      "ssl.certificate.location": sslCertLocation,
+      "ssl.key.location": sslKeyLocation,
+      "ssl.key.password": sslKeyPassword,
+      "sasl.mechanisms": mechanism,
+      "sasl.username": username,
+      "sasl.password": password,
+    } = config.noptions;
 
-    this.paused = false;
-    this.producer = null;
-    this._producerPollIntv = null;
-    this.defaultPartitionCount = defaultPartitionCount;
-    this._partitionCounts = {};
-    this._inClosing = false;
-    this._totalSentMessages = 0;
-    this._lastProcessed = null;
-    this._analyticsOptions = null;
-    this._analyticsIntv = null;
-    this._analytics = null;
+    const brokers = brokerList.split(",");
 
-    this._murmurHashVersion = this.config.options.murmurHashVersion || DEFAULT_MURMURHASH_VERSION;
-    this.config.logger.info(`using murmur ${this._murmurHashVersion} partitioner.`);
-
-    switch (this._murmurHashVersion) {
-      case "2":
-        this._murmur = (key, partitionCount) => murmur2Partitioner.partition(key, partitionCount);
-        break;
-
-      case "3":
-        this._murmur = (key, partitionCount) => murmur.v3(key) % partitionCount;
-        break;
-
-      default:
-        throw new Error(`${this._murmurHashVersion} is not a supported murmur hash version. Choose '2' or '3'.`);
+    if (!brokers || !clientId) {
+      throw new Error("You are missing a broker or group configs");
     }
 
-    this._errors = 0;
-    super.on("error", () => this._errors++);
+    if (securityProtocol) {
+      this.kafkaClient = new Kafka({
+        brokers,
+        clientId,
+        ssl: {
+          ca: [fs.readFileSync(sslCALocation as string, "utf-8")],
+          cert: fs.readFileSync(sslCertLocation as string, "utf-8"),
+          key: fs.readFileSync(sslKeyLocation as string, "utf-8"),
+          passphrase: sslKeyPassword,
+        },
+        sasl: {
+          mechanism: mechanism as SASLMechanism,
+          username: username as string,
+          password: password as string,
+        },
+      });
+    } else {
+      this.kafkaClient = new Kafka({ brokers, clientId });
+    }
+
+    this.config = config;
+    this._health = new ProducerHealth(this, this.config.health);
+    this._adminClient = this.kafkaClient.admin();
+
+    this._murmurHashVersion = this.config.options!.murmurHashVersion || DEFAULT_MURMURHASH_VERSION;
+    this.config.logger!.info(`using murmur ${this._murmurHashVersion} partitioner.`);
+
+    this.defaultPartitionCount = defaultPartitionCount;
+
+    switch (this._murmurHashVersion) {
+    case "2":
+      this._murmur = (key, partitionCount) => murmur2Partitioner.partition(key, partitionCount);
+      break;
+
+    case "3":
+      this._murmur = (key, partitionCount) => murmur.v3(key) % partitionCount;
+      break;
+
+    default:
+      throw new Error(`${this._murmurHashVersion} is not a supported murmur hash version. Choose '2' or '3'.`);
+    }
+
+    this.on("error", () => this._errors++);
   }
 
   /**
@@ -113,18 +144,16 @@ class NProducer extends EventEmitter {
    * starts analytics tasks
    * @param {object} options - analytic options
    */
-  enableAnalytics(options = {}) {
+  enableAnalytics(options: { analyticsInterval: number } = {analyticsInterval: defaultAnalyticsInterval}): void {
 
     if (this._analyticsIntv) {
       throw new Error("analytics intervals are already running.");
     }
 
-    let {
-      analyticsInterval
-    } = options;
+    let { analyticsInterval } = options;
     this._analyticsOptions = options;
 
-    analyticsInterval = analyticsInterval || 1000 * 150; // 150 sec
+    analyticsInterval = analyticsInterval || defaultAnalyticsInterval; // 150 sec
 
     this._analyticsIntv = setInterval(this._runAnalytics.bind(this), analyticsInterval);
   }
@@ -132,7 +161,7 @@ class NProducer extends EventEmitter {
   /**
    * halts all analytics tasks
    */
-  haltAnalytics() {
+  haltAnalytics(): void {
 
     if (this._analyticsIntv) {
       clearInterval(this._analyticsIntv);
@@ -143,38 +172,19 @@ class NProducer extends EventEmitter {
    * connects to the broker
    * @returns {Promise.<*>}
    */
-  connect() {
+  connect(): Promise<void> {
     return new Promise((resolve, reject) => {
+      const { kafkaHost, logger } = this.config;
+      let { noptions, tconf } = this.config;
 
-      let {
-        zkConStr,
-        kafkaHost,
-        logger,
-        options,
-        noptions,
-        tconf
-      } = this.config;
-
-      const {
-        pollIntervalMs
-      } = options;
-
-      let conStr = null;
+      let conStr: string | null = null;
 
       if (typeof kafkaHost === "string") {
         conStr = kafkaHost;
       }
 
-      if (typeof zkConStr === "string") {
-        conStr = zkConStr;
-      }
-
       if (conStr === null && !noptions) {
-        return reject(new Error("One of the following: zkConStr or kafkaHost must be defined."));
-      }
-
-      if (conStr === zkConStr) {
-        return reject(new Error("NProducer does not support zookeeper connection."));
+        return reject(new Error("KafkaHost must be defined."));
       }
 
       const config = {
@@ -182,75 +192,49 @@ class NProducer extends EventEmitter {
         "dr_cb": true
       };
 
-      noptions = noptions || {};
       noptions = Object.assign({}, config, noptions);
-      logger.debug(noptions);
+      logger!.debug(JSON.stringify(noptions));
 
       tconf = tconf ? tconf : {
         "request.required.acks": 1
       };
-      logger.debug(tconf);
 
-      this.producer = new BlizzKafka.HighLevelProducer(noptions, tconf);
+      logger!.debug(JSON.stringify(tconf));
 
-      this.producer.on("event.log", log => {
-        logger.debug(log.message);
-      });
+      this.producer = this.kafkaClient.producer();
+      const { CONNECT, DISCONNECT, REQUEST_TIMEOUT } = this.producer.events;
 
-      this.producer.on("event.error", error => {
-        super.emit("error", error);
-      });
-
-      this.producer.on("error", error => {
-        super.emit("error", error);
-      });
-
-      this.producer.on("delivery-report", (error, report) => {
-        if (error) {
-          logger.error("DeliveryReport-Error: " + error.message);
-        } else {
-          logger.debug("DeliveryReport: " + JSON.stringify(report));
-        }
-      });
-
-      /* ### this stuff is important, for the HighLevelProducer to work ### */
-
-      this.producer.setPollInterval(pollIntervalMs || 100);
-
-      this.producer.setKeySerializer((value) => {
-        return Promise.resolve(value);
-      });
-
-      this.producer.setValueSerializer((value) => {
-        return value;
+      this.producer.on(REQUEST_TIMEOUT, details => {
+        this.emit("error", new Error(`Request Timed out. Info ${JSON.stringify(details)}`));
       });
 
       /* ### EOF STUFF ### */
-
-      this.producer.on("disconnected", () => {
+      this.producer.on(DISCONNECT, () => {
         if (this._inClosing) {
           this._reset();
         }
-        logger.warn("Disconnected.");
+        logger!.warn("Disconnected.");
         //auto-reconnect??? -> handled by producer.poll()
       });
 
-      this.producer.on("ready", () => {
-        logger.info(`Native producer ready v. ${BlizzKafka.librdkafkaVersion}, e. ${BlizzKafka.features.join(", ")}.`);
-        super.emit("ready");
+      this.producer.on(CONNECT, () => {
+        logger!.info("KafkaJS producer is ready.");
+        this.emit("ready");
       });
 
-      logger.debug("Connecting..");
-      this.producer.connect(null, (error, metadata) => {
+      logger!.debug("Connecting..");
 
-        if (error) {
-          super.emit("error", error);
-          return reject(error);
-        }
+      try {
 
-        logger.debug(metadata);
-        resolve();
-      });
+        Promise.all([
+          this.producer.connect(),
+          this._adminClient.connect(),
+        ]).then(resolve);
+
+      } catch (error) {
+        this.emit("error", error);
+        return reject(error);
+      }
     });
   }
 
@@ -261,7 +245,7 @@ class NProducer extends EventEmitter {
    * @param {number} - partition count of topic, if 0 defaultPartitionCount is used
    * @returns {string} - deterministic partition value for key
    */
-  _getPartitionForKey(key, partitionCount = 1) {
+  _getPartitionForKey(key: string, partitionCount = 1): number {
 
     if (typeof key !== "string") {
       throw new Error("key must be a string.");
@@ -282,10 +266,21 @@ class NProducer extends EventEmitter {
    * @param {number} _partition - optional partition to produce to
    * @param {string} _key - optional message key
    * @param {string} _partitionKey - optional key to evaluate partition for this message
-   * @param {array} _headers - optional array containing custom key value pairs that provide message metadata
    * @returns {Promise.<object>}
    */
-  async send(topicName, message, _partition = null, _key = null, _partitionKey = null, _headers = null) {
+  async send(
+    topicName: string,
+    message: Record<string, unknown> | string | null | Buffer,
+    _partition: number | null = null,
+    _key: string | null = null,
+    _partitionKey: string | null = null
+  ): Promise<MessageReturn> {
+
+    /*
+      these are not supported in the HighLevelProducer of node-rdkafka
+      _opaqueKey = null,
+      _headers = null,
+    */
 
     if (!this.producer) {
       throw new Error("You must call and await .connect() before trying to produce messages.");
@@ -299,14 +294,16 @@ class NProducer extends EventEmitter {
       throw new Error("message must be a string, an instance of Buffer or null.");
     }
 
-    const key = _key ? _key : uuid.v4();
+    const key = _key ? _key : uuidv4();
+    let convertedMessage: Buffer;
+
     if (message !== null) {
-      message = Buffer.isBuffer(message) ? message : Buffer.from(message);
+      convertedMessage = Buffer.isBuffer(message) ? message : Buffer.from(message);
     }
 
     let maxPartitions = 0;
     //find correct max partition count
-    if (this.defaultPartitionCount === "auto" && typeof _partition !== "number") { //manual check to improve performance
+    if (typeof _partition !== "number") { //manual check to improve performance
       maxPartitions = await this.getPartitionCountOfTopic(topicName);
       if (maxPartitions === -1) {
         throw new Error("defaultPartition set to 'auto', but was not able to resolve partition count for topic" +
@@ -325,7 +322,7 @@ class NProducer extends EventEmitter {
     //if _partition (manual) is set, it always overwrites a selected partition
     partition = typeof _partition === "number" ? _partition : partition;
 
-    this.config.logger.debug(JSON.stringify({
+    this.config.logger!.debug(JSON.stringify({
       topicName,
       partition,
       key
@@ -335,20 +332,35 @@ class NProducer extends EventEmitter {
 
     this._lastProcessed = producedAt;
     this._totalSentMessages++;
+    const timestamp = producedAt.toString();
+    const acks = this.config && this.config.tconf && this.config.tconf["request.required.acks"] || 1;
+    const compression = (this.config.noptions) 
+      ? this.config.noptions["compression.codec"]
+      : CompressionTypes.None;
 
     return new Promise((resolve, reject) => {
-      this.producer.produce(topicName, partition, message, key, producedAt, _headers, (error, offset) => {
-
-        if (error) {
-          return reject(error);
-        }
-
-        resolve({
-          key,
+      this.producer!.send({
+        topic: topicName,
+        acks,
+        compression,
+        messages: [{
+          key, 
+          value: convertedMessage,
           partition,
-          offset
+          timestamp
+        }],
+      })
+        .then((metadata: RecordMetadata[] ) => {
+          resolve({
+            key,
+            partition,
+            offset: metadata[0].offset,
+          });
+        })
+        .catch((error) => {
+          reject(error);
         });
-      });
+
     });
   }
 
@@ -361,13 +373,19 @@ class NProducer extends EventEmitter {
    * @param {number} partition - optional partition to produce to
    * @param {number} version - optional version of the message value
    * @param {string} partitionKey - optional key to evaluate partition for this message
-   * @param {array} headers - optional array containing custom key value pairs that provide message metadata
    * @returns {Promise.<object>}
    */
-  async buffer(topic, identifier, payload, partition = null, version = null, partitionKey = null, headers = null) {
+  async buffer(
+    topic: string,
+    identifier: string,
+    payload: Record<string, unknown>,
+    partition: number | null = null,
+    version: number | null = null,
+    partitionKey: string | null = null
+  ): Promise<MessageReturn> {
 
     if (typeof identifier === "undefined") {
-      identifier = uuid.v4();
+      identifier = uuidv4();
     }
 
     if (typeof identifier !== "string") {
@@ -386,7 +404,7 @@ class NProducer extends EventEmitter {
       payload.version = version;
     }
 
-    return await this.send(topic, JSON.stringify(payload), partition, identifier, partitionKey, headers);
+    return await this.send(topic, JSON.stringify(payload), partition, identifier, partitionKey);
   }
 
   /**
@@ -401,13 +419,21 @@ class NProducer extends EventEmitter {
    * @param {string} partitionKey - optional key to deterministcally detect partition
    * @param {number} partition - optional partition (overwrites partitionKey)
    * @param {string} messageType - optional messageType (for the formatted message value)
-   * @param {array} headers - optional object containing custom key value pairs that provide message metadata
    * @returns {Promise.<object>}
    */
-  async _sendBufferFormat(topic, identifier, _payload, version = 1, _, partitionKey = null, partition = null, messageType = "", headers = null) {
+  async _sendBufferFormat(
+    topic: string,
+    identifier: string,
+    _payload: Record<string, unknown>,
+    version = 1,
+    _: null | number,
+    partitionKey: string | null = null,
+    partition: number | null = null,
+    messageType = ""
+  ): Promise<MessageReturn> {
 
     if (typeof identifier === "undefined") {
-      identifier = uuid.v4();
+      identifier = uuidv4();
     }
 
     if (typeof identifier !== "string") {
@@ -429,20 +455,27 @@ class NProducer extends EventEmitter {
     const payload = {
       payload: _payload,
       key: identifier,
-      id: uuid.v4(),
+      id: uuidv4(),
       time: (new Date()).toISOString(),
       type: topic + messageType
     };
 
-    return await this.send(topic, JSON.stringify(payload), partition, identifier, partitionKey, headers);
+    return await this.send(topic, JSON.stringify(payload), partition, identifier, partitionKey);
   }
 
   /**
    * an alias for bufferFormatPublish()
    * @alias bufferFormatPublish
    */
-  bufferFormat(topic, identifier, payload, version = 1, compressionType = 0, partitionKey = null, headers = null) {
-    return this.bufferFormatPublish(topic, identifier, payload, version, compressionType, partitionKey, headers);
+  bufferFormat(
+    topic: string,
+    identifier: string,
+    payload: Record<string, unknown>,
+    version = 1,
+    compressionType = 0,
+    partitionKey: string | null = null
+  ): Promise<MessageReturn> {
+    return this.bufferFormatPublish(topic, identifier, payload, version, compressionType, partitionKey);
   }
 
   /**
@@ -454,11 +487,18 @@ class NProducer extends EventEmitter {
    * @param {*} _ -ignoreable, here for api compatibility
    * @param {string} partitionKey - optional key to deterministcally detect partition
    * @param {number} partition - optional partition (overwrites partitionKey)
-   * @param {array} headers - optional object containing custom key value pairs that provide message metadata
    * @returns {Promise.<object>}
    */
-  bufferFormatPublish(topic, identifier, _payload, version = 1, _, partitionKey = null, partition = null, headers = null) {
-    return this._sendBufferFormat(topic, identifier, _payload, version, _, partitionKey, partition, MESSAGE_TYPES.PUBLISH, headers);
+  bufferFormatPublish(
+    topic: string,
+    identifier: string,
+    _payload: Record<string, unknown>,
+    version = 1,
+    _: null | number,
+    partitionKey: string | null = null,
+    partition: number | null = null
+  ): Promise<MessageReturn> {
+    return this._sendBufferFormat(topic, identifier, _payload, version, _, partitionKey, partition, MESSAGE_TYPES.PUBLISH);
   }
 
   /**
@@ -470,11 +510,18 @@ class NProducer extends EventEmitter {
    * @param {*} _ -ignoreable, here for api compatibility
    * @param {string} partitionKey - optional key to deterministcally detect partition
    * @param {number} partition - optional partition (overwrites partitionKey)
-   * @param {array} headers - optional object containing custom key value pairs that provide message metadata
    * @returns {Promise.<object>}
    */
-  bufferFormatUpdate(topic, identifier, _payload, version = 1, _, partitionKey = null, partition = null, headers = null) {
-    return this._sendBufferFormat(topic, identifier, _payload, version, _, partitionKey, partition, MESSAGE_TYPES.UPDATE, headers);
+  bufferFormatUpdate(
+    topic: string,
+    identifier: string,
+    _payload: Record<string, unknown>,
+    version = 1,
+    _: null | number,
+    partitionKey: string | null = null,
+    partition: number | null = null
+  ): Promise<MessageReturn> {
+    return this._sendBufferFormat(topic, identifier, _payload, version, _, partitionKey, partition, MESSAGE_TYPES.UPDATE);
   }
 
   /**
@@ -486,11 +533,18 @@ class NProducer extends EventEmitter {
    * @param {*} _ -ignoreable, here for api compatibility
    * @param {string} partitionKey - optional key to deterministcally detect partition
    * @param {number} partition - optional partition (overwrites partitionKey)
-   * @param {array} headers - optional object containing custom key value pairs that provide message metadata
    * @returns {Promise.<object>}
    */
-  bufferFormatUnpublish(topic, identifier, _payload, version = 1, _, partitionKey = null, partition = null, headers = null) {
-    return this._sendBufferFormat(topic, identifier, _payload, version, _, partitionKey, partition, MESSAGE_TYPES.UNPUBLISH, headers);
+  bufferFormatUnpublish(
+    topic: string,
+    identifier: string,
+    _payload: Record<string, unknown>,
+    version = 1,
+    _: null | number,
+    partitionKey: string | null = null,
+    partition: number | null = null
+  ): Promise<MessageReturn> {
+    return this._sendBufferFormat(topic, identifier, _payload, version, _, partitionKey, partition, MESSAGE_TYPES.UNPUBLISH);
   }
 
   /**
@@ -500,34 +554,39 @@ class NProducer extends EventEmitter {
    * @param {string} key - key
    * @param {number|null} _partition - optional partition
    */
-  tombstone(topic, key, _partition = null) {
+  tombstone(
+    topic: string,
+    key: string,
+    _partition: number | null = null
+  ): Promise<MessageReturn> {
 
     if (!key) {
       return Promise.reject(new Error("Tombstone messages only work on a key compacted topic, please provide a key."));
     }
 
-    return this.send(topic, null, _partition, key, null, null);
+    return this.send(topic, null, _partition, key, null);
   }
 
   /**
    * pauses production (sends will not be queued)
    */
-  pause() {
+  pause(): void {
     this.paused = true;
   }
 
   /**
    * resumes production
    */
-  resume() {
+  resume(): void {
     this.paused = false;
   }
 
   /**
    * returns producer statistics
+   * * @todo -  update type for producer stats.
    * @returns {object}
    */
-  getStats() {
+  getStats(): ProducerStats {
     return {
       totalPublished: this._totalSentMessages,
       last: this._lastProcessed,
@@ -539,7 +598,7 @@ class NProducer extends EventEmitter {
   /**
    * @deprecated
    */
-  refreshMetadata() {
+  refreshMetadata(): void {
     throw new Error("refreshMetadata not implemented for nproducer.");
   }
 
@@ -550,42 +609,38 @@ class NProducer extends EventEmitter {
    * @param {number} timeout - optional, default is 2500
    * @returns {Promise.<Metadata>}
    */
-  getTopicMetadata(topic, timeout = 2500) {
+  getTopicMetadata(topic: string): Promise<Metadata> {
     return new Promise((resolve, reject) => {
 
       if (!this.producer) {
         return reject(new Error("You must call and await .connect() before trying to get metadata."));
       }
 
-      this.producer.getMetadata({
-        topic,
-        timeout
-      }, (error, raw) => {
+      const topics = (topic === "")
+        ? []
+        : [topic];
 
-        if (error) {
-          return reject(error);
-        }
-
+      this._adminClient.fetchTopicMetadata({
+        topics,
+      }).then((raw) => {
         resolve(new Metadata(raw));
-      });
+      }).catch((e) => reject(e));
     });
   }
 
   /**
    * @alias getTopicMetadata
-   * @param {number} timeout - optional, default is 2500
    * @returns {Promise.<Metadata>}
    */
-  getMetadata(timeout = 2500) {
-    return this.getTopicMetadata(null, timeout);
+  getMetadata(): Promise<Metadata> {
+    return this.getTopicMetadata("");
   }
 
   /**
    * returns a list of available kafka topics on the connected brokers
-   * @param {number} timeout
    */
-  async getTopicList(timeout = 2500) {
-    const metadata = await this.getMetadata(timeout);
+  async getTopicList(): Promise<string[]> {
+    const metadata: Metadata = await this.getMetadata();
     return metadata.asTopicList();
   }
 
@@ -597,7 +652,7 @@ class NProducer extends EventEmitter {
    * @param {string} topic - name of topic
    * @returns {Promise.<number>}
    */
-  async getPartitionCountOfTopic(topic) {
+  async getPartitionCountOfTopic(topic: string): Promise<number> {
 
     if (!this.producer) {
       throw new Error("You must call and await .connect() before trying to get metadata.");
@@ -616,7 +671,7 @@ class NProducer extends EventEmitter {
         const metadata = await this.getMetadata(); //prevent creation of topic, if it does not exist
         count = metadata.getPartitionCountOfTopic(topic);
       } catch (error) {
-        super.emit("error", new Error(`Failed to get metadata for topic ${topic}, because: ${error.message}.`));
+        this.emit("error", new Error(`Failed to get metadata for topic ${topic}, because: ${error}.`));
         return -1;
       }
 
@@ -635,7 +690,7 @@ class NProducer extends EventEmitter {
    * gets the local partition count cache
    * @returns {object}
    */
-  getStoredPartitionCounts() {
+  getStoredPartitionCounts(): Record<string, unknown> {
     return this._partitionCounts;
   }
 
@@ -643,13 +698,13 @@ class NProducer extends EventEmitter {
    * @private
    * resets internal values
    */
-  _reset() {
-    this._lastProcessed = null;
+  private _reset() {
+    this._lastProcessed = 0;
     this._totalSentMessages = 0;
     this.paused = false;
     this._inClosing = false;
     this._partitionCounts = {};
-    this._analytics = null;
+    this._analytics = undefined;
     this._errors = 0;
   }
 
@@ -657,14 +712,23 @@ class NProducer extends EventEmitter {
    * closes connection if open
    * stops poll interval if open
    */
-  close() {
+  async close(): Promise<void> {
 
     this.haltAnalytics();
 
     if (this.producer) {
       this._inClosing = true;
       clearInterval(this._producerPollIntv);
-      this.producer.disconnect();
+
+      try {
+        await Promise.all([
+          this.producer.disconnect(),
+          this._adminClient.disconnect(),
+        ]);
+      } catch(error) {
+        // Do nothing, silently closing
+      }
+
       //this.producer = null;
     }
   }
@@ -673,15 +737,15 @@ class NProducer extends EventEmitter {
    * called in interval
    * @private
    */
-  _runAnalytics() {
+  private _runAnalytics(): void {
 
     if (!this._analytics) {
-      this._analytics = new ProducerAnalytics(this, this._analyticsOptions || {}, this.config.logger);
+      this._analytics = new ProducerAnalytics(this, this._analyticsOptions, this.config.logger as KafkaLogger);
     }
 
     this._analytics.run()
-      .then(res => super.emit("analytics", res))
-      .catch(error => super.emit("error", error));
+      .then(res => this.emit("analytics", res))
+      .catch(error => this.emit("error", error));
   }
 
   /**
@@ -689,11 +753,11 @@ class NProducer extends EventEmitter {
    * @throws
    * @returns {object}
    */
-  getAnalytics() {
+  getAnalytics(): ProducerRunResult|null {
 
     if (!this._analytics) {
-      super.emit("error", new Error("You have not enabled analytics on this consumer instance."));
-      return {};
+      this.emit("error", new Error("You have not enabled analytics on this consumer instance."));
+      return null;
     }
 
     return this._analytics.getLastResult();
@@ -701,11 +765,9 @@ class NProducer extends EventEmitter {
 
   /**
    * runs a health check and returns object with status and message
-   * @returns {Promise.<object>}
+   * @returns {Promise.<Check>}
    */
-  checkHealth() {
+  checkHealth(): Promise<Check> {
     return this._health.check();
   }
 }
-
-module.exports = NProducer;

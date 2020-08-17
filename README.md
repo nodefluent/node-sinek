@@ -34,30 +34,6 @@ npm install --save sinek
 
 ## Usage
 
-### Usage - Native Client (based on node-rdkafka)
-
-#### Please Note:
-
-You will have to manually install `node-rdkafka` alongside sinek.
-(This requires a Node.js version between 9 and 12 and will not work with Node.js >= 13, last tested with 12.16.1)
-
-On Mac OS High Sierra / Mojave:
-`CPPFLAGS=-I/usr/local/opt/openssl/include LDFLAGS=-L/usr/local/opt/openssl/lib yarn add --frozen-lockfile node-rdkafka@2.7.4`
-
-Otherwise:
-`yarn add --frozen-lockfile node-rdkafka@2.7.4`
-
-(Please also note: Doing this with npm does not work, it will remove your deps, `npm i -g yarn`)
-
-```javascript
-const {
-  NConsumer,
-  NProducer
-} = require("sinek");
-```
-
-* [Native Client (NConsumer & NProducer)](docs/native.md)
-
 ### Usage - JS Client (based on kafka.js)
 
 ```javascript
@@ -65,15 +41,36 @@ const {
   JSConsumer,
   JSProducer
 } = require("sinek");
-```
 
-### Usage - Old JS Client (based on kafka-node)
+const jsProducerConfig = {
+  clientId: "my-app",
+  brokers: ["kafka1:9092"]
+}
 
-```javascript
-const {
-  Consumer,
-  Producer
-} = require("sinek");
+(async () => {
+
+  const topic = "my-topic";
+
+  const producer = new JSProducer(jsProducerConfig);
+  const consumer = new JSConsumer(topic, jsConsumerConfig);
+
+  producer.on("error", error => console.error(error));
+  consumer.on("error", error => console.error(error));
+
+  await consumer.connect();
+
+  // consume from a topic.
+  consumer.consume(async (messages) => {
+    messages.forEach((message) => {
+      console.log(message);
+    })
+  });
+
+  // Produce messages to a topic.
+  await producer.connect();
+  producer.send(topic, "a message")
+})().catch(console.error);
+
 ```
 
 # Further Docs

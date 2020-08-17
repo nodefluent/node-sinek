@@ -1,14 +1,5 @@
-"use strict";
-
-const assert = require("assert");
-
-const {
-  Health
-} = require("./../../index.js");
-const {
-  ConsumerHealth,
-  ProducerHealth
-} = Health;
+import assert from "assert";
+import { ConsumerHealth, ProducerHealth, STATES } from "../../src/index";
 
 describe("Health UNIT", () => {
 
@@ -101,9 +92,9 @@ describe("Health UNIT", () => {
       ph.check(),
       ch.check()
     ]).then(res => {
-      assert.equal(res[0].status, 3);
-      assert.equal(res[0].messages.length, 2);
-      assert.equal(res[1].status, 3);
+      assert.equal(res[0].status, STATES.CRITICAL);
+      assert.equal(res[0].messages.length, 3);
+      assert.equal(res[1].status, STATES.CRITICAL);
       assert.equal(res[1].messages.length, 2);
     });
   });
@@ -117,8 +108,8 @@ describe("Health UNIT", () => {
       ph.check(),
       ch.check()
     ]).then(res => {
-      assert.equal(res[0].status, 1);
-      assert.equal(res[1].status, 1);
+      assert.equal(res[0].status, STATES.RISK);
+      assert.equal(res[1].status, STATES.RISK);
     });
   });
 
@@ -129,22 +120,22 @@ describe("Health UNIT", () => {
     return Promise.all([
       ch.check()
     ]).then(res => {
-      assert.equal(res[0].status, 2);
+      assert.equal(res[0].status, STATES.WARNING);
       assert.equal(res[0].messages.length, 1);
     });
   });
 
   it("should be no analytics", () => {
 
-    const ph = getPHI(getFakeProducer(null));
-    const ch = getCHI(getFakeConsumer(null));
+    const ph = getPHI(getFakeProducer());
+    const ch = getCHI(getFakeConsumer());
 
     return Promise.all([
       ph.check(),
       ch.check()
     ]).then(res => {
-      assert.equal(res[0].status, -3);
-      assert.equal(res[1].status, -3);
+      assert.equal(res[0].status, STATES.NO_ANALYTICS);
+      assert.equal(res[1].status, STATES.NO_ANALYTICS);
     });
   });
 
@@ -161,8 +152,8 @@ describe("Health UNIT", () => {
       ph.check(),
       ch.check()
     ]).then(res => {
-      assert.equal(res[0].status, -4);
-      assert.equal(res[1].status, -4);
+      assert.equal(res[0].status, STATES.DIS_ANALYTICS);
+      assert.equal(res[1].status, STATES.DIS_ANALYTICS);
     });
   });
 
@@ -179,8 +170,8 @@ describe("Health UNIT", () => {
       ph.check(),
       ch.check()
     ]).then(res => {
-      assert.equal(res[0].status, -1);
-      assert.equal(res[1].status, -1);
+      assert.equal(res[0].status, STATES.UNCONNECTED);
+      assert.equal(res[1].status, STATES.UNCONNECTED);
     });
   });
 

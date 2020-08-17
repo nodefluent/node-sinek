@@ -4,6 +4,10 @@ const TYPES = [0, 1, 2];
 
 class CompressionTypes {
 
+  public NONE: number;
+  public GZIP: number;
+  public SNAPPY: number;
+
   constructor() {
     this.NONE = 0;
     this.GZIP = 1;
@@ -20,4 +24,4 @@ class CompressionTypes {
   }
 }
 
-module.exports = new CompressionTypes();
+export default new CompressionTypes();

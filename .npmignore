@@ -11,3 +11,5 @@ test/
 .gitignore
 .jshintrc
 .travis.yml
+src
+.github/

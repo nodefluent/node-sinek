@@ -1,15 +1,34 @@
-"use strict";
+import { ITopicMetadata, PartitionMetadata } from "kafkajs";
+
+// Defined from https://docs.confluent.io/current/kafka-rest/api.html#partitions
+type PartitionRestFormat = {
+  partition: number;
+  leader: number;
+  replicas: PartitionReplicaRestFormat[]
+}
+
+type PartitionReplicaRestFormat = {
+  broker: number;
+  leader: boolean;
+  in_sync: boolean;
+}
+
+type TopicMetaData = {
+  topics: ITopicMetadata[]
+}
 
 /**
  * wrapper arround node-librdkafka metadata object
  */
-class Metadata {
+export class Metadata {
+  
+  raw: TopicMetaData = {topics: []};
 
   /**
    * creates a new instance
    * @param {object} raw - metadata object response of node-librdkafka client
    */
-  constructor(raw) {
+  constructor(raw: TopicMetaData) {
     this.raw = raw;
   }
 
@@ -19,9 +38,9 @@ class Metadata {
    * @param {string} topicName - name of the kafka topic
    * @returns {number}
    */
-  getPartitionCountOfTopic(topicName) {
+  getPartitionCountOfTopic(topicName: string): number {
 
-    const topic = this.raw.topics.filter(topic => topic.name === topicName)[0];
+    const topic = this.raw.topics.filter(topic => topic.name === topicName).pop();
 
     if (!topic) {
       throw new Error(topicName + " does not exist in fetched metadata.");
@@ -36,25 +55,25 @@ class Metadata {
    * @param {string} topicName - name of the kafka topic
    * @returns {Array<number>}
    */
-  getPartitionsForTopic(topicName) {
+  getPartitionsForTopic(topicName: string): number[] {
 
-    const topic = this.raw.topics.filter(topic => topic.name === topicName)[0];
+    const topic = this.raw.topics.filter((topic:ITopicMetadata) => topic.name === topicName).pop();
 
     if (!topic) {
       throw new Error(topicName + " does not exist in fetched metadata.");
     }
 
-    return topic.partitions.map((partition) => partition.id);
+    return topic.partitions.map((partition) => partition.partitionId);
   }
 
   /**
    * @throws
    * returns a list of topic names
    */
-  asTopicList() {
-    return this.raw.topics.map(topic => topic.name).filter(topic => {
-      return topic !== "__consumer_offsets";
-    });
+  asTopicList(): string[] {
+    return this.raw.topics
+      .filter((topic:ITopicMetadata) => topic.name !== "__consumer_offsets")
+      .map((topic: ITopicMetadata) => topic.name);
   }
 
   /**
@@ -63,13 +82,13 @@ class Metadata {
    * @param {string} topicName - name of the kafka topic
    * @returns {object}
    */
-  asTopicDescription(topicName) {
+  asTopicDescription(topicName: string): Record<string, unknown> {
 
     if (!this.raw.topics || !this.raw.topics.length) {
       return {};
     }
 
-    let topic = null;
+    let topic;
     for (let i = 0; i < this.raw.topics.length; i++) {
       if (this.raw.topics[i].name === topicName) {
         topic = this.raw.topics[i];
@@ -80,7 +99,7 @@ class Metadata {
     if (!topic) {
       return {};
     }
-
+    
     return {
       name: topic.name,
       configs: null,
@@ -94,13 +113,13 @@ class Metadata {
    * @param {string} topicName - name of the kafka topic
    * @returns {Array}
    */
-  asTopicPartitions(topicName) {
+  asTopicPartitions(topicName: string): PartitionRestFormat[] {
 
     if (!this.raw.topics || !this.raw.topics.length) {
-      return {};
+      return [];
     }
 
-    let topic = null;
+    let topic: ITopicMetadata | null = null;
     for (let i = 0; i < this.raw.topics.length; i++) {
       if (this.raw.topics[i].name === topicName) {
         topic = this.raw.topics[i];
@@ -109,20 +128,21 @@ class Metadata {
     }
 
     if (!topic) {
-      return {};
+      return [];
     }
 
     return Metadata.formatPartitions(topic.partitions);
   }
 
   /**
+   * @deprecated
    * @throws
    * gets a broker object (list of broker ids)
    * @returns {object}
    */
-  asBrokers() {
+  asBrokers(): Record<string, unknown> {
     return {
-      brokers: this.raw.brokers.map(broker => broker.id)
+      brokers: []
     };
   }
 
@@ -132,15 +152,15 @@ class Metadata {
    * @param {Array} partitions - array of partitions
    * @returns {Array}
    */
-  static formatPartitions(partitions) {
-    return partitions.map((p) => {
-      p.partition = p.id;
-      p.replicas = p.replicas.map((r) => ({ broker: r, in_sync: p.isrs.indexOf(r) !== -1, leader: r === p.leader }));
-      delete p.id;
-      delete p.isrs;
-      return p;
-    });
+  static formatPartitions(partitions: PartitionMetadata[]): PartitionRestFormat[] {
+    return partitions.map((p) => ({
+      partition: p.partitionId,
+      leader: p.leader,
+      replicas: p.replicas.map((r) => ({
+        broker: r,
+        in_sync: p.isr.indexOf(r) !== -1,
+        leader: r === p.leader
+      })),
+    }));
   }
 }
-
-module.exports = Metadata;
