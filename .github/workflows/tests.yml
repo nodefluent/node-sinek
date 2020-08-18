@@ -30,5 +30,5 @@ jobs:
     - run: ./kafka-setup/generate-certs.sh
     - name: Start Docker containers for Zookeeper, Kafka and Schema Registry
       run: cd kafka-setup && docker-compose up -d
-    - run: sleep 60
+    - run: sleep 180
     - run: yarn test
