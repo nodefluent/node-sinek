@@ -2,8 +2,8 @@
   "name": "sinek",
   "version": "9.1.0",
   "description": "Node.js kafka client, consumer, producer polite out of the box",
-  "main": "build/dist/index.js",
-  "types": "build/dist/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "engines": {
     "node": ">=8.11.3"
   },
