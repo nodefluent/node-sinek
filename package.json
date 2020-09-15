@@ -16,6 +16,7 @@
     "kafka:console": "./kafka-setup/kafka-console.sh",
     "test": "_mocha --recursive --timeout 32500 --exit -R spec test/int",
     "yarn:openssl": "LDFLAGS='-L/usr/local/opt/openssl/lib' CPPFLAGS='-I/usr/local/opt/openssl/include' yarn",
+    "prepare": "yarn prepublishOnly",
     "prepublishOnly": "tsc -p tsconfig.dist.json"
   },
   "repository": {
