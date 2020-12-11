@@ -4,7 +4,7 @@ import { EventEmitter } from "events";
 import { v4 as uuidv4} from "uuid";
 import { murmur } from "murmurhash";
 import { murmur2Partitioner } from "murmur2-partitioner";
-import { Kafka, SASLMechanism, Admin, Producer, RecordMetadata, CompressionTypes } from "kafkajs";
+import { Kafka, KafkaConfig, SASLMechanism, Admin, Producer, RecordMetadata, CompressionTypes } from "kafkajs";
 import { Metadata, ProducerAnalytics, ProducerHealth, Check, ProducerRunResult, defaultAnalyticsInterval } from "../shared";
 import { MessageReturn, JSKafkaProducerConfig, ProducerStats, AnalyticsConfig, KafkaLogger } from "../interfaces";
 import fs from "fs";
@@ -51,7 +51,7 @@ export class JSProducer extends EventEmitter {
   private _murmurHashVersion: string = DEFAULT_MURMURHASH_VERSION;
   private _murmur;
   private _errors = 0;
-  
+
   defaultPartitionCount = 1;
 
   /**
@@ -75,7 +75,7 @@ export class JSProducer extends EventEmitter {
       config.options = {};
     }
 
-    const { 
+    const {
       "metadata.broker.list": brokerList,
       "client.id": clientId,
       "security.protocol": securityProtocol,
@@ -94,25 +94,28 @@ export class JSProducer extends EventEmitter {
       throw new Error("You are missing a broker or group configs");
     }
 
+    const conf = {
+      brokers,
+      clientId,
+    } as KafkaConfig
     if (securityProtocol) {
-      this.kafkaClient = new Kafka({
-        brokers,
-        clientId,
-        ssl: {
+      if (securityProtocol.includes('sasl')) {
+        conf.sasl = {
+          mechanism: mechanism as SASLMechanism,
+          username: username as string,
+          password: password as string,
+        }
+      }
+      if (securityProtocol.includes('ssl')) {
+        conf.ssl = {
           ca: [fs.readFileSync(sslCALocation as string, "utf-8")],
           cert: fs.readFileSync(sslCertLocation as string, "utf-8"),
           key: fs.readFileSync(sslKeyLocation as string, "utf-8"),
           passphrase: sslKeyPassword,
-        },
-        sasl: {
-          mechanism: mechanism as SASLMechanism,
-          username: username as string,
-          password: password as string,
-        },
-      });
-    } else {
-      this.kafkaClient = new Kafka({ brokers, clientId });
+        }
+      }
     }
+    this.kafkaClient = new Kafka(conf);
 
     this.config = config;
     this._health = new ProducerHealth(this, this.config.health);
@@ -334,7 +337,7 @@ export class JSProducer extends EventEmitter {
     this._totalSentMessages++;
     const timestamp = producedAt.toString();
     const acks = this.config && this.config.tconf && this.config.tconf["request.required.acks"] || 1;
-    const compression = (this.config.noptions) 
+    const compression = (this.config.noptions)
       ? this.config.noptions["compression.codec"]
       : CompressionTypes.None;
 
@@ -344,7 +347,7 @@ export class JSProducer extends EventEmitter {
         acks,
         compression,
         messages: [{
-          key, 
+          key,
           value: convertedMessage,
           partition,
           timestamp
